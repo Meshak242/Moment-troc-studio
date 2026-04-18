@@ -6,7 +6,7 @@
   <title>Moment Troc · Studio</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
   <style>
-    /* ========== STYLES COMPLETS ========== */
+    /* ========== STYLES ========== */
     :root { --black: #080808; --gold: #C9A84C; --gold-dim: #8a6e2f; --gold-glow: rgba(201,168,76,0.15); --white: #F0EBE0; --white-dim: rgba(240,235,224,0.4); --white-faint: rgba(240,235,224,0.08); --border: rgba(201,168,76,0.2); --border-strong: rgba(201,168,76,0.5); }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background: var(--black); color: var(--white); font-family: 'Fraunces', Georgia, serif; min-height: 100vh; overflow-x: hidden; }
@@ -132,7 +132,6 @@
     <div class="step-dot" id="dot3"><div class="num">03</div><div class="label">Arsenal</div></div>
   </div>
 
-  <!-- STEP 1 -->
   <div id="step1">
     <div class="card">
       <div class="card-title">01 — Ton Univers</div>
@@ -144,7 +143,6 @@
     <button class="btn-primary" onclick="analyserProfils()"><span>Analyser les Profils →</span></button>
   </div>
 
-  <!-- STEP 2 -->
   <div id="step2" class="hidden">
     <div class="card">
       <div class="card-title">02 — Profils Dominants</div>
@@ -164,7 +162,6 @@
     </div>
   </div>
 
-  <!-- STEP 3 -->
   <div id="step3" class="hidden">
     <div class="card">
       <div class="card-title">03 — Arsenal de contenu</div>
@@ -186,7 +183,7 @@
   (function(){
     "use strict";
 
-    // ---------- 10 CLÉS VALIDES ----------
+    // ---------- 10 CLÉS INTÉGRÉES ----------
     const VALID_KEYS = new Set([
       "KBM2000-2022A",
       "KvSC2025",
@@ -202,7 +199,6 @@
 
     const STORAGE_KEY = "moment_troc_license";
 
-    // Génération d'un identifiant d'appareil (hash simple mais robuste)
     function generateDeviceId() {
       const nav = window.navigator;
       const screen = window.screen;
@@ -224,9 +220,7 @@
       return 'DEV_' + Math.abs(hash).toString(16).toUpperCase();
     }
 
-    // Fonction de vérification de clé
     window.verifierCle = function() {
-      console.log('verifierCle appelée'); // Pour débogage
       const input = document.getElementById('key-input');
       const errorDiv = document.getElementById('key-error');
       const cleSaisie = input.value.trim().toUpperCase();
@@ -236,7 +230,6 @@
       if (!VALID_KEYS.has(cleSaisie)) {
         errorDiv.style.display = 'block';
         errorDiv.textContent = 'Clé invalide.';
-        console.warn('Clé invalide :', cleSaisie);
         return;
       }
       
@@ -246,12 +239,10 @@
       if (storedLicense) {
         const licenseData = JSON.parse(storedLicense);
         if (licenseData.key === cleSaisie && licenseData.deviceId === currentDeviceId) {
-          console.log('Accès autorisé (licence existante)');
           document.getElementById('key-gate').style.display = 'none';
         } else {
           errorDiv.style.display = 'block';
           errorDiv.textContent = 'Cette clé est déjà utilisée sur un autre appareil.';
-          console.warn('Clé déjà utilisée sur un autre appareil');
         }
       } else {
         const licenseData = {
@@ -260,12 +251,11 @@
           activatedAt: new Date().toISOString()
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(licenseData));
-        console.log('Première activation, licence enregistrée');
         document.getElementById('key-gate').style.display = 'none';
       }
     };
 
-    // ---------- LOGIQUE APPLICATIVE ----------
+    // ---------- APPLICATION ----------
     let currentStep = 1;
     let selectedEtape = null;
     let profilsDetected = [];
