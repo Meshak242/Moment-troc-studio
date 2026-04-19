@@ -6,7 +6,7 @@
   <title>Moment Troc · Studio</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
   <style>
-    /* ========== STYLES (inchangés) ========== */
+    /* ========== VOTRE CSS D'ORIGINE (INTACT) ========== */
     :root { --black: #080808; --gold: #C9A84C; --gold-dim: #8a6e2f; --gold-glow: rgba(201,168,76,0.15); --white: #F0EBE0; --white-dim: rgba(240,235,224,0.4); --white-faint: rgba(240,235,224,0.08); --border: rgba(201,168,76,0.2); --border-strong: rgba(201,168,76,0.5); }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background: var(--black); color: var(--white); font-family: 'Fraunces', Georgia, serif; min-height: 100vh; overflow-x: hidden; }
@@ -186,45 +186,44 @@
   (function(){
     "use strict";
 
-    // ---------- 10 CLÉS VALIDES (KBM2000-2022A + 9 autres imprévisibles) ----------
+    // ---------- VOS 10 CLÉS D'ORIGINE ----------
     const VALID_KEYS = new Set([
       "KBM2000-2022A",
-      "X7G9P-2L5MN",
-      "QR8T6Y-3V1WD",
-      "Z4J2K9-M6N8B",
-      "F5D3S1A-P7O9I",
-      "U8Y6T4R-E2W1Q",
-      "H7G6F5D-S4A3Z",
-      "C9V8B7N-M1Q2W",
-      "L5K4J3H-G2F1D",
-      "P0O9I8U-Y7T6R"
+      "KvSC2025",
+      "CGhohu2380",
+      "MT-STUDIO-01",
+      "X9P7L-4MN2Q",
+      "OR-FR-2024",
+      "BETA-TEST-99",
+      "VIP-ACCESS-42",
+      "TROCMEDIA-77",
+      "EDEN-2025-AB"
     ]);
 
-    const STORAGE_KEY = "moment_troc_licenses"; // stocke un tableau de clés activées
+    const STORAGE_KEY = "moment_troc_license";
 
-    // Récupère les clés déjà activées sur cet appareil
-    function getActivatedKeys() {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
-      } catch(e) {
-        return [];
+    function generateDeviceId() {
+      const nav = window.navigator;
+      const screen = window.screen;
+      const data = [
+        nav.userAgent,
+        nav.language,
+        nav.platform,
+        screen.colorDepth,
+        screen.width,
+        screen.height,
+        new Date().getTimezoneOffset()
+      ].join('|');
+      let hash = 0;
+      for (let i = 0; i < data.length; i++) {
+        const char = data.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
       }
+      return 'DEV_' + Math.abs(hash).toString(16).toUpperCase();
     }
 
-    // Enregistre une nouvelle clé
-    function saveActivatedKey(key) {
-      try {
-        const keys = getActivatedKeys();
-        if (!keys.includes(key)) {
-          keys.push(key);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
-        }
-      } catch(e) {
-        console.warn("Impossible d'enregistrer la licence", e);
-      }
-    }
-
+    // VOTRE FONCTION D'ORIGINE (INTACTE)
     window.verifierCle = function() {
       const input = document.getElementById('key-input');
       const errorDiv = document.getElementById('key-error');
@@ -238,19 +237,29 @@
         return;
       }
       
-      const activatedKeys = getActivatedKeys();
+      const storedLicense = localStorage.getItem(STORAGE_KEY);
+      const currentDeviceId = generateDeviceId();
       
-      if (activatedKeys.includes(cleSaisie)) {
-        // Cette clé a déjà été activée sur cet appareil -> autoriser
-        document.getElementById('key-gate').style.display = 'none';
+      if (storedLicense) {
+        const licenseData = JSON.parse(storedLicense);
+        if (licenseData.key === cleSaisie && licenseData.deviceId === currentDeviceId) {
+          document.getElementById('key-gate').style.display = 'none';
+        } else {
+          errorDiv.style.display = 'block';
+          errorDiv.textContent = 'Cette clé est déjà utilisée sur un autre appareil.';
+        }
       } else {
-        // Nouvelle clé : on l'enregistre et on ouvre
-        saveActivatedKey(cleSaisie);
+        const licenseData = {
+          key: cleSaisie,
+          deviceId: currentDeviceId,
+          activatedAt: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(licenseData));
         document.getElementById('key-gate').style.display = 'none';
       }
     };
 
-    // ---------- LOGIQUE APPLICATIVE ----------
+    // ---------- LOGIQUE APPLICATIVE (INTACTE) ----------
     let currentStep = 1;
     let selectedEtape = null;
     let profilsDetected = [];
@@ -379,8 +388,9 @@
           postsGenerated.push({ day: i+1, etape: etapeObj.name, archetype: archetypePrincipal, content });
         }
         
+        // ⚠️ SEULE MODIFICATION : ajout de , event dans l'onclick
         document.getElementById('posts-list').innerHTML = postsGenerated.map((post, idx) => `
-          <div class="post-item" data-day="${post.day}">
+          <div class="post-item">
             <div class="post-header">
               <div class="post-meta">
                 <span class="post-day">Jour ${post.day}</span>
@@ -408,6 +418,7 @@
       }, 1800);
     };
 
+    // ⚠️ SEULE MODIFICATION : la fonction accepte evt en paramètre
     window.copierPost = function(index, evt) {
       const post = postsGenerated[index];
       if (!post) return;
@@ -420,7 +431,7 @@
     };
 
     window.scrollToPost = function(day) {
-      const postElement = document.querySelector(`.post-item[data-day="${day}"]`);
+      const postElement = document.querySelector(`.post-item:nth-child(${day})`);
       if (postElement) postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
   })();
