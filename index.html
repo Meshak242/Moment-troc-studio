@@ -92,6 +92,7 @@
     .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
     .divider span{font-family:'DM Mono','Courier New',monospace;font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;}
     .hidden{display:none !important;}
+    .error-box{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);border-radius:2px;padding:16px 20px;font-family:'DM Mono','Courier New',monospace;font-size:11px;color:#e74c3c;letter-spacing:1px;line-height:1.6;margin-top:12px;}
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
     @keyframes ld{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1.2)}}
@@ -133,7 +134,7 @@
 
 <header>
   <div class="logo">Moment Troc<span>Studio</span></div>
-  <div style="font-family:'Courier New',monospace;font-size:10px;color:var(--gold-dim);letter-spacing:2px;">Agent IA</div>
+  <div style="font-family:'Courier New',monospace;font-size:10px;color:var(--gold-dim);letter-spacing:2px;">Agent IA · Gemini</div>
 </header>
 
 <main>
@@ -185,6 +186,7 @@
         <div id="profils-tags"></div>
         <div class="profil-reasoning" id="profil-reasoning-text"></div>
       </div>
+      <div id="profils-error" class="hidden"></div>
     </div>
     <div class="card hidden" id="etape-card">
       <div class="card-title">Choisis une Étape</div>
@@ -209,6 +211,7 @@
         <div class="divider"><span>Calendrier</span></div>
         <div id="calendar-view" class="calendar-grid"></div>
       </div>
+      <div id="posts-error" class="hidden"></div>
     </div>
     <div id="step3-actions" class="hidden" style="display:flex;gap:12px;margin-top:8px;">
       <button class="btn-secondary" onclick="goBack(2)">← Retour</button>
@@ -222,404 +225,455 @@
   'use strict';
 
   // ═══════════════════════════════
-  // CONFIG GROQ
+  // CONFIG GEMINI
   // ═══════════════════════════════
-  var GROQ_KEY = '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';
-  var GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  var GROQ_MODEL = 'llama-3.3-70b-versatile';
+  var GEMINI_KEY = 'AIzaSyDx4DF52u9PBEFkpzAdaCfbWAZeRlbbDaA';
+  var GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
 
   // ═══════════════════════════════
   // CLÉS D'ACCÈS
   // ═══════════════════════════════
-  var MASTER = 'KBM2000-2022A';
-  var KEYS = new Set([
-    'KBM2000-2022A',
-    'MTS-Q0K5-OZJI-3RO0','MTS-8LZS-09H1-QZ5F','MTS-HOCM-OE01-OMHP',
-    'MTS-LH5I-BIA5-4L82','MTS-PE4V-I9NH-R4FN','MTS-M79Q-GZ5L-HYD4',
-    'MTS-AFZM-C2IQ-JSP8','MTS-HCKE-XJDH-HNSI','MTS-MZ2U-7T7Z-WECE',
-    'MTS-36WD-SIV0-FED7','MTS-U9WV-UTLE-BCWW','MTS-WHHG-GL0W-43HV',
-    'MTS-QPZ5-FO1M-YEY1','MTS-1P9H-QR3P-AM97','MTS-J0I8-34C5-G5L6',
-    'MTS-RNQP-RLBE-NWGZ','MTS-BPA6-7IL5-EUDD','MTS-VZPF-IAEN-UQ23',
-    'MTS-7T16-JMWO-1LSI','MTS-2MPQ-L8YG-XBNX','MTS-JSXK-T71S-QKIS',
-    'MTS-0886-RNBX-Z16D','MTS-WG18-1J31-YS72','MTS-GZ3C-EVEN-93D1',
-    'MTS-IK63-7NDE-OWM3','MTS-IVNU-G2J5-TZ0G','MTS-3YIA-WDPP-RJMM',
-    'MTS-RYQT-B6GX-RNR7','MTS-C09J-GQWF-EB10','MTS-ZCR7-SY4Y-XXWR',
-    'MTS-UYYT-ZL9J-BW2J','MTS-MBAL-LGKQ-BF2W','MTS-OOYE-AMOI-MVL0',
-    'MTS-V3OW-PEE9-7O9R','MTS-0748-4X38-61N5','MTS-4C6R-V427-6X0N',
-    'MTS-X6A4-6Z6F-FAAC','MTS-M9IS-2F3B-73MS','MTS-UDJA-3STQ-12YF',
-    'MTS-5JA6-IPFM-VEC0','MTS-I16F-Q5HQ-OWCX','MTS-11S3-6WZI-0FA8',
-    'MTS-0JY4-YOYN-QUEJ','MTS-JFEX-CRUE-FQVO','MTS-ZUOP-6LU4-S49W',
-    'MTS-8OS0-NL9Y-6JHX','MTS-U882-M6DX-5MAW','MTS-08XP-SDRU-KSMD',
-    'MTS-GTWB-YY4X-FDO6','MTS-1L20-XM8P-1QS1'
-  ]);
+  var MASTER = 'MKB2000-2022A';
+  var KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
 
-  function getActivated(){try{return JSON.parse(localStorage.getItem('mts_keys')||'[]');}catch(e){return[];}}
-  function saveKey(k){try{var a=getActivated();if(!a.includes(k)){a.push(k);localStorage.setItem('mts_keys',JSON.stringify(a));}}catch(e){}}
-
-  window.verifierCle = function(){
-    var input=document.getElementById('key-input');
-    var err=document.getElementById('key-error');
-    var k=input.value.trim().toUpperCase();
-    err.style.display='none';
-    if(!KEYS.has(k)){
-      err.textContent='Clé invalide.';err.style.display='block';
-      input.style.borderColor='#c0392b';
-      setTimeout(function(){input.style.borderColor='rgba(201,168,76,0.2)';},2000);
-      return;
-    }
-    if(k===MASTER){ouvrirApp();return;}
-    var activated=getActivated();
-    if(activated.includes(k)){ouvrirApp();return;}
-    saveKey(k);ouvrirApp();
+  // ═══════════════════════════════
+  // ÉTAT
+  // ═══════════════════════════════
+  var state = {
+    profils: [],
+    etapeSelectee: null,
+    business: '',
+    contenu: '',
+    mots: '',
+    douleur: ''
   };
 
-  function ouvrirApp(){
-    var g=document.getElementById('key-gate');
-    g.style.opacity='0';g.style.transition='opacity 0.4s';
-    setTimeout(function(){g.style.display='none';},400);
-  }
-
   // ═══════════════════════════════
-  // STATE
+  // FRAMEWORK MOMENT TROC
   // ═══════════════════════════════
-  var selectedEtape=null;
-  var profilsDetected=[];
-  var postsGenerated=[];
-  var postsPrecedents='';
+  var ARCHETYPES = {
+    'Automatiseur': {
+      trigger: 'gain de temps, efficacité, processus',
+      peur: 'perdre du temps sur des tâches inutiles',
+      hook: 'Ce que tu fais en 3h, ça peut se faire en 20 minutes.',
+      masque: 'Je cherche la meilleure solution du marché',
+      fissure: 'Il perd du temps et il le sait'
+    },
+    'Optimiseur Valeur': {
+      trigger: 'qualité, résultat concret, retour sur investissement',
+      peur: 'payer pour quelque chose qui ne tient pas ses promesses',
+      hook: 'Tu ne paies pas le prix. Tu paies le résultat.',
+      masque: 'Je veux le meilleur rapport qualité/prix',
+      fissure: 'Il doute que ça vaille vraiment ce que ça coûte'
+    },
+    'Optimiseur Prix': {
+      trigger: 'économie, offre spéciale, meilleur deal',
+      peur: 'être arnaqué ou payer trop cher',
+      hook: 'Même résultat. La moitié du prix. Voilà pourquoi.',
+      masque: 'Je cherche quelque chose d\'abordable',
+      fissure: 'Il a peur de se faire avoir'
+    },
+    'Élévateur': {
+      trigger: 'statut, transformation, être reconnu',
+      peur: 'rester là où il est, ne pas évoluer',
+      hook: 'Dans 90 jours, les gens autour de toi vont remarquer quelque chose.',
+      masque: 'Je veux progresser et m\'améliorer',
+      fissure: 'Il veut être vu différemment'
+    },
+    'Libérateur': {
+      trigger: 'liberté, indépendance, sortir d\'une contrainte',
+      peur: 'rester prisonnier d\'une situation',
+      hook: 'Et si la vraie solution c\'était de tout arrêter et de recommencer autrement ?',
+      masque: 'Je cherche plus de liberté',
+      fissure: 'Il étouffe et cherche une sortie'
+    },
+    'Protecteur': {
+      trigger: 'sécurité, protection, éviter le risque',
+      peur: 'perdre ce qu\'il a construit',
+      hook: 'Ce n\'est pas ce que tu gagnes qui compte. C\'est ce que tu ne perds pas.',
+      masque: 'Je veux être sûr que c\'est fiable',
+      fissure: 'La peur de perdre est plus forte que l\'envie de gagner'
+    }
+  };
 
-  var ETAPES=[
-    {id:'attention',    name:'Attention',    desc:'Signal. On entre dans la ligue.'},
-    {id:'reconnaissance',name:'Reconnaissance',desc:'Le prospect se voit dedans.'},
-    {id:'rupture',      name:'Rupture',      desc:'Une croyance se brise.'},
-    {id:'conviction',   name:'Conviction',   desc:'Le puzzle devient clair.'},
-    {id:'resonance',    name:'Résonance',    desc:'Il se voit déjà sur le terrain.'},
-    {id:'integration',  name:'Intégration',  desc:"Il s'engage."}
+  var ETAPES = [
+    {id:'masque', num:'01', name:'MASQUE', desc:'Ce que le prospect montre — la surface de sa demande'},
+    {id:'declencheur', num:'02', name:'DÉCLENCHEUR', desc:'Ce qui active réellement la décision d\'achat'},
+    {id:'fissure', num:'03', name:'FISSURE', desc:'La tension cachée — ce qu\'il n\'ose pas dire'},
+    {id:'reconstruction', num:'04', name:'RECONSTRUCTION', desc:'Comment il se raconte l\'histoire après l\'achat'}
   ];
 
-  var PROFILS=[
-    {nom:"L'Automatiseur",    kw:['automatique','système','simple','étapes','marche','résultat','méthode','outil','processus','digital','vendre','formation','commencer'],organe:'Cortex préfrontal',douleur:'répète les mêmes tâches sans résultat',desir:'un chemin clair qui tourne seul',langue:'simple, étape par étape, ça marche, concret'},
-    {nom:"L'Optimiseur Valeur",kw:['résultat','roi','efficace','rentable','valeur','retour','investissement','optimiser','performance','croître','gagner'],organe:'Striatum',douleur:'travaille beaucoup pour peu de retour',desir:'un multiplicateur de résultats',langue:'ROI, résultat concret, retour sur investissement'},
-    {nom:"L'Optimiseur Prix", kw:['prix','coût','budget','économiser','rapport','qualité','abordable','investir','cher','payer'],organe:'Insula',douleur:'peur de payer plus que ça vaut',desir:'certitude du juste prix',langue:'juste prix, honnête, transparent'},
-    {nom:"L'Élévateur",       kw:['image','niveau','statut','reconnu','professionnel','premium','visible','positionner','expert','marque','ligue'],organe:'Noyau accumbens',douleur:'compétent mais pas reconnu',desir:'être perçu dans une autre catégorie',langue:'niveau, ligue, positionné, image'},
-    {nom:"Le Libérateur",     kw:['liberté','indépendant','sur-mesure','personnalisé','unique','différent','autonome','adapté','ma situation'],organe:'Cortex cingulaire',douleur:'solutions génériques qui ne correspondent pas',desir:'quelque chose fait exactement pour lui',langue:'précis, adapté, fait pour toi, singulier'},
-    {nom:"Le Protecteur",     kw:['sécurité','garantie','risque','peur','confiance','fiable','sûr','protéger','stable','certitude','déçu','méfiance'],organe:'Amygdale',douleur:'a peur d\'être déçu encore',desir:'certitude que ça ne va pas mal se passer',langue:'garanti, sans risque, sûr, transparent'}
+  var HOOKS_STRUCTURES = [
+    'Affirmation paradoxale + preuve inversée',
+    'Question qui désarme + révélation',
+    'Chiffre concret + tension narrative',
+    'Observation de terrain + conclusion inattendue',
+    'Erreur commune + correction surprenante',
+    'Histoire courte + pivot philosophique',
+    'Contradiction assumée + explication',
+    'Comparaison décalée + leçon de vente'
   ];
 
   // ═══════════════════════════════
-  // NAVIGATION
+  // APPEL GEMINI
   // ═══════════════════════════════
-  function setStep(s){
-    ['step1','step2','step3'].forEach(function(id,i){document.getElementById(id).classList.toggle('hidden',i+1!==s);});
-    ['dot1','dot2','dot3'].forEach(function(d){var el=document.getElementById(d);el.classList.remove('active','done');});
-    ['line1','line2'].forEach(function(l){document.getElementById(l).classList.remove('done');});
-    if(s===1){document.getElementById('dot1').classList.add('active');}
-    else if(s===2){document.getElementById('dot1').classList.add('done');document.getElementById('dot2').classList.add('active');document.getElementById('line1').classList.add('done');}
-    else if(s===3){document.getElementById('dot1').classList.add('done');document.getElementById('dot2').classList.add('done');document.getElementById('dot3').classList.add('active');document.getElementById('line1').classList.add('done');document.getElementById('line2').classList.add('done');}
-  }
-  window.goBack=function(s){setStep(s);};
-
-  // ═══════════════════════════════
-  // APPEL GROQ
-  // ═══════════════════════════════
-  async function callGroq(systemPrompt, userPrompt, maxTokens){
-    var res = await fetch(GROQ_URL, {
+  async function callGemini(prompt) {
+    var response = await fetch(GEMINI_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + GROQ_KEY
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: GROQ_MODEL,
-        max_tokens: maxTokens || 1200,
-        temperature: 0.85,
-        messages: [
-          {role: 'system', content: systemPrompt},
-          {role: 'user', content: userPrompt}
-        ]
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.85,
+          maxOutputTokens: 2048
+        }
       })
     });
-    var data = await res.json();
-    if(data.error) throw new Error(data.error.message);
-    return data.choices[0].message.content;
+
+    if (!response.ok) {
+      var err = await response.json().catch(function(){ return {}; });
+      throw new Error(err.error && err.error.message ? err.error.message : 'Erreur API Gemini (' + response.status + ')');
+    }
+
+    var data = await response.json();
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+      throw new Error('Réponse vide de Gemini');
+    }
+    return data.candidates[0].content.parts[0].text;
   }
 
   // ═══════════════════════════════
-  // ANALYSE PROFILS
+  // VÉRIFICATION CLÉ
   // ═══════════════════════════════
-  window.analyserProfils = function(){
-    var business=document.getElementById('input-business').value.trim();
-    if(!business){
-      document.getElementById('input-business').style.borderColor='#c0392b';
-      setTimeout(function(){document.getElementById('input-business').style.borderColor='rgba(201,168,76,0.2)';},2000);
+  window.verifierCle = function() {
+    var val = document.getElementById('key-input').value.trim().toUpperCase();
+    var errEl = document.getElementById('key-error');
+    if (val === MASTER || KEYS.indexOf(val) !== -1) {
+      localStorage.setItem('mt_studio_key', val);
+      document.getElementById('key-gate').style.display = 'none';
+      errEl.style.display = 'none';
+    } else {
+      errEl.textContent = 'Clé invalide. Contacte Meshak.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  // ═══════════════════════════════
+  // NAVIGATION STEPS
+  // ═══════════════════════════════
+  function showStep(n) {
+    ['step1','step2','step3'].forEach(function(id, i) {
+      document.getElementById(id).classList.toggle('hidden', i + 1 !== n);
+    });
+    ['dot1','dot2','dot3'].forEach(function(id, i) {
+      var el = document.getElementById(id);
+      el.classList.remove('active','done');
+      if (i + 1 === n) el.classList.add('active');
+      else if (i + 1 < n) el.classList.add('done');
+    });
+    ['line1','line2'].forEach(function(id, i) {
+      document.getElementById(id).classList.toggle('done', i + 1 < n);
+    });
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  window.goBack = function(n) { showStep(n); };
+
+  // ═══════════════════════════════
+  // ÉTAPES GRID
+  // ═══════════════════════════════
+  function renderEtapes() {
+    var grid = document.getElementById('etapes-grid');
+    grid.innerHTML = '';
+    ETAPES.forEach(function(e) {
+      var btn = document.createElement('button');
+      btn.className = 'etape-btn';
+      btn.innerHTML = '<div class="etape-num">' + e.num + '</div><div class="etape-name">' + e.name + '</div><div class="etape-desc">' + e.desc + '</div>';
+      btn.onclick = function() {
+        document.querySelectorAll('.etape-btn').forEach(function(b){ b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        state.etapeSelectee = e.id;
+        document.getElementById('btn-generer').disabled = false;
+      };
+      grid.appendChild(btn);
+    });
+  }
+
+  // ═══════════════════════════════
+  // ANALYSER PROFILS
+  // ═══════════════════════════════
+  window.analyserProfils = async function() {
+    state.business = document.getElementById('input-business').value.trim();
+    state.contenu = document.getElementById('input-contenu').value.trim();
+    state.mots = document.getElementById('input-mots').value.trim();
+    state.douleur = document.getElementById('input-douleur').value.trim();
+
+    if (!state.business) {
+      document.getElementById('input-business').focus();
       return;
     }
-    setStep(2);
+
+    showStep(2);
     document.getElementById('loading-profils').classList.remove('hidden');
     document.getElementById('profils-result').classList.add('hidden');
+    document.getElementById('profils-error').classList.add('hidden');
     document.getElementById('etape-card').classList.add('hidden');
     document.getElementById('step2-actions').classList.add('hidden');
-    selectedEtape=null;
 
-    // Calcul local des profils — précis et instantané
-    setTimeout(function(){
-      var text=(business+' '+(document.getElementById('input-mots').value||'')+' '+(document.getElementById('input-douleur').value||'')+' '+(document.getElementById('input-contenu').value||'')).toLowerCase();
-      var scores=PROFILS.map(function(p){
-        var score=0;
-        p.kw.forEach(function(kw){if(text.includes(kw))score+=3;});
-        score+=Math.floor(Math.random()*2);
-        return{p:p,score:score};
-      });
-      scores.sort(function(a,b){return b.score-a.score;});
-      profilsDetected=scores.slice(0,2).map(function(s){return s.p;});
+    var archetypesList = Object.keys(ARCHETYPES).map(function(k) {
+      return '- ' + k + ': trigger=' + ARCHETYPES[k].trigger + ' / peur=' + ARCHETYPES[k].peur;
+    }).join('\n');
 
-      document.getElementById('profils-tags').innerHTML=profilsDetected.map(function(p){
-        return '<span class="profil-tag">'+p.nom+'</span>';
-      }).join('');
-      document.getElementById('profil-reasoning-text').innerHTML=
-        '<strong>'+profilsDetected[0].nom+'</strong> — son organe dominant : '+profilsDetected[0].organe+'. Il '+profilsDetected[0].douleur+'. '+
-        '<strong>'+profilsDetected[1].nom+'</strong> — son organe dominant : '+profilsDetected[1].organe+'. Il '+profilsDetected[1].douleur+'.';
+    var prompt = 'Tu es un expert du framework Moment Troc, basé sur la psychologie comportementale de Duhigg et la hiérarchie de Maslow.\n\n' +
+      'Les 6 archétypes Moment Troc sont:\n' + archetypesList + '\n\n' +
+      'Business analysé: ' + state.business + '\n' +
+      (state.douleur ? 'Douleur centrale: ' + state.douleur + '\n' : '') +
+      (state.mots ? 'Univers lexical: ' + state.mots + '\n' : '') +
+      '\nIdentifie les 2-3 archétypes dominants de la cible de ce business. ' +
+      'Réponds avec:\n1. Les archétypes (séparés par des virgules)\n2. Une analyse courte (3-4 phrases) expliquant pourquoi ces profils dominent, en utilisant le langage Moment Troc (masque, déclencheur, fissure).\n\n' +
+      'Format de réponse:\nARCHETYPES: [liste]\nANALYSE: [texte]';
 
-      var grid=document.getElementById('etapes-grid');
-      grid.innerHTML=ETAPES.map(function(e,i){
-        return '<div class="etape-btn" data-id="'+e.id+'" onclick="selectEtape(\''+e.id+'\')">'+'<div class="etape-num">0'+(i+1)+'</div>'+'<div class="etape-name">'+e.name+'</div>'+'<div class="etape-desc">'+e.desc+'</div>'+'</div>';
-      }).join('');
+    try {
+      var result = await callGemini(prompt);
+      var archMatch = result.match(/ARCHETYPES:\s*(.+)/i);
+      var analyseMatch = result.match(/ANALYSE:\s*([\s\S]+)/i);
+
+      state.profils = archMatch ? archMatch[1].split(',').map(function(s){ return s.trim(); }) : ['Optimiseur Valeur'];
+      var analyse = analyseMatch ? analyseMatch[1].trim() : result;
 
       document.getElementById('loading-profils').classList.add('hidden');
       document.getElementById('profils-result').classList.remove('hidden');
+
+      var tagsEl = document.getElementById('profils-tags');
+      tagsEl.innerHTML = '';
+      state.profils.forEach(function(p) {
+        var tag = document.createElement('span');
+        tag.className = 'profil-tag';
+        tag.textContent = p;
+        tagsEl.appendChild(tag);
+      });
+      document.getElementById('profil-reasoning-text').textContent = analyse;
+
+      renderEtapes();
       document.getElementById('etape-card').classList.remove('hidden');
       document.getElementById('step2-actions').classList.remove('hidden');
-      document.getElementById('btn-generer').disabled=true;
-    },800);
-  };
 
-  window.selectEtape=function(id){
-    selectedEtape=id;
-    document.querySelectorAll('.etape-btn').forEach(function(b){b.classList.toggle('selected',b.dataset.id===id);});
-    document.getElementById('btn-generer').disabled=false;
-  };
-
-  // ═══════════════════════════════
-  // GÉNÉRATION + AUTOCRITIQUE
-  // ═══════════════════════════════
-  async function genererPost(business, mots, douleur, contenu, etapeObj, profil, postIndex){
-
-    var SYSTEM = `Tu es un copywriter d'élite francophone africain. Tu écris des posts Facebook qui descendent dans le subconscient.
-
-TON STYLE OBLIGATOIRE :
-- Ton autoritaire et imposant. Tu prends par la main sans demander la permission.
-- Tu nommes le problème EXACTEMENT. Sans ménagement. Comme un médecin qui montre la radio.
-- Chaque mot pèse. Chaque phrase laisse une marque physique dans le corps du lecteur.
-- Tu utilises Tu / Je / On ensemble — les trois créent intimité et autorité simultanément.
-- Tu ne ménages pas. Le problème EST le problème. Pas "c'est pas ta faute."
-- Tu diagnostiques avec des preuves concrètes et des images précises — pas des affirmations vagues.
-- Tu ne répètes JAMAIS une image ou une métaphore déjà utilisée dans les posts précédents.
-- Chaque post doit être plus intense que le précédent — la tension monte toujours.
-
-PROFIL CIBLE : ${profil.nom}
-- Organe neurologique dominant : ${profil.organe}
-- Sa douleur exacte : ${profil.douleur}
-- Son désir profond : ${profil.desir}
-- Sa langue : ${profil.langue}
-- Tu parles SA langue sans jamais le nommer.
-
-ÉTAPE : ${etapeObj.name} — ${etapeObj.desc}
-
-STRUCTURE DU POST (striatum) :
-1. ACCROCHE — quelque chose que le cerveau n'a jamais vu venir. Jamais les clichés habituels.
-2. DIAGNOSTIC — montre exactement ce qui ne va pas, avec une image concrète précise.
-3. MICRO-VÉRITÉ — une pièce de puzzle vraie et concrète. Utile seule. Mais il manque la moitié.
-4. BOUCLE OUVERTE — fin Netflix. Le cerveau ne peut pas s'arrêter. Il doit savoir la suite.
-
-RÈGLES :
-- Séparateur ✧ entre les sections
-- Phrases courtes. Une idée. Un point.
-- Jamais de liens explicites avec les posts précédents — le lien se sent, il ne se voit pas.
-- Post ${postIndex+1} sur 4 — tension supérieure aux précédents obligatoire.
-
-POSTS PRÉCÉDENTS À NE PAS RÉPÉTER :
-${postsPrecedents || 'Aucun — premier post de la série.'}`;
-
-    var USER = `Business : ${business}
-${mots ? 'Mots univers : '+mots : ''}
-${douleur ? 'Douleur centrale : '+douleur : ''}
-${contenu ? 'Idée brute : '+contenu : ''}
-
-Génère UN post Facebook complet. Commence directement sans titre ni numéro.`;
-
-    // Premier passage — génération
-    var postV1 = await callGroq(SYSTEM, USER, 900);
-
-    // Deuxième passage — autocritique et amélioration
-    var CRITIQUE_SYSTEM = `Tu es un jury d'élite en copywriting francophone africain. Tu évalues et améliores des posts Facebook.
-
-CRITÈRES D'ÉVALUATION (sur 100) :
-- Accroche (25pts) : Le cerveau dit "attends — quoi ?" dans les 3 premières secondes ?
-- Diagnostic (25pts) : Le problème est nommé avec des preuves concrètes comme un médecin ?
-- Profil (25pts) : Chaque mot parle la langue exacte du profil ${profil.nom} ?
-- Boucle (25pts) : La fin crée une faim irrésistible pour la suite ?
-
-RÉPONDS EXACTEMENT DANS CE FORMAT :
-SCORE: [X]/100
-POST AMÉLIORÉ:
-[le post réécrit complet, nettement plus fort]`;
-
-    var CRITIQUE_USER = `Post à évaluer :
-
-${postV1}
-
-Contexte : étape ${etapeObj.name}, profil ${profil.nom}`;
-
-    var critiqueResult = await callGroq(CRITIQUE_SYSTEM, CRITIQUE_USER, 1000);
-
-    // Extraire score et post amélioré
-    var score = 80;
-    var scoreMatch = critiqueResult.match(/SCORE:\s*(\d+)/i);
-    if(scoreMatch) score = parseInt(scoreMatch[1]);
-
-    var postFinal = postV1;
-    var postMatch = critiqueResult.match(/POST AMÉLIORÉ:\s*([\s\S]+)/i);
-    if(postMatch && postMatch[1].trim().length > 100){
-      postFinal = postMatch[1].trim();
+    } catch(e) {
+      document.getElementById('loading-profils').classList.add('hidden');
+      var errBox = document.getElementById('profils-error');
+      errBox.className = 'error-box';
+      errBox.textContent = '⚠ Erreur: ' + e.message;
+      errBox.classList.remove('hidden');
     }
-
-    return {content: postFinal, score: score};
-  }
+  };
 
   // ═══════════════════════════════
-  // GÉNÉRER LA SÉRIE
+  // GÉNÉRER SÉRIE
   // ═══════════════════════════════
-  window.genererSerie = async function(){
-    if(!selectedEtape) return;
-    setStep(3);
+  window.genererSerie = async function() {
+    if (!state.etapeSelectee) return;
 
-    var loadingPosts = document.getElementById('loading-posts');
-    var postsResult = document.getElementById('posts-result');
-    var step3Actions = document.getElementById('step3-actions');
-    var loadingText = document.getElementById('loading-text');
-    var loadingStatus = document.getElementById('loading-status');
+    showStep(3);
+    document.getElementById('loading-posts').classList.remove('hidden');
+    document.getElementById('posts-result').classList.add('hidden');
+    document.getElementById('posts-error').classList.add('hidden');
+    document.getElementById('step3-actions').classList.add('hidden');
 
-    loadingPosts.classList.remove('hidden');
-    postsResult.classList.add('hidden');
-    step3Actions.classList.add('hidden');
-    document.getElementById('posts-list').innerHTML='';
-    postsGenerated=[];
-    postsPrecedents='';
+    var etapeInfo = ETAPES.find(function(e){ return e.id === state.etapeSelectee; });
+    var profilsStr = state.profils.join(' + ');
 
-    var business=document.getElementById('input-business').value.trim();
-    var mots=document.getElementById('input-mots').value.trim();
-    var douleur=document.getElementById('input-douleur').value.trim();
-    var contenu=document.getElementById('input-contenu').value.trim();
-    var etapeObj=ETAPES.find(function(e){return e.id===selectedEtape;});
-    var postDays=[1,3,5,7];
+    var statuses = [
+      'Analyse des profils cibles...',
+      'Calibration Moment Troc...',
+      'Construction des hooks...',
+      'Rédaction de la série...',
+      'Optimisation pour Facebook...'
+    ];
+    var si = 0;
+    var statusInterval = setInterval(function() {
+      if (si < statuses.length) {
+        document.getElementById('loading-status').textContent = statuses[si++];
+      }
+    }, 1200);
 
-    try{
-      for(var i=0;i<4;i++){
-        var profil=i%2===0?profilsDetected[0]:profilsDetected[1];
-        loadingText.textContent='Épisode '+(i+1)+' sur 4 — génération...';
-        loadingStatus.textContent='Rédaction → Autocritique → Amélioration';
+    var hooksStr = HOOKS_STRUCTURES.map(function(h, i){ return (i+1) + '. ' + h; }).join('\n');
 
-        var result = await genererPost(business,mots,douleur,contenu,etapeObj,profil,i);
+    var profilDetails = state.profils.map(function(p) {
+      var a = ARCHETYPES[p];
+      if (!a) return p;
+      return p + ' (hook: "' + a.hook + '" / fissure: ' + a.fissure + ')';
+    }).join('\n');
 
-        postsGenerated.push({day:postDays[i],etape:etapeObj.name,archetype:profil.nom,content:result.content,score:result.score});
-        postsPrecedents+='\n\n--- ÉPISODE '+(i+1)+' ---\n'+result.content.substring(0,400);
+    var prompt = 'Tu es le Studio Moment Troc — un agent de contenu expert en psychologie d\'achat et copywriting francophone africain.\n\n' +
+      'FRAMEWORK MOMENT TROC:\n' +
+      '- Philosophie: "Vendre c\'est pas convaincre. C\'est reconnaître."\n' +
+      '- Les 4 niveaux: Masque (surface) → Déclencheur (trigger réel) → Fissure (tension cachée) → Reconstruction (récit post-achat)\n\n' +
+      'BUSINESS: ' + state.business + '\n' +
+      'PROFILS DOMINANTS:\n' + profilDetails + '\n' +
+      'ÉTAPE CHOISIE: ' + etapeInfo.name + ' — ' + etapeInfo.desc + '\n' +
+      (state.contenu ? 'IDÉE BRUTE: ' + state.contenu + '\n' : '') +
+      (state.mots ? 'UNIVERS LEXICAL: ' + state.mots + '\n' : '') +
+      (state.douleur ? 'DOULEUR CENTRALE: ' + state.douleur + '\n' : '') +
+      '\nSTRUCTURES DE HOOKS DISPONIBLES:\n' + hooksStr + '\n\n' +
+      'MISSION: Génère une série de 5 posts Facebook calibrés pour cette étape et ces profils.\n\n' +
+      'RÈGLES STRICTES:\n' +
+      '- Phrases ultra-courtes (style Divin Setondji)\n' +
+      '- Jamais de "gratuit" ou de fausse preuve sociale\n' +
+      '- Registre "tu" toujours\n' +
+      '- Chaque post commence par un hook dévastateur\n' +
+      '- Jamais de structure marketing visible\n' +
+      '- Terminer par une question ou une tension ouverte\n' +
+      '- Signe chaque post: "Meshak, Peace."\n\n' +
+      'FORMAT DE RÉPONSE pour chaque post:\n' +
+      'POST [numéro]\n' +
+      'ARCHETYPE: [archétype ciblé]\n' +
+      'HOOK: [structure utilisée]\n' +
+      '---\n' +
+      '[contenu du post]\n' +
+      '===\n';
 
-        renderPost(postsGenerated[postsGenerated.length-1],i);
-        postsResult.classList.remove('hidden');
-        loadingText.textContent='Épisode '+(i+2)+' sur 4 — génération...';
+    try {
+      var result = await callGemini(prompt);
+      clearInterval(statusInterval);
+      document.getElementById('loading-posts').classList.add('hidden');
+
+      var posts = parsePostsFromResult(result, etapeInfo);
+
+      if (posts.length === 0) {
+        throw new Error('Aucun post généré. Réessaie.');
       }
 
-      loadingPosts.classList.add('hidden');
-      renderCalendar(postDays);
-      step3Actions.classList.remove('hidden');
+      renderPosts(posts);
+      renderCalendar(posts);
 
-    }catch(err){
-      loadingPosts.innerHTML='<div style="color:var(--gold);font-family:\'Courier New\',monospace;font-size:12px;padding:20px 0;">Erreur : '+err.message+'<br><br>Vérifie ta connexion et réessaie.</div>';
+      document.getElementById('posts-result').classList.remove('hidden');
+      document.getElementById('step3-actions').classList.remove('hidden');
+
+    } catch(e) {
+      clearInterval(statusInterval);
+      document.getElementById('loading-posts').classList.add('hidden');
+      var errBox = document.getElementById('posts-error');
+      errBox.className = 'error-box';
+      errBox.textContent = '⚠ Erreur: ' + e.message;
+      errBox.classList.remove('hidden');
+      document.getElementById('step3-actions').classList.remove('hidden');
     }
   };
 
-  function renderPost(post,idx){
-    var list=document.getElementById('posts-list');
-    var div=document.createElement('div');
-    div.className='post-item';
-    div.setAttribute('data-day',post.day);
-    div.style.animationDelay=(idx*0.15)+'s';
-    div.innerHTML=
-      '<div class="post-header">'+
-        '<div class="post-meta">'+
-          '<span class="post-day">Jour '+post.day+'</span>'+
-          '<span class="post-etape-tag">'+post.etape+'</span>'+
-          '<span class="post-archetype">'+post.archetype+'</span>'+
-        '</div>'+
-        '<span class="post-score">'+post.score+'/100</span>'+
-      '</div>'+
-      '<div class="post-body">'+post.content+'</div>'+
-      '<div class="post-footer">'+
-        '<button class="copy-btn" onclick="copierPost('+idx+',event)">Copier</button>'+
-      '</div>';
-    list.appendChild(div);
+  // ═══════════════════════════════
+  // PARSE POSTS
+  // ═══════════════════════════════
+  function parsePostsFromResult(raw, etapeInfo) {
+    var posts = [];
+    var blocks = raw.split(/POST\s*\d+/i).filter(function(b){ return b.trim(); });
+
+    blocks.forEach(function(block, i) {
+      var archetypeMatch = block.match(/ARCHETYPE:\s*(.+)/i);
+      var hookMatch = block.match(/HOOK:\s*(.+)/i);
+      var contentMatch = block.match(/---\s*([\s\S]+?)(?:===|$)/);
+
+      posts.push({
+        day: 'J' + ((i * 6) + 1),
+        etape: etapeInfo.name,
+        archetype: archetypeMatch ? archetypeMatch[1].trim() : state.profils[0],
+        hook: hookMatch ? hookMatch[1].trim() : '',
+        content: contentMatch ? contentMatch[1].trim() : block.replace(/ARCHETYPE:.*\n|HOOK:.*\n|---/g,'').trim()
+      });
+    });
+
+    return posts;
   }
 
-  function renderCalendar(days){
-    var cal=document.getElementById('calendar-view');
-    var html='';
-    for(var d=1;d<=14;d++){
-      var idx=days.indexOf(d);
-      var has=idx!==-1;
-      html+='<div class="cal-day'+(has?' has-post':'')+'"'+(has?' onclick="scrollToPost('+d+')"':'')+'>'+d+(has?'<span class="cal-post-num">EP'+(idx+1)+'</span>':'')+'</div>';
+  // ═══════════════════════════════
+  // RENDER POSTS
+  // ═══════════════════════════════
+  function renderPosts(posts) {
+    var list = document.getElementById('posts-list');
+    list.innerHTML = '';
+    posts.forEach(function(post, i) {
+      var item = document.createElement('div');
+      item.className = 'post-item';
+      item.style.animationDelay = (i * 0.1) + 's';
+      item.innerHTML =
+        '<div class="post-header">' +
+          '<div class="post-meta">' +
+            '<span class="post-day">' + post.day + '</span>' +
+            '<span class="post-etape-tag">' + post.etape + '</span>' +
+            '<span class="post-archetype">' + post.archetype + '</span>' +
+          '</div>' +
+          (post.hook ? '<span class="post-score">' + post.hook.substring(0,20) + '…</span>' : '') +
+        '</div>' +
+        '<div class="post-body">' + escapeHtml(post.content) + '</div>' +
+        '<div class="post-footer">' +
+          '<button class="copy-btn" onclick="copyPost(this, ' + i + ')">Copier</button>' +
+        '</div>';
+      list.appendChild(item);
+    });
+    window._posts = posts;
+  }
+
+  window.copyPost = function(btn, i) {
+    var post = window._posts[i];
+    navigator.clipboard.writeText(post.content).then(function() {
+      btn.textContent = '✓ Copié';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+    });
+  };
+
+  // ═══════════════════════════════
+  // RENDER CALENDRIER
+  // ═══════════════════════════════
+  function renderCalendar(posts) {
+    var cal = document.getElementById('calendar-view');
+    cal.innerHTML = '';
+    var postDays = posts.map(function(p){ return parseInt(p.day.replace('J','')); });
+
+    for (var d = 1; d <= 28; d++) {
+      var cell = document.createElement('div');
+      cell.className = 'cal-day';
+      var idx = postDays.indexOf(d);
+      if (idx !== -1) {
+        cell.classList.add('has-post');
+        cell.innerHTML = '<span>' + d + '</span><span class="cal-post-num">P' + (idx+1) + '</span>';
+      } else {
+        cell.innerHTML = '<span>' + d + '</span>';
+      }
+      cal.appendChild(cell);
     }
-    cal.innerHTML=html;
   }
 
-  window.copierPost=function(idx,evt){
-    var post=postsGenerated[idx];
-    if(!post)return;
-    var btn=evt.target;
-    function done(){btn.textContent='Copié ✓';btn.classList.add('copied');setTimeout(function(){btn.textContent='Copier';btn.classList.remove('copied');},2000);}
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(post.content).then(done).catch(function(){fallback(post.content,btn);});
-    }else{fallback(post.content,btn);}
+  // ═══════════════════════════════
+  // NOUVELLE ÉTAPE
+  // ═══════════════════════════════
+  window.nouvelleEtape = function() {
+    state.etapeSelectee = null;
+    document.querySelectorAll('.etape-btn').forEach(function(b){ b.classList.remove('selected'); });
+    document.getElementById('btn-generer').disabled = true;
+    showStep(2);
   };
 
-  function fallback(text,btn){
-    var ta=document.createElement('textarea');
-    ta.value=text;ta.style.cssText='position:fixed;opacity:0;';
-    document.body.appendChild(ta);ta.select();
-    try{document.execCommand('copy');btn.textContent='Copié ✓';btn.classList.add('copied');setTimeout(function(){btn.textContent='Copier';btn.classList.remove('copied');},2000);}
-    catch(e){btn.textContent='Erreur';}
-    document.body.removeChild(ta);
+  // ═══════════════════════════════
+  // UTILS
+  // ═══════════════════════════════
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
-
-  window.scrollToPost=function(day){
-    var el=document.querySelector('.post-item[data-day="'+day+'"]');
-    if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
-  };
-
-  window.nouvelleEtape=function(){
-    setStep(2);selectedEtape=null;
-    document.querySelectorAll('.etape-btn').forEach(function(b){b.classList.remove('selected');});
-    document.getElementById('btn-generer').disabled=true;
-    document.getElementById('posts-list').innerHTML='';
-    document.getElementById('posts-result').classList.add('hidden');
-    postsPrecedents='';
-  };
 
   // ═══════════════════════════════
   // INIT
   // ═══════════════════════════════
-  window.addEventListener('load',function(){
-    setTimeout(function(){
-      var l=document.getElementById('app-loader');
-      if(l){l.style.opacity='0';l.style.transition='opacity 0.4s';setTimeout(function(){l.style.display='none';},400);}
-    },600);
+  window.addEventListener('DOMContentLoaded', function() {
+    var savedKey = localStorage.getItem('mt_studio_key');
+    var loader = document.getElementById('app-loader');
+    var gate = document.getElementById('key-gate');
 
-    var activated=getActivated();
-    var hasValid=activated.some(function(k){return KEYS.has(k);});
-    var gate=document.getElementById('key-gate');
-    if(hasValid){gate.style.display='none';}
-    else{
-      gate.style.display='flex';
-      setTimeout(function(){var ki=document.getElementById('key-input');if(ki)ki.focus();},700);
-    }
+    setTimeout(function() {
+      loader.style.display = 'none';
+      if (!savedKey || (savedKey !== MASTER && KEYS.indexOf(savedKey) === -1)) {
+        gate.style.display = 'flex';
+      }
+    }, 1800);
   });
 
 })();
