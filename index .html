@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moment Troc · Studio</title>
+  <meta property="og:title" content="Moment Troc Studio">
+  <meta property="og:description" content="Ton agent de contenu. Calibré sur ta cible.">
+  <meta property="og:image" content="https://meshak242.github.io/Moment-troc-studio/Lucid_Origin_a_cinematic_photo_of_Dark_luxury_product_banner_d_1.jpg">
+  <meta property="og:url" content="https://meshak242.github.io/Moment-troc-studio/">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&family=DM+Mono:wght@300&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&family=DM+Mono:wght@300&display=swap"></noscript>
+  <style>
+    :root{--black:#080808;--gold:#C9A84C;--gold-dim:#8a6e2f;--gold-glow:rgba(201,168,76,0.15);--white:#F0EBE0;--white-dim:rgba(240,235,224,0.4);--border:rgba(201,168,76,0.2);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--black);color:var(--white);font-family:'Fraunces',Georgia,'Times New Roman',serif;min-height:100vh;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4;}
+    header{padding:40px 32px 0;display:flex;align-items:center;justify-content:space-between;}
+    .logo{font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:28px;letter-spacing:4px;color:var(--gold);}
+    .logo span{color:var(--white-dim);font-size:12px;font-family:'DM Mono','Courier New',monospace;letter-spacing:2px;display:block;margin-top:-4px;}
+    main{max-width:760px;margin:0 auto;padding:60px 24px 120px;}
+    .hero{text-align:center;margin-bottom:64px;animation:fadeUp 0.8s ease both;}
+    .hero h1{font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:clamp(52px,12vw,88px);letter-spacing:6px;line-height:0.9;background:linear-gradient(135deg,var(--gold) 0%,#f0d080 50%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero p{margin-top:20px;font-size:15px;font-weight:300;font-style:italic;color:var(--white-dim);}
+    .steps{display:flex;align-items:center;justify-content:center;margin-bottom:52px;animation:fadeUp 0.8s 0.1s ease both;}
+    .step-dot{display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .step-dot .num{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono','Courier New',monospace;font-size:12px;color:var(--white-dim);transition:all 0.4s;}
+    .step-dot .lbl{font-family:'DM Mono','Courier New',monospace;font-size:9px;letter-spacing:2px;color:var(--white-dim);text-transform:uppercase;transition:all 0.4s;}
+    .step-dot.active .num{border-color:var(--gold);color:var(--gold);background:var(--gold-glow);box-shadow:0 0 20px var(--gold-glow);}
+    .step-dot.active .lbl{color:var(--gold);}
+    .step-dot.done .num{border-color:var(--gold-dim);background:rgba(201,168,76,0.1);color:var(--gold-dim);}
+    .step-line{width:60px;height:1px;background:var(--border);margin:0 8px 28px;transition:background 0.4s;}
+    .step-line.done{background:var(--gold-dim);}
+    .card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:40px 36px;margin-bottom:24px;animation:fadeUp 0.6s ease both;position:relative;overflow:hidden;}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.4;}
+    .card-title{font-family:'DM Mono','Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+    .field{margin-bottom:28px;}
+    .field label{display:block;font-family:'DM Mono','Courier New',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--white-dim);margin-bottom:10px;}
+    .optional{color:var(--gold-dim);font-size:9px;margin-left:8px;}
+    textarea,input[type="text"]{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:2px;color:var(--white);font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:300;padding:14px 16px;resize:vertical;outline:none;transition:border-color 0.3s,box-shadow 0.3s;line-height:1.7;}
+    textarea:focus,input[type="text"]:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow);}
+    textarea::placeholder,input::placeholder{color:rgba(240,235,224,0.2);font-style:italic;}
+    .etapes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+    .etape-btn{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:14px 16px;cursor:pointer;transition:all 0.3s;text-align:left;position:relative;overflow:hidden;}
+    .etape-btn:hover{border-color:var(--gold-dim);background:rgba(201,168,76,0.05);}
+    .etape-btn.selected{border-color:var(--gold);background:var(--gold-glow);}
+    .etape-btn.selected::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--gold);opacity:0.6;}
+    .etape-num{font-family:'DM Mono','Courier New',monospace;font-size:9px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:4px;}
+    .etape-name{font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);transition:color 0.3s;}
+    .etape-btn.selected .etape-name{color:var(--gold);}
+    .etape-desc{font-size:11px;font-style:italic;font-weight:300;color:var(--white-dim);margin-top:4px;line-height:1.4;}
+    .profil-tag{display:inline-block;border:1px solid var(--gold);padding:8px 16px;font-family:'DM Mono','Courier New',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:var(--gold-glow);border-radius:2px;margin:4px;}
+    .profil-reasoning{margin-top:20px;padding:16px;border-left:2px solid var(--gold-dim);background:rgba(201,168,76,0.04);font-size:13px;font-weight:300;font-style:italic;color:var(--white-dim);line-height:1.7;}
+    .btn-primary{width:100%;padding:18px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:18px;letter-spacing:4px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:2px;}
+    .btn-primary::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-100%);transition:transform 0.3s;}
+    .btn-primary:hover::before{transform:translateX(0);}
+    .btn-primary:hover{color:var(--black);}
+    .btn-primary span{position:relative;z-index:1;}
+    .btn-primary:disabled{opacity:0.3;cursor:not-allowed;}
+    .btn-primary:disabled::before{display:none;}
+    .btn-primary:disabled:hover{color:var(--gold);}
+    .btn-secondary{background:transparent;border:1px solid var(--border);color:var(--white-dim);font-family:'DM Mono','Courier New',monospace;font-size:11px;letter-spacing:2px;padding:12px 20px;cursor:pointer;transition:all 0.3s;border-radius:2px;text-transform:uppercase;}
+    .btn-secondary:hover{border-color:var(--white-dim);color:var(--white);}
+    .loading{display:flex;flex-direction:column;gap:8px;padding:20px 0;}
+    .loading-row{display:flex;align-items:center;gap:12px;color:var(--white-dim);font-family:'DM Mono','Courier New',monospace;font-size:11px;letter-spacing:2px;}
+    .loading-dots{display:flex;gap:4px;}
+    .loading-dots span{width:4px;height:4px;border-radius:50%;background:var(--gold);animation:pulse 1.2s infinite;}
+    .loading-dots span:nth-child(2){animation-delay:0.2s;}
+    .loading-dots span:nth-child(3){animation-delay:0.4s;}
+    .loading-status{font-family:'DM Mono','Courier New',monospace;font-size:10px;color:var(--gold-dim);letter-spacing:1px;padding-left:4px;}
+    .post-item{border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:20px;animation:fadeUp 0.5s ease both;}
+    .post-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(201,168,76,0.04);border-bottom:1px solid var(--border);}
+    .post-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .post-day{font-family:'DM Mono','Courier New',monospace;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;}
+    .post-etape-tag{font-family:'DM Mono','Courier New',monospace;font-size:9px;color:var(--white-dim);border:1px solid var(--border);padding:2px 8px;border-radius:2px;text-transform:uppercase;}
+    .post-archetype{font-family:'DM Mono','Courier New',monospace;font-size:9px;color:var(--gold-dim);text-transform:uppercase;}
+    .post-score{font-family:'DM Mono','Courier New',monospace;font-size:9px;color:var(--gold);border:1px solid rgba(201,168,76,0.3);padding:2px 8px;border-radius:2px;}
+    .post-body{padding:24px 20px;white-space:pre-wrap;font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:300;line-height:1.9;color:var(--white);}
+    .post-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;}
+    .copy-btn{background:transparent;border:none;color:var(--white-dim);font-family:'DM Mono','Courier New',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:color 0.3s;padding:4px 0;}
+    .copy-btn:hover{color:var(--gold);}
+    .copy-btn.copied{color:var(--gold);}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:20px;}
+    .cal-day{aspect-ratio:1;border:1px solid var(--border);border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Mono','Courier New',monospace;font-size:10px;color:var(--white-dim);}
+    .cal-day.has-post{border-color:var(--gold);background:var(--gold-glow);color:var(--gold);cursor:pointer;}
+    .cal-day.has-post:hover{background:rgba(201,168,76,0.2);}
+    .cal-post-num{font-size:8px;color:var(--gold-dim);margin-top:2px;}
+    .divider{display:flex;align-items:center;gap:16px;margin:32px 0;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+    .divider span{font-family:'DM Mono','Courier New',monospace;font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;}
+    .hidden{display:none !important;}
+    .error-box{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);border-radius:2px;padding:16px 20px;font-family:'DM Mono','Courier New',monospace;font-size:11px;color:#e74c3c;letter-spacing:1px;line-height:1.6;margin-top:12px;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+    @keyframes ld{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1.2)}}
+    ::-webkit-scrollbar{width:4px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px;}
+    @media(max-width:600px){main{padding:40px 16px 80px;}.card{padding:28px 20px;}.etapes-grid{grid-template-columns:1fr;}.calendar-grid{grid-template-columns:repeat(5,1fr);}.step-line{width:30px;}}
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="app-loader" style="position:fixed;inset:0;background:#080808;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;">
+  <div style="font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:36px;letter-spacing:4px;color:#C9A84C;margin-bottom:24px;">MOMENT TROC</div>
+  <div style="display:flex;gap:6px;">
+    <div style="width:7px;height:7px;border-radius:50%;background:#C9A84C;animation:ld 1.2s infinite 0s;"></div>
+    <div style="width:7px;height:7px;border-radius:50%;background:#C9A84C;animation:ld 1.2s infinite 0.2s;"></div>
+    <div style="width:7px;height:7px;border-radius:50%;background:#C9A84C;animation:ld 1.2s infinite 0.4s;"></div>
+  </div>
+  <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:rgba(201,168,76,0.4);margin-top:16px;">STUDIO</div>
+</div>
+
+<!-- KEY GATE -->
+<div id="key-gate" style="position:fixed;inset:0;background:#080808;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:24px;">
+  <div style="max-width:400px;width:100%;border:1px solid rgba(201,168,76,0.3);padding:40px 32px;position:relative;background:rgba(255,255,255,0.01);">
+    <div style="position:absolute;top:10px;left:10px;width:14px;height:14px;border-top:1px solid rgba(201,168,76,0.5);border-left:1px solid rgba(201,168,76,0.5);"></div>
+    <div style="position:absolute;top:10px;right:10px;width:14px;height:14px;border-top:1px solid rgba(201,168,76,0.5);border-right:1px solid rgba(201,168,76,0.5);"></div>
+    <div style="position:absolute;bottom:10px;left:10px;width:14px;height:14px;border-bottom:1px solid rgba(201,168,76,0.5);border-left:1px solid rgba(201,168,76,0.5);"></div>
+    <div style="position:absolute;bottom:10px;right:10px;width:14px;height:14px;border-bottom:1px solid rgba(201,168,76,0.5);border-right:1px solid rgba(201,168,76,0.5);"></div>
+    <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:rgba(201,168,76,0.6);text-transform:uppercase;margin-bottom:8px;">Moment Troc</div>
+    <div style="font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:42px;letter-spacing:3px;background:linear-gradient(135deg,#C9A84C,#f0d080,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:32px;line-height:1;">Studio</div>
+    <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:rgba(240,235,224,0.4);text-transform:uppercase;margin-bottom:10px;">Clé d'accès</div>
+    <input type="text" id="key-input" placeholder="XXXX-XXXXXX" autocomplete="off" style="width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:2px;color:#F0EBE0;font-family:'Courier New',monospace;font-size:16px;letter-spacing:4px;padding:14px 16px;outline:none;text-transform:uppercase;margin-bottom:12px;transition:border-color 0.3s;" onkeydown="if(event.key==='Enter')verifierCle()" oninput="this.value=this.value.toUpperCase()">
+    <div id="key-error" style="font-family:'Courier New',monospace;font-size:11px;color:#c0392b;letter-spacing:1px;margin-bottom:12px;min-height:16px;display:none;"></div>
+    <button onclick="verifierCle()" style="width:100%;padding:16px;background:transparent;border:1px solid #C9A84C;color:#C9A84C;font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:18px;letter-spacing:4px;cursor:pointer;transition:all 0.3s;border-radius:2px;" onmouseover="this.style.background='#C9A84C';this.style.color='#080808'" onmouseout="this.style.background='transparent';this.style.color='#C9A84C'">Activer</button>
+    <div style="margin-top:20px;font-family:'Fraunces',Georgia,serif;font-size:12px;font-style:italic;color:rgba(240,235,224,0.2);text-align:center;line-height:1.5;">Accès réservé aux membres.<br>Clé unique par appareil.</div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">Moment Troc<span>Studio</span></div>
+  <div style="font-family:'Courier New',monospace;font-size:10px;color:var(--gold-dim);letter-spacing:2px;">Agent IA · Gemini</div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Studio</h1>
+    <p>Décris ton univers. L'agent pense. La série monte.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step-dot active" id="dot1"><div class="num">01</div><div class="lbl">Univers</div></div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-dot" id="dot2"><div class="num">02</div><div class="lbl">Profils</div></div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-dot" id="dot3"><div class="num">03</div><div class="lbl">Série</div></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <div class="card">
+      <div class="card-title">01 — Ton Univers</div>
+      <div class="field">
+        <label>Ton business ou produit <span class="optional">requis</span></label>
+        <textarea id="input-business" rows="4" placeholder="Décris ce que tu fais, pour qui, et ce que ça change dans la vie de tes clients..."></textarea>
+      </div>
+      <div class="field">
+        <label>Idée de contenu brut <span class="optional">optionnel</span></label>
+        <textarea id="input-contenu" rows="3" placeholder="Une idée brute — l'agent va la transformer et l'élever..."></textarea>
+      </div>
+      <div class="field">
+        <label>Tes mots à toi <span class="optional">optionnel</span></label>
+        <input type="text" id="input-mots" placeholder="Ex: signal, terrain, racine — les mots de ton univers...">
+      </div>
+      <div class="field">
+        <label>La douleur centrale <span class="optional">optionnel</span></label>
+        <textarea id="input-douleur" rows="2" placeholder="La vraie tension que porte ta cible — pas la surface, le fond..."></textarea>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="analyserProfils()"><span>Analyser les Profils →</span></button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" class="hidden">
+    <div class="card">
+      <div class="card-title">02 — Profils Dominants</div>
+      <div id="loading-profils" class="loading">
+        <div class="loading-row"><div class="loading-dots"><span></span><span></span><span></span></div><span>Analyse en cours...</span></div>
+      </div>
+      <div id="profils-result" class="hidden">
+        <div id="profils-tags"></div>
+        <div class="profil-reasoning" id="profil-reasoning-text"></div>
+      </div>
+      <div id="profils-error" class="hidden"></div>
+    </div>
+    <div class="card hidden" id="etape-card">
+      <div class="card-title">Choisis une Étape</div>
+      <div class="etapes-grid" id="etapes-grid"></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px;" id="step2-actions" class="hidden">
+      <button class="btn-secondary" onclick="goBack(1)">← Modifier</button>
+      <button class="btn-primary" id="btn-generer" onclick="genererSerie()" disabled><span>Générer la Série →</span></button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="step3" class="hidden">
+    <div class="card">
+      <div class="card-title">03 — Arsenal de Contenu</div>
+      <div id="loading-posts" class="loading">
+        <div class="loading-row"><div class="loading-dots"><span></span><span></span><span></span></div><span id="loading-text">Génération en cours...</span></div>
+        <div class="loading-status" id="loading-status"></div>
+      </div>
+      <div id="posts-result" class="hidden">
+        <div id="posts-list"></div>
+        <div class="divider"><span>Calendrier</span></div>
+        <div id="calendar-view" class="calendar-grid"></div>
+      </div>
+      <div id="posts-error" class="hidden"></div>
+    </div>
+    <div id="step3-actions" class="hidden" style="display:flex;gap:12px;margin-top:8px;">
+      <button class="btn-secondary" onclick="goBack(2)">← Retour</button>
+      <button class="btn-primary" onclick="nouvelleEtape()"><span>Changer d'étape →</span></button>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  // ═══════════════════════════════
+  // CONFIG GEMINI
+  // ═══════════════════════════════
+  var GEMINI_KEY = 'AIzaSyDtAqGtHQ5Nz7jP7M2K0R8kPeJAHLBz2-w';
+  var GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + GEMINI_KEY;
+
+  // ═══════════════════════════════
+  // CLÉS D'ACCÈS
+  // ═══════════════════════════════
+  var MASTER = 'MKB2000-2022A';
+  var KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
+
+  // ═══════════════════════════════
+  // ÉTAT
+  // ═══════════════════════════════
+  var state = {
+    profils: [],
+    etapeSelectee: null,
+    business: '',
+    contenu: '',
+    mots: '',
+    douleur: ''
+  };
+
+  // ═══════════════════════════════
+  // FRAMEWORK MOMENT TROC
+  // ═══════════════════════════════
+  var ARCHETYPES = {
+    'Automatiseur': {
+      trigger: 'gain de temps, efficacité, processus',
+      peur: 'perdre du temps sur des tâches inutiles',
+      hook: 'Ce que tu fais en 3h, ça peut se faire en 20 minutes.',
+      masque: 'Je cherche la meilleure solution du marché',
+      fissure: 'Il perd du temps et il le sait'
+    },
+    'Optimiseur Valeur': {
+      trigger: 'qualité, résultat concret, retour sur investissement',
+      peur: 'payer pour quelque chose qui ne tient pas ses promesses',
+      hook: 'Tu ne paies pas le prix. Tu paies le résultat.',
+      masque: 'Je veux le meilleur rapport qualité/prix',
+      fissure: 'Il doute que ça vaille vraiment ce que ça coûte'
+    },
+    'Optimiseur Prix': {
+      trigger: 'économie, offre spéciale, meilleur deal',
+      peur: 'être arnaqué ou payer trop cher',
+      hook: 'Même résultat. La moitié du prix. Voilà pourquoi.',
+      masque: 'Je cherche quelque chose d\'abordable',
+      fissure: 'Il a peur de se faire avoir'
+    },
+    'Élévateur': {
+      trigger: 'statut, transformation, être reconnu',
+      peur: 'rester là où il est, ne pas évoluer',
+      hook: 'Dans 90 jours, les gens autour de toi vont remarquer quelque chose.',
+      masque: 'Je veux progresser et m\'améliorer',
+      fissure: 'Il veut être vu différemment'
+    },
+    'Libérateur': {
+      trigger: 'liberté, indépendance, sortir d\'une contrainte',
+      peur: 'rester prisonnier d\'une situation',
+      hook: 'Et si la vraie solution c\'était de tout arrêter et de recommencer autrement ?',
+      masque: 'Je cherche plus de liberté',
+      fissure: 'Il étouffe et cherche une sortie'
+    },
+    'Protecteur': {
+      trigger: 'sécurité, protection, éviter le risque',
+      peur: 'perdre ce qu\'il a construit',
+      hook: 'Ce n\'est pas ce que tu gagnes qui compte. C\'est ce que tu ne perds pas.',
+      masque: 'Je veux être sûr que c\'est fiable',
+      fissure: 'La peur de perdre est plus forte que l\'envie de gagner'
+    }
+  };
+
+  var ETAPES = [
+    {id:'masque', num:'01', name:'MASQUE', desc:'Ce que le prospect montre — la surface de sa demande'},
+    {id:'declencheur', num:'02', name:'DÉCLENCHEUR', desc:'Ce qui active réellement la décision d\'achat'},
+    {id:'fissure', num:'03', name:'FISSURE', desc:'La tension cachée — ce qu\'il n\'ose pas dire'},
+    {id:'reconstruction', num:'04', name:'RECONSTRUCTION', desc:'Comment il se raconte l\'histoire après l\'achat'}
+  ];
+
+  var HOOKS_STRUCTURES = [
+    'Affirmation paradoxale + preuve inversée',
+    'Question qui désarme + révélation',
+    'Chiffre concret + tension narrative',
+    'Observation de terrain + conclusion inattendue',
+    'Erreur commune + correction surprenante',
+    'Histoire courte + pivot philosophique',
+    'Contradiction assumée + explication',
+    'Comparaison décalée + leçon de vente'
+  ];
+
+  // ═══════════════════════════════
+  // APPEL GEMINI
+  // ═══════════════════════════════
+  async function callGemini(prompt) {
+    var response = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.85,
+          maxOutputTokens: 2048
+        }
+      })
+    });
+
+    if (!response.ok) {
+      var err = await response.json().catch(function(){ return {}; });
+      throw new Error(err.error && err.error.message ? err.error.message : 'Erreur API Gemini (' + response.status + ')');
+    }
+
+    var data = await response.json();
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+      throw new Error('Réponse vide de Gemini');
+    }
+    return data.candidates[0].content.parts[0].text;
+  }
+
+  // ═══════════════════════════════
+  // VÉRIFICATION CLÉ
+  // ═══════════════════════════════
+  window.verifierCle = function() {
+    var val = document.getElementById('key-input').value.trim().toUpperCase();
+    var errEl = document.getElementById('key-error');
+    if (val === MASTER || KEYS.indexOf(val) !== -1) {
+      localStorage.setItem('mt_studio_key', val);
+      document.getElementById('key-gate').style.display = 'none';
+      errEl.style.display = 'none';
+    } else {
+      errEl.textContent = 'Clé invalide. Contacte Meshak.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  // ═══════════════════════════════
+  // NAVIGATION STEPS
+  // ═══════════════════════════════
+  function showStep(n) {
+    ['step1','step2','step3'].forEach(function(id, i) {
+      document.getElementById(id).classList.toggle('hidden', i + 1 !== n);
+    });
+    ['dot1','dot2','dot3'].forEach(function(id, i) {
+      var el = document.getElementById(id);
+      el.classList.remove('active','done');
+      if (i + 1 === n) el.classList.add('active');
+      else if (i + 1 < n) el.classList.add('done');
+    });
+    ['line1','line2'].forEach(function(id, i) {
+      document.getElementById(id).classList.toggle('done', i + 1 < n);
+    });
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  window.goBack = function(n) { showStep(n); };
+
+  // ═══════════════════════════════
+  // ÉTAPES GRID
+  // ═══════════════════════════════
+  function renderEtapes() {
+    var grid = document.getElementById('etapes-grid');
+    grid.innerHTML = '';
+    ETAPES.forEach(function(e) {
+      var btn = document.createElement('button');
+      btn.className = 'etape-btn';
+      btn.innerHTML = '<div class="etape-num">' + e.num + '</div><div class="etape-name">' + e.name + '</div><div class="etape-desc">' + e.desc + '</div>';
+      btn.onclick = function() {
+        document.querySelectorAll('.etape-btn').forEach(function(b){ b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        state.etapeSelectee = e.id;
+        document.getElementById('btn-generer').disabled = false;
+      };
+      grid.appendChild(btn);
+    });
+  }
+
+  // ═══════════════════════════════
+  // ANALYSER PROFILS
+  // ═══════════════════════════════
+  window.analyserProfils = async function() {
+    state.business = document.getElementById('input-business').value.trim();
+    state.contenu = document.getElementById('input-contenu').value.trim();
+    state.mots = document.getElementById('input-mots').value.trim();
+    state.douleur = document.getElementById('input-douleur').value.trim();
+
+    if (!state.business) {
+      document.getElementById('input-business').focus();
+      return;
+    }
+
+    showStep(2);
+    document.getElementById('loading-profils').classList.remove('hidden');
+    document.getElementById('profils-result').classList.add('hidden');
+    document.getElementById('profils-error').classList.add('hidden');
+    document.getElementById('etape-card').classList.add('hidden');
+    document.getElementById('step2-actions').classList.add('hidden');
+
+    var archetypesList = Object.keys(ARCHETYPES).map(function(k) {
+      return '- ' + k + ': trigger=' + ARCHETYPES[k].trigger + ' / peur=' + ARCHETYPES[k].peur;
+    }).join('\n');
+
+    var prompt = 'Tu es un expert du framework Moment Troc, basé sur la psychologie comportementale de Duhigg et la hiérarchie de Maslow.\n\n' +
+      'Les 6 archétypes Moment Troc sont:\n' + archetypesList + '\n\n' +
+      'Business analysé: ' + state.business + '\n' +
+      (state.douleur ? 'Douleur centrale: ' + state.douleur + '\n' : '') +
+      (state.mots ? 'Univers lexical: ' + state.mots + '\n' : '') +
+      '\nIdentifie les 2-3 archétypes dominants de la cible de ce business. ' +
+      'Réponds avec:\n1. Les archétypes (séparés par des virgules)\n2. Une analyse courte (3-4 phrases) expliquant pourquoi ces profils dominent, en utilisant le langage Moment Troc (masque, déclencheur, fissure).\n\n' +
+      'Format de réponse:\nARCHETYPES: [liste]\nANALYSE: [texte]';
+
+    try {
+      var result = await callGemini(prompt);
+      var archMatch = result.match(/ARCHETYPES:\s*(.+)/i);
+      var analyseMatch = result.match(/ANALYSE:\s*([\s\S]+)/i);
+
+      state.profils = archMatch ? archMatch[1].split(',').map(function(s){ return s.trim(); }) : ['Optimiseur Valeur'];
+      var analyse = analyseMatch ? analyseMatch[1].trim() : result;
+
+      document.getElementById('loading-profils').classList.add('hidden');
+      document.getElementById('profils-result').classList.remove('hidden');
+
+      var tagsEl = document.getElementById('profils-tags');
+      tagsEl.innerHTML = '';
+      state.profils.forEach(function(p) {
+        var tag = document.createElement('span');
+        tag.className = 'profil-tag';
+        tag.textContent = p;
+        tagsEl.appendChild(tag);
+      });
+      document.getElementById('profil-reasoning-text').textContent = analyse;
+
+      renderEtapes();
+      document.getElementById('etape-card').classList.remove('hidden');
+      document.getElementById('step2-actions').classList.remove('hidden');
+
+    } catch(e) {
+      document.getElementById('loading-profils').classList.add('hidden');
+      var errBox = document.getElementById('profils-error');
+      errBox.className = 'error-box';
+      errBox.textContent = '⚠ Erreur: ' + e.message;
+      errBox.classList.remove('hidden');
+    }
+  };
+
+  // ═══════════════════════════════
+  // GÉNÉRER SÉRIE
+  // ═══════════════════════════════
+  window.genererSerie = async function() {
+    if (!state.etapeSelectee) return;
+
+    showStep(3);
+    document.getElementById('loading-posts').classList.remove('hidden');
+    document.getElementById('posts-result').classList.add('hidden');
+    document.getElementById('posts-error').classList.add('hidden');
+    document.getElementById('step3-actions').classList.add('hidden');
+
+    var etapeInfo = ETAPES.find(function(e){ return e.id === state.etapeSelectee; });
+    var profilsStr = state.profils.join(' + ');
+
+    var statuses = [
+      'Analyse des profils cibles...',
+      'Calibration Moment Troc...',
+      'Construction des hooks...',
+      'Rédaction de la série...',
+      'Optimisation pour Facebook...'
+    ];
+    var si = 0;
+    var statusInterval = setInterval(function() {
+      if (si < statuses.length) {
+        document.getElementById('loading-status').textContent = statuses[si++];
+      }
+    }, 1200);
+
+    var hooksStr = HOOKS_STRUCTURES.map(function(h, i){ return (i+1) + '. ' + h; }).join('\n');
+
+    var profilDetails = state.profils.map(function(p) {
+      var a = ARCHETYPES[p];
+      if (!a) return p;
+      return p + ' (hook: "' + a.hook + '" / fissure: ' + a.fissure + ')';
+    }).join('\n');
+
+    var prompt = 'Tu es le Studio Moment Troc — un agent de contenu expert en psychologie d\'achat et copywriting francophone africain.\n\n' +
+      'FRAMEWORK MOMENT TROC:\n' +
+      '- Philosophie: "Vendre c\'est pas convaincre. C\'est reconnaître."\n' +
+      '- Les 4 niveaux: Masque (surface) → Déclencheur (trigger réel) → Fissure (tension cachée) → Reconstruction (récit post-achat)\n\n' +
+      'BUSINESS: ' + state.business + '\n' +
+      'PROFILS DOMINANTS:\n' + profilDetails + '\n' +
+      'ÉTAPE CHOISIE: ' + etapeInfo.name + ' — ' + etapeInfo.desc + '\n' +
+      (state.contenu ? 'IDÉE BRUTE: ' + state.contenu + '\n' : '') +
+      (state.mots ? 'UNIVERS LEXICAL: ' + state.mots + '\n' : '') +
+      (state.douleur ? 'DOULEUR CENTRALE: ' + state.douleur + '\n' : '') +
+      '\nSTRUCTURES DE HOOKS DISPONIBLES:\n' + hooksStr + '\n\n' +
+      'MISSION: Génère une série de 5 posts Facebook calibrés pour cette étape et ces profils.\n\n' +
+      'RÈGLES STRICTES:\n' +
+      '- Phrases ultra-courtes (style Divin Setondji)\n' +
+      '- Jamais de "gratuit" ou de fausse preuve sociale\n' +
+      '- Registre "tu" toujours\n' +
+      '- Chaque post commence par un hook dévastateur\n' +
+      '- Jamais de structure marketing visible\n' +
+      '- Terminer par une question ou une tension ouverte\n' +
+      '- Signe chaque post: "Meshak, Peace."\n\n' +
+      'FORMAT DE RÉPONSE pour chaque post:\n' +
+      'POST [numéro]\n' +
+      'ARCHETYPE: [archétype ciblé]\n' +
+      'HOOK: [structure utilisée]\n' +
+      '---\n' +
+      '[contenu du post]\n' +
+      '===\n';
+
+    try {
+      var result = await callGemini(prompt);
+      clearInterval(statusInterval);
+      document.getElementById('loading-posts').classList.add('hidden');
+
+      var posts = parsePostsFromResult(result, etapeInfo);
+
+      if (posts.length === 0) {
+        throw new Error('Aucun post généré. Réessaie.');
+      }
+
+      renderPosts(posts);
+      renderCalendar(posts);
+
+      document.getElementById('posts-result').classList.remove('hidden');
+      document.getElementById('step3-actions').classList.remove('hidden');
+
+    } catch(e) {
+      clearInterval(statusInterval);
+      document.getElementById('loading-posts').classList.add('hidden');
+      var errBox = document.getElementById('posts-error');
+      errBox.className = 'error-box';
+      errBox.textContent = '⚠ Erreur: ' + e.message;
+      errBox.classList.remove('hidden');
+      document.getElementById('step3-actions').classList.remove('hidden');
+    }
+  };
+
+  // ═══════════════════════════════
+  // PARSE POSTS
+  // ═══════════════════════════════
+  function parsePostsFromResult(raw, etapeInfo) {
+    var posts = [];
+    var blocks = raw.split(/POST\s*\d+/i).filter(function(b){ return b.trim(); });
+
+    blocks.forEach(function(block, i) {
+      var archetypeMatch = block.match(/ARCHETYPE:\s*(.+)/i);
+      var hookMatch = block.match(/HOOK:\s*(.+)/i);
+      var contentMatch = block.match(/---\s*([\s\S]+?)(?:===|$)/);
+
+      posts.push({
+        day: 'J' + ((i * 6) + 1),
+        etape: etapeInfo.name,
+        archetype: archetypeMatch ? archetypeMatch[1].trim() : state.profils[0],
+        hook: hookMatch ? hookMatch[1].trim() : '',
+        content: contentMatch ? contentMatch[1].trim() : block.replace(/ARCHETYPE:.*\n|HOOK:.*\n|---/g,'').trim()
+      });
+    });
+
+    return posts;
+  }
+
+  // ═══════════════════════════════
+  // RENDER POSTS
+  // ═══════════════════════════════
+  function renderPosts(posts) {
+    var list = document.getElementById('posts-list');
+    list.innerHTML = '';
+    posts.forEach(function(post, i) {
+      var item = document.createElement('div');
+      item.className = 'post-item';
+      item.style.animationDelay = (i * 0.1) + 's';
+      item.innerHTML =
+        '<div class="post-header">' +
+          '<div class="post-meta">' +
+            '<span class="post-day">' + post.day + '</span>' +
+            '<span class="post-etape-tag">' + post.etape + '</span>' +
+            '<span class="post-archetype">' + post.archetype + '</span>' +
+          '</div>' +
+          (post.hook ? '<span class="post-score">' + post.hook.substring(0,20) + '…</span>' : '') +
+        '</div>' +
+        '<div class="post-body">' + escapeHtml(post.content) + '</div>' +
+        '<div class="post-footer">' +
+          '<button class="copy-btn" onclick="copyPost(this, ' + i + ')">Copier</button>' +
+        '</div>';
+      list.appendChild(item);
+    });
+    window._posts = posts;
+  }
+
+  window.copyPost = function(btn, i) {
+    var post = window._posts[i];
+    navigator.clipboard.writeText(post.content).then(function() {
+      btn.textContent = '✓ Copié';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+    });
+  };
+
+  // ═══════════════════════════════
+  // RENDER CALENDRIER
+  // ═══════════════════════════════
+  function renderCalendar(posts) {
+    var cal = document.getElementById('calendar-view');
+    cal.innerHTML = '';
+    var postDays = posts.map(function(p){ return parseInt(p.day.replace('J','')); });
+
+    for (var d = 1; d <= 28; d++) {
+      var cell = document.createElement('div');
+      cell.className = 'cal-day';
+      var idx = postDays.indexOf(d);
+      if (idx !== -1) {
+        cell.classList.add('has-post');
+        cell.innerHTML = '<span>' + d + '</span><span class="cal-post-num">P' + (idx+1) + '</span>';
+      } else {
+        cell.innerHTML = '<span>' + d + '</span>';
+      }
+      cal.appendChild(cell);
+    }
+  }
+
+  // ═══════════════════════════════
+  // NOUVELLE ÉTAPE
+  // ═══════════════════════════════
+  window.nouvelleEtape = function() {
+    state.etapeSelectee = null;
+    document.querySelectorAll('.etape-btn').forEach(function(b){ b.classList.remove('selected'); });
+    document.getElementById('btn-generer').disabled = true;
+    showStep(2);
+  };
+
+  // ═══════════════════════════════
+  // UTILS
+  // ═══════════════════════════════
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ═══════════════════════════════
+  // INIT
+  // ═══════════════════════════════
+  window.addEventListener('DOMContentLoaded', function() {
+    var savedKey = localStorage.getItem('mt_studio_key');
+    var loader = document.getElementById('app-loader');
+    var gate = document.getElementById('key-gate');
+
+    setTimeout(function() {
+      loader.style.display = 'none';
+      if (!savedKey || (savedKey !== MASTER && KEYS.indexOf(savedKey) === -1)) {
+        gate.style.display = 'flex';
+      }
+    }, 1800);
+  });
+
+})();
+</script>
+</body>
+</html>
