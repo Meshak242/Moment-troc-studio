@@ -10,16 +10,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Archivo+Black&display=swap">
 <style>
 :root {
-  --ink:#0A0A0A;
-  --paper:#F2EDE4;
-  --paper2:#E8E2D6;
-  --rust:#C4440A;
-  --rust-dim:rgba(196,68,10,0.15);
-  --rust-line:rgba(196,68,10,0.3);
-  --ink-dim:rgba(10,10,10,0.35);
-  --ink-mid:rgba(10,10,10,0.6);
-  --white:#FDFAF5;
-  --line:rgba(10,10,10,0.12);
+  --ink:#F0EAD6;
+  --paper:#0D0D0D;
+  --paper2:#161616;
+  --rust:#D4541A;
+  --rust-dim:rgba(212,84,26,0.18);
+  --rust-line:rgba(212,84,26,0.35);
+  --ink-dim:rgba(240,234,214,0.3);
+  --ink-mid:rgba(240,234,214,0.6);
+  --white:#1A1A1A;
+  --line:rgba(240,234,214,0.1);
+  --gold:#C9A84C;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -141,55 +142,55 @@ body::after {
 
 /* GEMINI GATE */
 #geminigate {
-  position:fixed;inset:0;background:rgba(10,10,10,0.92);
+  position:fixed;inset:0;background:rgba(0,0,0,0.95);
   display:none;align-items:center;justify-content:center;
   z-index:9998;padding:24px;
-  backdrop-filter:blur(4px);
+  backdrop-filter:blur(6px);
 }
 .ggate-inner {
   max-width:420px;width:100%;
-  background:var(--paper);
+  background:#161616;
   border-top:3px solid var(--rust);
-  padding:40px 36px;
+  border-bottom:1px solid rgba(212,84,26,0.2);
+  padding:44px 40px;
 }
 .ggate-label {
   font-family:'Space Mono',monospace;
   font-size:9px;letter-spacing:4px;
   color:var(--rust);
-  text-transform:uppercase;margin-bottom:8px;
+  text-transform:uppercase;margin-bottom:10px;
 }
 .ggate-title {
   font-family:'Playfair Display',serif;
-  font-size:28px;font-weight:900;
-  color:var(--ink);line-height:1.1;margin-bottom:6px;
+  font-size:36px;font-weight:900;font-style:italic;
+  color:var(--ink);line-height:1;margin-bottom:8px;
 }
 .ggate-sub {
   font-family:'Space Mono',monospace;
   font-size:10px;color:var(--ink-mid);
-  margin-bottom:28px;line-height:1.6;
+  margin-bottom:28px;line-height:1.7;
 }
 .ggate-sub a{color:var(--rust);text-decoration:none;}
 .ggate-input {
-  width:100%;background:var(--white);
-  border:1px solid var(--line);
-  border-top:2px solid var(--ink);
+  width:100%;background:transparent;
+  border:none;border-bottom:1px solid rgba(240,234,214,0.25);
   color:var(--ink);
   font-family:'Space Mono',monospace;
-  font-size:13px;letter-spacing:2px;
-  padding:12px 14px;outline:none;
+  font-size:14px;letter-spacing:3px;
+  padding:12px 0;outline:none;
   transition:border-color 0.3s;
 }
-.ggate-input:focus{border-top-color:var(--rust);}
-.ggate-input::placeholder{color:var(--ink-dim);font-size:11px;letter-spacing:1px;}
+.ggate-input:focus{border-bottom-color:var(--rust);}
+.ggate-input::placeholder{color:var(--ink-dim);font-size:11px;letter-spacing:2px;}
 #ggate-err {
   font-size:10px;letter-spacing:1px;
   color:var(--rust);margin-top:8px;
   min-height:14px;font-family:'Space Mono',monospace;
 }
 .ggate-btn {
-  margin-top:16px;width:100%;
-  background:var(--ink);border:none;
-  color:var(--paper);
+  margin-top:20px;width:100%;
+  background:var(--rust);border:none;
+  color:#F0EAD6;
   font-family:'Archivo Black',sans-serif;
   font-size:13px;letter-spacing:3px;
   padding:16px;cursor:pointer;
@@ -200,7 +201,7 @@ body::after {
 .ggate-note {
   font-family:'Space Mono',monospace;
   font-size:9px;color:var(--ink-dim);
-  margin-top:16px;letter-spacing:1px;
+  margin-top:14px;letter-spacing:1px;
   text-align:center;
 }
 
@@ -648,18 +649,18 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
 </div>
 
 <!-- GEMINI GATE -->
-<div id="geminigate">
+<div id="geminigate" style="display:none;">
   <div class="ggate-inner">
     <div class="ggate-label">Moteur IA — Étape 2 / 2</div>
-    <div class="ggate-title">Clé Gemini</div>
+    <div class="ggate-title">Clé<br>Gemini</div>
     <div class="ggate-sub">
-      Obtiens ta clé gratuite sur <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a><br>
-      → Get API Key → Create API Key
+      Obtiens ta clé gratuite sur<br>
+      <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a> → Get API Key → Create API Key
     </div>
-    <input class="ggate-input" id="gemini-input" type="text" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <input class="ggate-input" id="gemini-input" type="text" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')validerGeminiKey()">
     <div id="ggate-err"></div>
     <button class="ggate-btn" onclick="validerGeminiKey()">Activer le moteur →</button>
-    <div class="ggate-note">Stockée localement · Jamais envoyée ailleurs</div>
+    <div class="ggate-note">Stockée dans ton navigateur · Jamais envoyée ailleurs</div>
   </div>
 </div>
 
@@ -706,19 +707,19 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
       <div id="st-step1">
         <div class="section-eyebrow">Mode Studio</div>
         <div class="section-headline">L'agent<br><em>lit ta cible.</em></div>
-        <div class="section-deck">Décris ton univers. L'agent détecte les profils, choisit l'intention, et génère du contenu qui coupe.</div>
+        <div class="section-deck">Décris ton univers. L'agent scanne le marché, détecte les profils, et génère du contenu qui piège.</div>
 
         <div class="field">
           <div class="field-label">Ton business ou produit <span class="opt">requis</span></div>
           <textarea id="s-biz" rows="4" placeholder="Ce que tu fais, pour qui, ce que ça change dans leur vie..."></textarea>
         </div>
         <div class="field">
-          <div class="field-label">Idée brute <span class="opt">optionnel</span></div>
-          <textarea id="s-idee" rows="2" placeholder="Une idée — l'agent va la transformer..."></textarea>
+          <div class="field-label">Angle ou idée de départ <span class="opt">optionnel</span></div>
+          <textarea id="s-idee" rows="2" placeholder="Un angle spécifique que tu veux explorer..."></textarea>
         </div>
         <div class="field">
-          <div class="field-label">La douleur centrale <span class="opt">optionnel</span></div>
-          <textarea id="s-douleur" rows="2" placeholder="La tension profonde que porte ta cible..."></textarea>
+          <div class="field-label">Matière brute <span class="opt">recommandé — c'est ici que ça devient réel</span></div>
+          <textarea id="s-douleur" rows="4" placeholder="Une scène vécue. Une tension réelle. Une anecdote. Un moment qui t'a frappé. Le Studio part de là — pas d'une scène inventée.&#10;&#10;Exemple : &quot;Un client m'a dit qu'il avait essayé 3 formations et abandonné à chaque fois au bout d'une semaine.&quot;"></textarea>
         </div>
         <button class="btn-primary" onclick="studioAnalyser()">Analyser les profils →</button>
       </div>
@@ -1033,24 +1034,61 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
 // ═══════════════════════════════
 var GEMINI_KEY = '';
 var GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
+function getGeminiKey(){var k=localStorage.getItem('mt_gemini_key');return k?k.trim():'';}
 
-function getGeminiKey(){
-  var k = localStorage.getItem('mt_gemini_key');
-  return k ? k.trim() : '';
-}
 var MASTER = 'MKB2000-2022A';
 var KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
 
 // ═══════════════════════════════
 // FRAMEWORK
 // ═══════════════════════════════
+// 4 PROFILS RÉELS + MODE PEUR (Protecteur = état, pas profil)
 var ARCHETYPES = {
-  'Automatiseur':{trigger:'gain de temps, efficacité, systèmes',peur:'perdre du temps sur des tâches inutiles',hook:'Ce que tu fais en 3h, ça peut se faire en 20 minutes.',fissure:'Il perd du temps et il le sait',version_peur:'Il a peur que son système s\'effondre'},
-  'Optimiseur Valeur':{trigger:'qualité, résultat concret, ROI',peur:'payer pour quelque chose qui ne tient pas',hook:'Tu ne paies pas le prix. Tu paies le résultat.',fissure:'Il doute que ça vaille ce que ça coûte',version_peur:'Il a peur d\'avoir fait le mauvais choix'},
-  'Optimiseur Prix':{trigger:'économie, meilleur deal, offre',peur:'être arnaqué ou payer trop cher',hook:'Même résultat. La moitié du prix.',fissure:'Il a peur de se faire avoir',version_peur:'La peur de perdre de l\'argent domine tout'},
-  'Élévateur':{trigger:'statut, transformation, reconnaissance',peur:'rester là où il est',hook:'Dans 90 jours, les gens autour de toi vont remarquer quelque chose.',fissure:'Il veut être vu différemment',version_peur:'Il a peur de redescendre après avoir grimpé'},
-  'Libérateur':{trigger:'liberté, sortir d\'une contrainte',peur:'rester prisonnier d\'une situation',hook:'Et si la vraie solution c\'était de tout arrêter et recommencer autrement ?',fissure:'Il étouffe et cherche une sortie',version_peur:'Il a peur de ne jamais sortir'},
-  'Protecteur':{trigger:'sécurité, protection — version peur de tous les autres archétypes',peur:'perdre ce qu\'il a construit',hook:'Ce n\'est pas ce que tu gagnes qui compte. C\'est ce que tu ne perds pas.',fissure:'La peur de perdre est plus forte que l\'envie de gagner',version_peur:'Il protège tout le monde sauf lui-même'}
+  'Automatiseur':{
+    organe:'Cortex préfrontal (saturé de décisions)',
+    trigger:'gain de temps, chemin clair, systèmes qui tournent seuls',
+    desir:'Veut une décision de moins. Un chemin sans branches.',
+    peur:'Son système va s\'effondrer. Il s\'épuise et tout s\'arrête.',
+    hook:'Ce que tu fais en 3h, ça peut se faire en 20 minutes.',
+    fissure:'Il perd du temps et il le sait. Il continue quand même.',
+    structures_interdites:'Jamais deux fois le même plan en étapes. Jamais deux fois le même test. Varier : jour dans sa vie / système cassé / question révélatrice / comparaison avant-après.'
+  },
+  'Optimiseur Valeur':{
+    organe:'Striatum (calcul ROI)',
+    trigger:'résultat concret, qualité, multiplicateur',
+    desir:'Veut savoir exactement ce qu\'il va obtenir. Pas de promesse floue.',
+    peur:'Il a payé pour quelque chose qui ne tient pas. Mauvais choix.',
+    hook:'Tu ne paies pas le prix. Tu paies le résultat.',
+    fissure:'Il doute que ça vaille ce que ça coûte. Il reporte.',
+    structures_interdites:'Jamais deux fois le calendrier vivant. Jamais deux fois le ticket de caisse. Varier : projection chiffrée / décision passée analysée / deux colonnes coût-gain / témoignage inversé.'
+  },
+  'Optimiseur Prix':{
+    organe:'Insula (détecteur d\'injustice)',
+    trigger:'juste prix, transparence, meilleur deal sans arnaque',
+    desir:'Veut payer le juste prix. Pas le moins cher — le plus honnête.',
+    peur:'Se faire avoir. Payer trop. Être le naïf de la transaction.',
+    hook:'Il y a une différence entre cheap et juste. Tu la connais ?',
+    fissure:'Il compare tout. Il reporte parce qu\'il cherche encore.',
+    structures_interdites:'Jamais deux fois le post-énigme A/B. Varier : révélation du vrai coût du cheap / anatomie d\'une arnaque / test de cohérence prix-valeur / la question que personne ne pose.'
+  },
+  'Élévateur':{
+    organe:'Noyau Accumbens (statut, appartenance)',
+    trigger:'reconnaissance, transformation visible, changer de ligue',
+    desir:'Être vu différemment. Monter. Appartenir au cercle d\'en haut.',
+    peur:'Rester là où il est. Voir le train partir. Être dépassé.',
+    hook:'Dans 90 jours, les gens autour de toi vont remarquer quelque chose.',
+    fissure:'Il veut monter mais il attend le bon moment. Le bon moment ne vient pas.',
+    structures_interdites:'Jamais deux fois le court-métrage ascension. Varier : la chute de celui qui n\'a pas embarqué / le cercle d\'en haut décrit de l\'intérieur / la scène du regard des autres / le faux closing retourné.'
+  },
+  'Libérateur':{
+    organe:'Cortex cingulaire (rejet du générique)',
+    trigger:'liberté, sortir d\'une contrainte, être reconnu dans sa singularité',
+    desir:'Sortir. Arrêter de faire comme tout le monde. Être vu comme cas unique.',
+    peur:'Ne jamais sortir. Rester prisonnier du système des autres.',
+    hook:'Et si la vraie solution c\'était de tout arrêter et recommencer autrement ?',
+    fissure:'Il étouffe. Il cherche une sortie mais les conseils génériques ne lui parlent pas.',
+    structures_interdites:'Jamais deux fois le miroir inversé. Varier : le conseil refusé / la permission de faire autrement / le cas particulier révélé / la rupture avec le discours dominant.'
+  }
 };
 
 var ETAPES = [
@@ -1060,16 +1098,20 @@ var ETAPES = [
   {id:'reconstruction',name:'RECONSTRUCTION',desc:'Comment il se raconte l\'histoire après l\'achat'}
 ];
 
-var WIL_AIME = 'Mécanique narrative Wil Aime — Le Gendre Idéal: commence par "il" — le lecteur se croit spectateur d\'une scène qui parle de quelqu\'un d\'autre. À mi-chemin la scène bascule vers "tu" sans transition forcée — il réalise que c\'est lui. Le vrai personnage qu\'on attendait n\'arrive jamais — quelqu\'un d\'autre occupe sa place. La révélation finale retourne tout sans résolution confortable. Dense émotionnellement.';
+var WIL_AIME = 'MÉCANIQUE WIL AIME — LE GENDRE IDÉAL:\nCommence par "il" — une scène concrète du quotidien africain (marché, bureau, téléphone le matin, famille, café chaud, cour vide). Le lecteur croit être spectateur. À mi-chemin, sans transition forcée, bascule vers "tu" — il réalise que c\'est lui. Le personnage attendu n\'arrive jamais — quelqu\'un d\'autre a pris sa place. Fin sans résolution confortable.\nLOI ABSOLUE: JAMAIS deux fois la même forme de twist dans une série. JAMAIS la morale expliquée avant que le lecteur ait ressenti. Le mécanisme se ressent — il ne s\'explique pas.';
 
-var DIVIN = 'Style Divin Setondji: phrases ultra-courtes. Une idée par ligne. Pas de connecteurs évidents. Pivots inattendus. Le lecteur ne voit pas où tu vas jusqu\'à la dernière ligne.';
+var DIVIN = 'STYLE DIVIN SETONDJI — TON CHEF DE GUERRE (Valeur Brute uniquement):\n1. La thèse d\'abord — jamais l\'histoire. Commence par la vérité brute. Le constat, pas l\'anecdote.\n2. Brièveté comme autorité — phrases courtes. Parfois sans verbe. Chaque phrase se lit seule et fait mal.\n3. Tutoiement de commandement — pas "tu devrais". Des ordres : "Arrête." "Commence." "Regarde."\n4. Silence comme outil — laisser des trous. Le blanc entre les phrases fait plus mal que le mot suivant.\n5. Neutralité froide — jamais de colère, jamais d\'émotion visible. Le froid est plus intimidant que le cri.\nATTENTION: Ce ton est INTERDIT sur Émotion/Miroir. Il tue l\'empathie. Réservé strictement à Valeur Brute.';
 
-var MIROIR = 'Positionnement Miroir Brutal: ne jamais caresser dans le sens du poil. Tout le monde applaudit — toi tu révèles la vérité même quand ça fait mal. Précision chirurgicale. Pas d\'encouragements vides.';
+var MIROIR = 'MIROIR BRUTAL:\nQuand tout le monde applaudit — toi tu révèles la vérité. Précision chirurgicale. Pas d\'encouragements vides. La vérité même quand ça fait mal. Le Studio est la seule voix qui dit ce que les autres n\'osent pas.';
+
+var MECANIQUE = 'RÈGLE ANTI-RÉPÉTITION — DÉFI COGNITIF PERMANENT:\nChaque post est un prototype inédit. Le stimulus est fixe (l\'organe du profil). L\'architecture est toujours nouvelle. L\'agent doit se demander avant chaque génération : quelle structure n\'a pas encore été utilisée pour activer cet organe ?\n\nMÉCANIQUES DE BASE PAR PROFIL (à varier, jamais répéter la même):\n\nÉlévateur (Noyau Accumbens):\n- Court-Métrage ascension + faux closing + "Regarde-toi"\n- La chute de celui qui n\'a pas embarqué\n- Le cercle d\'en haut décrit de l\'intérieur\n- La scène du regard des autres qui changent\n\nAutomatiseur (Cortex préfrontal):\n- Plan en étapes qui se brise sur son blocage exact\n- Sa journée minute par minute — il reconnaît chaque détail\n- Une seule question qui révèle que son système est cassé\n- Comparaison avant/après système\n\nOptimiseur Valeur (Striatum):\n- Calendrier vivant : jours × dépense = perte annuelle\n- Ticket de caisse décortiqué\n- Décision passée analysée : ce qu\'elle a vraiment coûté\n- Deux colonnes : investi vs obtenu\n\nOptimiseur Prix (Insula):\n- Post-Énigme A (cheap/opaque) vs B (juste/transparent)\n- Révélation du vrai coût du cheap\n- Anatomie d\'une arnaque\n- La question que personne ne pose sur le prix\n\nLibérateur (Cortex cingulaire):\n- Miroir inversé : conseil générique → "Toi. Le cas particulier."\n- Le conseil refusé et pourquoi c\'est juste\n- La permission de faire autrement\n- Rupture avec le discours dominant\n\nPROTECTEUR = MODE PEUR DE CHAQUE PROFIL (pas un profil séparé):\nQuand le profil est en mode peur → activer l\'Amygdale. Pas de promesse — suppression du risque. Nommer ce qu\'il risque de perdre. Aucune pression. Ton rassurant, diagnostic, pas de CTA agressif.';
+
+var FORMATS = 'FORMATS OBLIGATOIRES — PALETTE COMPLÈTE:\n\nFORMAT TWEET (Valeur Brute + Curiosité/Suspense):\nUne phrase par ligne. Blanc entre chaque. Accroche + pivot + chute. Le lecteur descend sans s\'arrêter. Maximum 10 lignes totales.\n\nFORMAT COURT (tous types):\n5-8 lignes serrées. Un seul angle. Pas de développement — juste l\'impact. Entrée directe, sortie nette.\n\nFORMAT LONG (Émotion/Miroir uniquement):\nLe court-métrage. La scène qui respire. Structure Wil Aime complète. Dense émotionnellement. Peut aller jusqu\'à 20-25 lignes si la tension le justifie.\n\nFORMAT FIL COMMENTAIRES (optionnel sur Curiosité/Suspense):\nLe post pose une vérité courte et incomplète. Le créateur livre la suite en 3-5 commentaires avec ton Divin. L\'algo Facebook est activé naturellement. Marquer clairement : [FIL — suite en commentaires]\n\nRÈGLE ABSOLUE DE FORMAT:\n- Valeur Brute → Tweet ou Court + Ton Divin\n- Émotion/Miroir → Long + Mécanique Wil Aime\n- Curiosité/Suspense → Tweet + Fil commentaires possible';
 
 var INTENTIONS = {
-  valeur: 'VALEUR BRUTE: Pas d\'histoire. Pas de "il". Pas d\'émotion. Une vérité précise, sèche, directe. Maximum 8 lignes. Ton autoritaire. Pas de question finale — une affirmation qui tranche.',
-  emotion: 'ÉMOTION/MIROIR (Wil Aime): Commence par "il" dans une scène concrète du quotidien local urbain africain. À mi-chemin bascule vers "tu" — le lecteur réalise que c\'est lui. Dense émotionnellement. Fin avec une question qui dérange.',
-  curiosite: 'CURIOSITÉ/SUSPENSE: Court — maximum 8 lignes. Une situation paradoxale ou un résultat inattendu. On ne donne pas tout. La fin annonce quelque chose sans l\'expliquer. Le lecteur doit commenter pour savoir la suite.'
+  valeur: 'VALEUR BRUTE — FORMAT TWEET OU COURT — TON DIVIN SETONDJI:\nPas d\'histoire. Pas de "il". Pas d\'émotion visible. La thèse d\'abord — le constat brutal. Phrases courtes, parfois sans verbe. Chaque ligne se lit seule et fait mal. Tutoiement de commandement. Silence entre les phrases. Pas de question finale — une affirmation froide qui tranche. Ancré dans le business réel. Zéro généralité.',
+  emotion: 'ÉMOTION/MIROIR — FORMAT LONG — MÉCANIQUE WIL AIME:\nCommence par "il" dans une scène concrète du quotidien africain. Scène réelle, pas universelle. Le lecteur est spectateur. À mi-chemin bascule vers "tu" sans transition forcée. Dense émotionnellement. Fin sans résolution — une question qui dérange ou un blanc qui force la réflexion. La mécanique se ressent — jamais expliquée avant la fin.',
+  curiosite: 'CURIOSITÉ/SUSPENSE — FORMAT TWEET — FIL POSSIBLE:\nMaximum 6 lignes dans le post. Une situation paradoxale ou un résultat inattendu. On ne donne jamais tout. La fin annonce sans expliquer. Le lecteur DOIT commenter pour savoir la suite. Si format Fil : indiquer [FIL — suite en commentaires] et préparer 3 commentaires Divin.'
 };
 
 // STATE
@@ -1083,16 +1125,20 @@ var S = {
 // ═══════════════════════════════
 // API
 // ═══════════════════════════════
-async function callGemini(prompt, tokens){
+async function callGemini(prompt, tokens, useSearch){
   var GEMINI_KEY = getGeminiKey();
   if(!GEMINI_KEY){showGeminiGate();throw new Error('Clé Gemini manquante.');}
+  var body = {
+    contents:[{parts:[{text:prompt}]}],
+    generationConfig:{temperature:0.88,maxOutputTokens:tokens||2048}
+  };
+  if(useSearch){
+    body.tools = [{google_search:{}}];
+  }
   var r = await fetch(GEMINI_URL+GEMINI_KEY,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      contents:[{parts:[{text:prompt}]}],
-      generationConfig:{temperature:0.88,maxOutputTokens:tokens||2048}
-    })
+    body:JSON.stringify(body)
   });
   if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error(e.error&&e.error.message?e.error.message:'Erreur API ('+r.status+')');}
   var d=await r.json();
@@ -1113,13 +1159,12 @@ async function callWithEval(main,evalP,tokens){
 // ═══════════════════════════════
 function showGeminiGate(){
   document.getElementById('geminigate').style.display='flex';
-  setTimeout(function(){document.getElementById('gemini-input').focus();},100);
+  setTimeout(function(){var i=document.getElementById('gemini-input');if(i)i.focus();},100);
 }
-
 window.validerGeminiKey=function(){
   var v=document.getElementById('gemini-input').value.trim();
   var e=document.getElementById('ggate-err');
-  if(!v||v.length<30){e.textContent='Clé invalide — vérifie la copie.';return;}
+  if(!v||v.length<30){e.textContent='Clé invalide — vérifie la copie complète.';return;}
   localStorage.setItem('mt_gemini_key',v);
   document.getElementById('geminigate').style.display='none';
   e.textContent='';
@@ -1190,10 +1235,21 @@ window.studioAnalyser=async function(){
   hide('st-step1');show('st-step2');
   show('st-load1');hide('st-profils');hide('st-err1');hide('st-etape-card');hide('st-actions2');
 
-  var al=Object.keys(ARCHETYPES).map(function(k){return '- '+k+': trigger='+ARCHETYPES[k].trigger+' / peur='+ARCHETYPES[k].peur+' / version_peur='+ARCHETYPES[k].version_peur;}).join('\n');
-  var t=statTimer('st-sub1',['Lecture du marché...','Détection des profils...','Analyse des fissures...']);
+  // ÉTAPE ZÉRO — Recherche terrain web
+  var t=statTimer('st-sub1',['Scan du marché en cours...','Détection des angles saturés...','Identification des silences...','Calibration des profils...']);
 
-  var prompt='Tu es expert Moment Troc (Duhigg + Maslow).\n\nNote importante: Le Protecteur est la version peur de tous les autres archétypes — quand un prospect est dominé par la peur de perdre plutôt que le désir de gagner.\n\nArchétypes:\n'+al+'\n\nBusiness: '+S.studio.biz+'\n'+(S.studio.douleur?'Douleur: '+S.studio.douleur+'\n':'')+'\nIdentifie 2-3 archétypes dominants ET précise si chaque profil est en mode désir ou mode peur.\nRéponds:\nARCHETYPES: [nom1 (désir/peur), nom2 (désir/peur)]\nANALYSE: [3-4 phrases — masque, déclencheur, fissure de cette cible]';
+  var searchPrompt='Tu es un agent de veille marché pour le copywriting africain.\n\nBUSINESS: '+S.studio.biz+'\n\nFais une recherche sur ce marché et réponds avec:\n\nMARCHÉ: [2-3 phrases sur la réalité actuelle de ce marché — ce qui se passe vraiment]\nANGLES_SATURÉS: [3-4 angles que tout le monde utilise déjà — ce qu\'il faut éviter]\nSILENCES: [2-3 angles que personne n\'exploite encore — les vides à occuper]\nTENSION_DOMINANTE: [La tension profonde non dite que porte ce marché en ce moment]';
+
+  try{
+    var searchResult = await callGemini(searchPrompt, 800, true);
+    S.studio.terrain = searchResult;
+  } catch(e){
+    S.studio.terrain = '';
+  }
+
+  var al=Object.keys(ARCHETYPES).map(function(k){var a=ARCHETYPES[k];return '- '+k+' (organe: '+a.organe+'): désir='+a.desir+' / peur='+a.peur;}).join('\n');
+
+  var prompt='Tu es expert Moment Troc — psychologie d\'achat neurologique.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\n\nLE PROTECTEUR N\'EST PAS UN PROFIL. C\'est l\'état peur de chaque profil. Quand un prospect est dominé par la peur de perdre plutôt que le désir de gagner, il est en mode Protecteur.\n\n4 PROFILS RÉELS:\n'+al+'\n\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.douleur?'MATIÈRE: '+S.studio.douleur+'\n':'')+(S.studio.terrain?'\nTERRAIN MARCHÉ SCANNÉ:\n'+S.studio.terrain+'\n':'')+'\nIdentifie 2-3 profils dominants. Précise le MODE de chaque profil : désir ou peur.\nRéponds:\nARCHETYPES: [nom1 (désir/peur), nom2 (désir/peur)]\nANALYSE: [3-4 phrases — masque visible, déclencheur réel, fissure cachée, ce qu\'il n\'ose pas dire]';
 
   try{
     var r=await callGemini(prompt,700);
@@ -1218,14 +1274,15 @@ window.studioGenerer=async function(){
   var pd=S.studio.profils.map(function(p){
     var k=p.replace(/\s*\(.*\)/,'').trim();
     var a=ARCHETYPES[k];
-    return a?p+' — hook: "'+a.hook+'" / fissure: '+a.fissure:p;
+    var mode=p.toLowerCase().includes('peur')?'PEUR':'DÉSIR';
+    return a?p+'\n  Organe: '+a.organe+'\n  Mode '+mode+': '+(mode==='PEUR'?a.peur:a.desir)+'\n  Hook: "'+a.hook+'"':p;
   }).join('\n');
 
-  var t=statTimer('st-sub3',['Construction des hooks...','Injection style Wil Aime...','Calibration miroir brutal...','Rédaction des posts...','Auto-évaluation...','Correction angles morts...']);
+  var t=statTimer('st-sub3',['Analyse des organes cibles...','Sélection des structures inédites...','Injection style Wil Aime...','Construction des pièges cognitifs...','Rédaction des posts...','Auto-évaluation angles morts...']);
 
-  var main='Tu es le Studio Moment Troc — agent de contenu expert.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\nNIVEAUX: Masque → Déclencheur → Fissure → Reconstruction\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.idee?'IDÉE: '+S.studio.idee+'\n':'')+(S.studio.douleur?'DOULEUR: '+S.studio.douleur+'\n':'')+'\nPROFILS:\n'+pd+'\nÉTAPE: '+ei.name+' — '+ei.desc+'\n\nGénère 5 posts avec les 3 intentions:\n- 2 posts ÉMOTION/MIROIR: '+INTENTIONS.emotion+'\n- 2 posts VALEUR BRUTE: '+INTENTIONS.valeur+'\n- 1 post CURIOSITÉ/SUSPENSE: '+INTENTIONS.curiosite+'\n\nRÈGLES ABSOLUES:\n- Une seule intention par post — jamais mélanger\n- Phrases ultra-courtes sauf posts émotionnels\n- Jamais de marketing visible\n- Miroir brutal — la vérité même quand ça fait mal\n- Pour les posts émotionnels: commence par "il" puis bascule vers "tu"\n- Fin ouverte ou affirmation qui tranche selon l\'intention\n- Le sujet sort toujours du produit réel — pas de généralité\n\nFORMAT STRICT:\nPOST [n]\nINTENTION: [Émotion Miroir / Valeur Brute / Curiosité Suspense]\nARCHETYPE: [profil ciblé]\n---\n[contenu]\n===';
+  var main='Tu es le Studio Moment Troc — agent de contenu expert en psychologie d\'achat neurologique.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\nGRILLE: Masque → Déclencheur → Fissure → Reconstruction\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\n'+MECANIQUE+'\n\n'+FORMATS+'\n\nCONTEXTE:\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.idee?'ANGLE: '+S.studio.idee+'\n':'')+(S.studio.douleur?'MATIÈRE BRUTE: '+S.studio.douleur+'\n':'')+(S.studio.terrain?'\nTERRAIN SCANNÉ (ce que les concurrents disent déjà / les silences à occuper):\n'+S.studio.terrain+'\n':'')+'\nPROFILS DÉTECTÉS:\n'+pd+'\nÉTAPE: '+ei.name+' — '+ei.desc+'\n\nTÂCHE: Génère 5 posts. Chaque post = PROTOTYPE INÉDIT. Architecture différente à chaque fois. Le stimulus est fixe (l\'organe). La structure change toujours.\n\nIMPORTANT SUR LE TERRAIN: Si le terrain scanné est fourni — occupe les SILENCES, pas les angles saturés. Ce que les concurrents disent déjà est interdit.\n\nDISTRIBUTION:\n- 2 posts ÉMOTION/MIROIR: '+INTENTIONS.emotion+'\n- 2 posts VALEUR BRUTE: '+INTENTIONS.valeur+'\n- 1 post CURIOSITÉ/SUSPENSE: '+INTENTIONS.curiosite+'\n\nRÈGLES ABSOLUES:\n1. Une seule intention par post — jamais mélanger\n2. Jamais de marketing visible — le mécanisme se ressent avant de s\'expliquer\n3. Ancré dans le business réel — zéro généralité\n4. Si matière brute fournie — partir de là, pas d\'une scène inventée\n5. Le lecteur est piégé sans s\'en rendre compte\n6. INTERDIT: "j\'ai été comme toi" / morale visible / explications avant la fin\n7. Si profil en mode PEUR → activer l\'Amygdale — supprimer le risque, pas promettre\n8. Respecter les formats : Valeur Brute=Tweet/Court+Divin / Émotion=Long+WilAime / Curiosité=Tweet\n\nFORMAT STRICT:\nPOST [n]\nINTENTION: [Émotion Miroir / Valeur Brute / Curiosité Suspense]\nFORMAT: [Tweet / Court / Long / Fil]\nARCHETYPE: [profil + mode]\n---\n[contenu complet]\n===';
 
-  var evalP='Tu es évaluateur expert Moment Troc + Wil Aime.\nÉvalue ces 5 posts:\n1. Chaque post a-t-il UNE SEULE intention claire ?\n2. Les posts Émotion/Miroir basculent-ils vraiment de "il" vers "tu" ?\n3. Les posts Valeur Brute sont-ils secs et autoritaires sans histoire ?\n4. Le post Curiosité/Suspense est-il vraiment incomplet et court ?\n5. Y a-t-il des angles morts — des vérités plus fortes qu\'on aurait dû dire ?\nSi tout est satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée même format]';
+  var evalP='Tu es évaluateur expert Moment Troc.\nÉvalue ces 5 posts sur 5 critères:\n1. INTENTION PURE: Chaque post a-t-il une seule intention — pas de mélange ?\n2. ÉMOTION/MIROIR: Le "il" bascule-t-il vraiment vers "tu" sans transition forcée ?\n3. VALEUR BRUTE: Ton Divin respecté — thèse d\'abord, froid, pas de verbes doux ?\n4. CURIOSITÉ: Vraiment incomplet — le lecteur DOIT commenter pour la suite ?\n5. DÉFI COGNITIF: Les 5 posts ont-ils chacun une architecture différente ?\n6. ANCRAGE: Chaque post est-il ancré dans le business réel ou c\'est générique ?\nSi tout satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée même format strict]';
 
   try{
     var res=await callWithEval(main,evalP,3000);
