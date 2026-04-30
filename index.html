@@ -602,6 +602,109 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
 }
 .cal-pn{font-size:6px;color:var(--rust);margin-top:1px;}
 
+/* CAL GRID */
+.cal-wrap{margin-top:20px;}
+.cal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+.cal-title{
+  font-family:'Archivo Black',sans-serif;
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ink-mid);
+}
+.cal-toggle{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Space Mono',monospace;
+  font-size:8px;letter-spacing:1px;color:var(--ink-dim);
+  cursor:pointer;user-select:none;
+}
+.cal-toggle-pill{
+  width:32px;height:16px;
+  background:var(--line);
+  border-radius:8px;position:relative;
+  transition:background 0.2s;
+}
+.cal-toggle-pill::after{
+  content:'';position:absolute;
+  width:12px;height:12px;
+  background:var(--ink-dim);
+  border-radius:50%;top:2px;left:2px;
+  transition:transform 0.2s,background 0.2s;
+}
+.cal-toggle.on .cal-toggle-pill{background:var(--rust-dim);}
+.cal-toggle.on .cal-toggle-pill::after{transform:translateX(16px);background:var(--rust);}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:0;}
+.cal-cell {
+  aspect-ratio:1;
+  background:var(--white);
+  border:1px solid var(--line);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;
+  font-size:8px;color:var(--ink-dim);
+  cursor:default;transition:border-color 0.2s;
+  position:relative;
+}
+.cal-cell.has{
+  border-top:2px solid var(--rust);
+  color:var(--ink);cursor:pointer;
+}
+.cal-cell.has.valeur{background:rgba(212,84,26,0.12);}
+.cal-cell.has.emotion{background:rgba(201,168,76,0.10);}
+.cal-cell.has.curiosite{background:rgba(240,234,214,0.06);}
+.cal-cell.active-day{border-color:var(--rust)!important;box-shadow:0 0 0 1px var(--rust);}
+.cal-pn{font-size:6px;color:var(--rust);margin-top:1px;letter-spacing:1px;}
+
+/* POST CARD — un à la fois */
+.post-card-wrap{position:relative;}
+.post-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.post-counter{
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:2px;color:var(--ink-dim);
+}
+.post-dots{display:flex;gap:6px;align-items:center;}
+.post-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--line);transition:background 0.2s,transform 0.2s;
+}
+.post-dot.active{background:var(--rust);transform:scale(1.3);}
+.post-dot.done{background:var(--ink-dim);}
+.btn-nav{
+  background:none;border:1px solid var(--line);
+  color:var(--ink-dim);
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:2px;
+  padding:8px 16px;cursor:pointer;
+  text-transform:uppercase;
+  transition:border-color 0.2s,color 0.2s;
+}
+.btn-nav:hover{border-color:var(--rust);color:var(--rust);}
+.btn-nav:disabled{opacity:0.3;cursor:default;}
+
+/* EVAL DETAIL */
+.eval-detail{
+  background:rgba(212,84,26,0.08);
+  border-left:2px solid var(--rust);
+  padding:10px 14px;
+  font-family:'Space Mono',monospace;
+  font-size:9px;line-height:1.8;
+  color:var(--ink-mid);
+  margin-bottom:16px;
+}
+.eval-detail strong{color:var(--rust);}
+
+/* MATIERE BRUTE WARNING */
+.field-warn{
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:1px;
+  color:var(--rust);margin-top:6px;
+  display:none;
+}
+
 /* ERROR */
 .error-box {
   background:var(--white);
@@ -694,6 +797,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
   <button class="section-tab" onclick="switchMode('trockit')">Troc Kit</button>
   <button class="section-tab" onclick="switchMode('sprint')">Content Sprint</button>
   <button class="section-tab" onclick="switchMode('diagnostic')">Diagnostic</button>
+  <button class="section-tab" onclick="switchMode('deconstruire')">Déconstruire</button>
 </nav>
 <div class="hr-thin"></div>
 
@@ -720,6 +824,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
         <div class="field">
           <div class="field-label">Matière brute <span class="opt">recommandé — c'est ici que ça devient réel</span></div>
           <textarea id="s-douleur" rows="4" placeholder="Une scène vécue. Une tension réelle. Une anecdote. Un moment qui t'a frappé. Le Studio part de là — pas d'une scène inventée.&#10;&#10;Exemple : &quot;Un client m'a dit qu'il avait essayé 3 formations et abandonné à chaque fois au bout d'une semaine.&quot;"></textarea>
+          <div class="field-warn" id="s-douleur-warn">Sans matière réelle, le Studio génère du générique. Donne une scène vraie.</div>
         </div>
         <button class="btn-primary" onclick="studioAnalyser()">Analyser les profils →</button>
       </div>
@@ -763,22 +868,50 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
         <div id="st-load3" class="loading">
           <div class="loading-head">Génération en cours...</div>
           <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Construction des hooks</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Injection style Wil Aime</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Auto-évaluation</span></div>
+            <div class="loading-step"><div class="dot"></div><span>Protocole Racine activé</span></div>
+            <div class="loading-step"><div class="dot"></div><span>Injection bibliothèque d'illusions</span></div>
+            <div class="loading-step"><div class="dot"></div><span>Auto-évaluation des angles morts</span></div>
           </div>
           <div class="loading-status" id="st-sub3"></div>
         </div>
 
         <div id="st-result" class="hidden">
-          <div id="st-eval" class="eval-bar hidden">✓ Auto-évaluation — angles morts corrigés</div>
-          <div id="st-posts"></div>
-          <div class="section-break"><span>Calendrier</span></div>
-          <div id="st-cal" class="cal"></div>
+          <div id="st-eval" class="eval-bar hidden"></div>
+          <div id="st-eval-detail" class="eval-detail hidden"></div>
+
+          <!-- POST UN À LA FOIS -->
+          <div class="post-card-wrap">
+            <div class="post-nav">
+              <div class="post-dots" id="st-dots"></div>
+              <div class="post-counter" id="st-counter">Post 1 / 5</div>
+            </div>
+            <div id="st-post-card"></div>
+            <div class="btn-row" style="margin-top:16px;">
+              <button class="btn-nav" id="st-prev" onclick="stNav(-1)" disabled>← Préc.</button>
+              <button class="btn-nav" id="st-next" onclick="stNav(1)">Suiv. →</button>
+            </div>
+          </div>
+
+          <!-- CALENDRIER 30 JOURS -->
+          <div class="cal-wrap">
+            <div class="cal-header">
+              <div class="cal-title">Calendrier — 30 jours</div>
+              <div class="cal-toggle" id="cal-toggle-btn" onclick="calToggleMode()">
+                <span id="cal-toggle-label">Placement libre</span>
+                <div class="cal-toggle-pill"></div>
+              </div>
+            </div>
+            <div class="cal" id="st-cal"></div>
+            <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+              <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(212,84,26,0.3);border-top:1px solid var(--rust);"></span> Valeur Brute</span>
+              <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(201,168,76,0.15);border-top:1px solid var(--gold);"></span> Émotion</span>
+              <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(240,234,214,0.08);border-top:1px solid var(--ink-dim);"></span> Curiosité</span>
+            </div>
+          </div>
         </div>
         <div id="st-err3" class="hidden error-box"></div>
 
-        <div class="btn-row hidden" id="st-actions3">
+        <div class="btn-row hidden" id="st-actions3" style="margin-top:24px;">
           <button class="btn-ghost" onclick="studioBack(2)">← Retour</button>
           <button class="btn-primary" onclick="studioNouvelle()" style="flex:1">Changer d'étape →</button>
         </div>
@@ -1023,6 +1156,66 @@ textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;
   </div>
 </div>
 
+<!-- ══════════════ MODE DÉCONSTRUIRE ══════════════ -->
+<div id="mode-deconstruire" class="hidden">
+  <div class="col-layout">
+    <div class="col-main">
+
+      <div id="dc-step1">
+        <div class="section-eyebrow">Mode Déconstruire</div>
+        <div class="section-headline">L'agent<br><em>dissèque.</em></div>
+        <div class="section-deck">Colle un post — n'importe lequel. L'agent identifie la mécanique utilisée, l'organe activé, ce qui manque, et génère un contre-angle que personne n'a encore pris.</div>
+
+        <div class="field">
+          <div class="field-label">Le post à déconstruire <span class="opt">requis</span></div>
+          <textarea id="dc-post" rows="10" placeholder="Colle ici le post complet à analyser..."></textarea>
+        </div>
+        <div class="field">
+          <div class="field-label">Contexte <span class="opt">optionnel</span></div>
+          <input type="text" id="dc-contexte" placeholder="Qui a écrit ce post ? Quel business ? Quel résultat ?">
+        </div>
+        <button class="btn-primary" onclick="deconstruireGen()">Déconstruire →</button>
+      </div>
+
+      <div id="dc-step2" class="hidden">
+        <div class="section-eyebrow">Analyse</div>
+        <div class="section-headline"><em>Mécanique</em><br>révélée.</div>
+
+        <div id="dc-load" class="loading">
+          <div class="loading-head">Dissection en cours...</div>
+          <div class="loading-steps">
+            <div class="loading-step"><div class="dot"></div><span>Identification profil ciblé</span></div>
+            <div class="loading-step"><div class="dot"></div><span>Détection mécanique utilisée</span></div>
+            <div class="loading-step"><div class="dot"></div><span>Analyse des angles morts</span></div>
+            <div class="loading-step"><div class="dot"></div><span>Génération contre-angle</span></div>
+          </div>
+          <div class="loading-status" id="dc-sub"></div>
+        </div>
+
+        <div id="dc-result" class="hidden">
+          <div id="dc-sections"></div>
+        </div>
+        <div id="dc-err" class="hidden error-box"></div>
+
+        <div class="btn-row hidden" id="dc-actions">
+          <button class="btn-ghost" onclick="dcBack()">← Retour</button>
+          <button class="btn-primary" onclick="deconstruireGen()" style="flex:1">Relancer →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-aside">
+      <div class="widget">
+        <div class="widget-title">Ce que l'analyse révèle</div>
+        <div class="widget-item"><strong>Profil ciblé</strong><br>L'organe activé et le mode (désir ou peur)</div>
+        <div class="widget-item"><strong>Mécanique utilisée</strong><br>L'illusion, la rupture, le CTA</div>
+        <div class="widget-item"><strong>Ce qui manque</strong><br>Les silences. Ce que l'auteur n'a pas osé dire.</div>
+        <div class="widget-item"><strong>Contre-angle</strong><br>Un post inédit sur le même sujet — angle que personne n'a pris</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <script>
@@ -1098,20 +1291,26 @@ var ETAPES = [
   {id:'reconstruction',name:'RECONSTRUCTION',desc:'Comment il se raconte l\'histoire après l\'achat'}
 ];
 
+var SUSPENSION = 'LA SUSPENSION — MISE EN LUMIÈRE CHIRURGICALE:\nEntre la rupture et le CTA, il y a un moment précis — la Mise en Lumière.\nCe n\'est pas du FOMO. Ce n\'est pas une urgence fabriquée.\nC\'est nommer avec précision l\'état interne que le lecteur vivait dans l\'ombre.\n\nDéfinition : La Suspension est cet espace entre la décision et le mouvement. Pas du doute. Pas de la peur. Quelque chose de plus étrange — une partie de la personne sait, et une autre partie fait semblant de ne pas savoir. Les deux coexistent en silence.\n\nLa Suspension devient insupportable dès qu\'elle est vue. Tu n\'as pas besoin de créer de pression. La pression existait déjà. Tu allumes juste la lumière.\n\nAPRÈS la mise en lumière vient la PERMISSION — la porte de sortie naturelle.\nPas une injonction. Pas "achète maintenant".\nUne ouverture douce vers le mouvement.\n\nSTRUCTURE COMPLÈTE T1→T2→T3:\nT1 — L\'Expérience: le lecteur VIT sans savoir qu\'il est dedans\nT2 — La Rupture: il réalise que c\'est lui (rupture signature du profil)\nT3 — Mise en Lumière + Permission + CTA:\n  → Nommer l\'état de suspension avec précision chirurgicale (1-2 phrases)\n  → Donner la permission de bouger (pas forcer — ouvrir)\n  → CTA signature du profil\n\nEXEMPLES DE MISE EN LUMIÈRE PAR PROFIL:\nÉlévateur: "Tu le sais depuis le début. Tu attendais juste que quelqu\'un le dise."\nAutomatiseur: "Tu n\'hésites pas. Tu procrastines en portant le costume de quelqu\'un qui réfléchit."\nOptimiseur Valeur: "Tu connais déjà la réponse. Tu cherches juste une permission de faire confiance au chiffre."\nOptimiseur Prix: "Tu n\'as pas peur de payer. Tu as peur de te tromper. C\'est différent."\nLibérateur: "Tu savais que les conseils des autres ne marchaient pas pour toi. Tu attendais que quelqu\'un te le confirme."\nMode peur: "Tu ne doutes pas du produit. Tu doutes de toi. Et ça, personne ne te l\'a encore dit."\n\nEXEMPLES DE PERMISSION:\n"Si tu es prêt à sortir de là — le lien est en commentaire."\n"La prochaine étape existe. Elle t\'attend."\n"Tu n\'as plus besoin de faire semblant."\n"Quand tu es prêt — tape [CTA]."\n\nRÈGLE ABSOLUE: La Permission n\'est JAMAIS une urgence. Jamais "dernière chance". Jamais "plus que X places". C\'est une sortie, pas une pression.';
+
 var WIL_AIME = 'MÉCANIQUE WIL AIME — LE GENDRE IDÉAL:\nCommence par "il" — une scène concrète du quotidien africain (marché, bureau, téléphone le matin, famille, café chaud, cour vide). Le lecteur croit être spectateur. À mi-chemin, sans transition forcée, bascule vers "tu" — il réalise que c\'est lui. Le personnage attendu n\'arrive jamais — quelqu\'un d\'autre a pris sa place. Fin sans résolution confortable.\nLOI ABSOLUE: JAMAIS deux fois la même forme de twist dans une série. JAMAIS la morale expliquée avant que le lecteur ait ressenti. Le mécanisme se ressent — il ne s\'explique pas.';
 
-var DIVIN = 'STYLE DIVIN SETONDJI — TON CHEF DE GUERRE (Valeur Brute uniquement):\n1. La thèse d\'abord — jamais l\'histoire. Commence par la vérité brute. Le constat, pas l\'anecdote.\n2. Brièveté comme autorité — phrases courtes. Parfois sans verbe. Chaque phrase se lit seule et fait mal.\n3. Tutoiement de commandement — pas "tu devrais". Des ordres : "Arrête." "Commence." "Regarde."\n4. Silence comme outil — laisser des trous. Le blanc entre les phrases fait plus mal que le mot suivant.\n5. Neutralité froide — jamais de colère, jamais d\'émotion visible. Le froid est plus intimidant que le cri.\nATTENTION: Ce ton est INTERDIT sur Émotion/Miroir. Il tue l\'empathie. Réservé strictement à Valeur Brute.';
+var DIVIN = 'STYLE DIVIN SETONDJI — TON CHEF DE GUERRE (Valeur Brute uniquement):\n1. La thèse d\'abord — jamais l\'histoire. Commence par la vérité brute. Le constat, pas l\'anecdote.\n2. Brièveté comme autorité — phrases courtes. Parfois sans verbe. Chaque phrase se lit seule et fait mal.\n3. Tutoiement de commandement — pas "tu devrais". Des ordres : "Arrête." "Commence." "Regarde."\n4. Silence comme outil — laisser des trous. Le blanc entre les phrases fait plus mal que le mot suivant.\n5. Neutralité froide — jamais de colère, jamais d\'émotion visible. Le froid est plus intimidant que le cri.\n6. JAMAIS "peace" ou équivalent en signature. Terminer par une affirmation froide ou rien.\nATTENTION: Ce ton est INTERDIT sur Émotion/Miroir. Il tue l\'empathie. Réservé strictement à Valeur Brute.';
 
 var MIROIR = 'MIROIR BRUTAL:\nQuand tout le monde applaudit — toi tu révèles la vérité. Précision chirurgicale. Pas d\'encouragements vides. La vérité même quand ça fait mal. Le Studio est la seule voix qui dit ce que les autres n\'osent pas.';
 
-var MECANIQUE = 'RÈGLE ANTI-RÉPÉTITION — DÉFI COGNITIF PERMANENT:\nChaque post est un prototype inédit. Le stimulus est fixe (l\'organe du profil). L\'architecture est toujours nouvelle. L\'agent doit se demander avant chaque génération : quelle structure n\'a pas encore été utilisée pour activer cet organe ?\n\nMÉCANIQUES DE BASE PAR PROFIL (à varier, jamais répéter la même):\n\nÉlévateur (Noyau Accumbens):\n- Court-Métrage ascension + faux closing + "Regarde-toi"\n- La chute de celui qui n\'a pas embarqué\n- Le cercle d\'en haut décrit de l\'intérieur\n- La scène du regard des autres qui changent\n\nAutomatiseur (Cortex préfrontal):\n- Plan en étapes qui se brise sur son blocage exact\n- Sa journée minute par minute — il reconnaît chaque détail\n- Une seule question qui révèle que son système est cassé\n- Comparaison avant/après système\n\nOptimiseur Valeur (Striatum):\n- Calendrier vivant : jours × dépense = perte annuelle\n- Ticket de caisse décortiqué\n- Décision passée analysée : ce qu\'elle a vraiment coûté\n- Deux colonnes : investi vs obtenu\n\nOptimiseur Prix (Insula):\n- Post-Énigme A (cheap/opaque) vs B (juste/transparent)\n- Révélation du vrai coût du cheap\n- Anatomie d\'une arnaque\n- La question que personne ne pose sur le prix\n\nLibérateur (Cortex cingulaire):\n- Miroir inversé : conseil générique → "Toi. Le cas particulier."\n- Le conseil refusé et pourquoi c\'est juste\n- La permission de faire autrement\n- Rupture avec le discours dominant\n\nPROTECTEUR = MODE PEUR DE CHAQUE PROFIL (pas un profil séparé):\nQuand le profil est en mode peur → activer l\'Amygdale. Pas de promesse — suppression du risque. Nommer ce qu\'il risque de perdre. Aucune pression. Ton rassurant, diagnostic, pas de CTA agressif.';
+var PROTOCOLE_RACINE = 'PROTOCOLE RACINE — STRUCTURE ANTI-GÉNÉRIQUE:\nChaque business a une Vérité Centrale — une thèse qui choque, qui divise, qui n\'est pas un constat fade.\nAutour de cette vérité : 3 Piliers — trois vérités inconfortables que personne n\'ose dire.\nAutour de chaque pilier : 5 Portes — cinq angles d\'attaque, cinq formats, cinq tons différents.\nRésultat : 15 posts uniques qui ne tombent jamais dans le générique.\n\nAPPLICATION:\n- Extraire la Vérité Centrale du business fourni\n- Identifier les 3 Piliers les plus forts pour le profil cible\n- Choisir la Porte la plus adaptée à l\'intention (Valeur Brute / Émotion / Curiosité)\nJAMAIS répéter la même Porte dans une série.';
 
-var FORMATS = 'FORMATS OBLIGATOIRES — PALETTE COMPLÈTE:\n\nFORMAT TWEET (Valeur Brute + Curiosité/Suspense):\nUne phrase par ligne. Blanc entre chaque. Accroche + pivot + chute. Le lecteur descend sans s\'arrêter. Maximum 10 lignes totales.\n\nFORMAT COURT (tous types):\n5-8 lignes serrées. Un seul angle. Pas de développement — juste l\'impact. Entrée directe, sortie nette.\n\nFORMAT LONG (Émotion/Miroir uniquement):\nLe court-métrage. La scène qui respire. Structure Wil Aime complète. Dense émotionnellement. Peut aller jusqu\'à 20-25 lignes si la tension le justifie.\n\nFORMAT FIL COMMENTAIRES (optionnel sur Curiosité/Suspense):\nLe post pose une vérité courte et incomplète. Le créateur livre la suite en 3-5 commentaires avec ton Divin. L\'algo Facebook est activé naturellement. Marquer clairement : [FIL — suite en commentaires]\n\nRÈGLE ABSOLUE DE FORMAT:\n- Valeur Brute → Tweet ou Court + Ton Divin\n- Émotion/Miroir → Long + Mécanique Wil Aime\n- Curiosité/Suspense → Tweet + Fil commentaires possible';
+var PIÈGES_COGNITIFS = 'PHILOSOPHIE DU PIÈGE COGNITIF:\nChaque post est un piège construit depuis l\'INTÉRIEUR de l\'organe du profil.\nPas une scène décrite de l\'extérieur. Une expérience vécue de l\'intérieur.\nLe lecteur ne lit pas — il VIT. Il ne regarde pas — il EST dedans.\nIl ne sait pas qu\'il est piégé jusqu\'à la rupture. Parfois même après.\n\nLOI FONDAMENTALE: L\'illusion part de la RÉACTION DE L\'ORGANE — pas d\'un décor.\nJAMAIS "Il est 7h. Le réveil sonne." — c\'est du décor universel, ça parle à personne.\nTOUJOURS construire depuis ce que l\'organe FAIT naturellement :\n- Le Cortex préfrontal CHERCHE un rail → donne-lui un choix piégé\n- Le Cortex cingulaire REJETTE le générique → commence par l\'exclure\n- Le Striatum CALCULE → lance-lui un calcul qui se retourne\n- Le Noyau Accumbens PROJETTE → montre-lui quelqu\'un à sa place\n- L\'Insula DÉTECTE l\'injustice → révèle ce que personne ne dit sur le prix\n\nDÉFI COGNITIF PERMANENT:\nChaque nouveau post est un nouveau piège. Jamais la même structure. Jamais la même entrée.\nL\'agent doit se demander avant chaque génération : quel piège n\'a pas encore été utilisé pour activer cet organe ?\nSi un post ressemble à un autre — il est raté.\n\nEXEMPLES CALIBRÉS — NIVEAU DE RÉFÉRENCE:\n\n[LIBÉRATEUR — L\'Exclusion]\n"Ce post n\'est pas pour toi.\\n\\n✧\\n\\nSi tu as déjà trouvé ta méthode, ta case, ta routine, passe ton chemin.\\nSi tu sais exactement comment tu fonctionnes et que ça marche, ce texte n\'a rien à t\'apprendre.\\n\\n✧\\n\\nSi tu es encore là, c\'est que tu as déjà senti ce décalage.\\nCelui qui te fait prendre des bouts de méthode et jeter le reste.\\nCelui qui te fait dire : \'ça ne marchera pas pour moi, je ne suis pas comme les autres\'.\\n\\n✧\\n\\nTu n\'es pas compliqué. Tu es juste hors des cases.\\n\\n✧\\n\\nSi tu as lu jusqu\'ici, ce post n\'était pas une leçon. C\'était un tri."\nPOURQUOI ÇA MARCHE: Le Cortex cingulaire rejette le générique. En le repoussant, tu actives son organe. Ceux qui restent se sont auto-qualifiés.\n\n[AUTOMATISEUR — Le Choix Piégé]\n"Tu es à un carrefour. Il y a deux chemins.\\n\\nChemin A : un plan. Cinq étapes. Tu appliques sans réfléchir.\\nChemin B : un miroir. On te voit. On te demande ce que tu veux faire.\\n\\nTu as choisi. Ne me dis rien.\\n\\nSi tu as choisi A — tu es un Automatiseur. Ton cerveau veut un rail.\\nSi tu as choisi B — tu es un Libérateur. Tu veux être compris avant d\'être guidé."\nPOURQUOI ÇA MARCHE: Le Cortex préfrontal saturé VEUT choisir un chemin clair. Tu lui donnes deux rails. Il choisit. Son choix le diagnostique sans qu\'il pose une question.\n\n[OPTIMISEUR VALEUR — La Méta-Conscience]\n"Ce matin, j\'ai écrit un post. Il commençait par : \'La seule chose qui t\'empêche de vendre.\' Puis j\'ai effacé. C\'était un énième post qui promettait une solution miracle.\\n\\nJ\'ai réécrit : \'Tu as essayé de suivre un plan, mais tu t\'es arrêté au jour 3.\' Puis j\'ai effacé. C\'était ta vie, pas un post.\\n\\nAlors j\'ai écrit ceci : un plan pour ne plus jamais t\'arrêter.\\n1. Relis le titre. 2. Relis la première phrase. 3. Relis la troisième phrase.\\n\\nTu viens de suivre un plan jusqu\'au bout.\\nTu n\'es pas bloqué au jour 3. Tu es bloqué parce que le plan n\'était pas le tien."\nPOURQUOI ÇA MARCHE: Le Striatum calcule le ROI de chaque expérience. Tu lui montres le résultat de ce qu\'il vient de vivre. Il réalise la valeur après coup — pas avant.';
+
+var MECANIQUE = 'BIBLIOTHÈQUE D\'ILLUSIONS PAR PROFIL — ORGANE → PIÈGE:\n\nRÈGLE: L\'illusion part de la réaction naturelle de l\'organe. Pas d\'un décor.\nJAMAIS deux pièges qui se ressemblent dans une série.\n\nLIBÉRATEUR (Cortex cingulaire rejette le générique — fenêtre 5-10j):\nOrgane → Piège: Il rejette ce qui est pour tout le monde → tu commences par l\'EXCLURE. Il reste. En restant, il se révèle.\nIllusions: L\'Exclusion d\'Entrée / Le Miroir Inversé / L\'Anti-Masterclass / L\'Énigme du Profil Perdu / La Non-Leçon\nRupture: "La solution, c\'était toi."\nMise en lumière: "Tu savais que les conseils des autres ne marchaient pas pour toi. Tu attendais que quelqu\'un te le confirme."\nCTA: Tape "Solo"\n\nAUTOMATISEUR (Cortex préfrontal saturé cherche un rail — fenêtre 72h):\nOrgane → Piège: Il veut un chemin clair → tu lui donnes UN CHOIX PIÉGÉ. Il choisit librement. Son choix le diagnostique.\nIllusions: Le Choix Piégé / Le Mode d\'Emploi Cassé / La Check-List Absurde / Le Rail Hypnotique / La Séquence d\'Ordres\nRupture: "Regarde ton système."\nMise en lumière: "Tu n\'hésites pas. Tu procrastines en portant le costume de quelqu\'un qui réfléchit."\nCTA: Tape "Rail"\n\nOPTIMISEUR VALEUR (Striatum calcule le ROI — fenêtre 7-10j):\nOrgane → Piège: Il calcule la valeur de chaque expérience → tu lui fais VIVRE une expérience puis tu lui montres son ROI après coup.\nIllusions: La Méta-Conscience / Le Calcul Pur / Le Ticket de Caisse / Le Client Perdu / Le Calendrier Vivant\nRupture: "Vérifie ton chiffre."\nMise en lumière: "Tu connais déjà la réponse. Tu cherches juste une permission de faire confiance au chiffre."\nCTA: Tape "Calcul"\n\nÉLÉVATEUR (Noyau Accumbens projette le statut — fenêtre 48-72h):\nOrgane → Piège: Il se projette constamment dans une version supérieure de lui-même → tu lui montres QUELQU\'UN D\'AUTRE à sa place. La jalousie fait le travail.\nIllusions: La Projection de Statut / Le Faux Closing / La Story Privée / Le Post-Brouillon / Le Mur d\'Exclusion\nRupture: "Regarde-toi."\nMise en lumière: "Tu le sais depuis le début. Tu attendais juste que quelqu\'un le dise."\nCTA: Tape "Dédicace"\n\nOPTIMISEUR PRIX (Insula détecte l\'injustice — fenêtre 3-5j):\nOrgane → Piège: Il détecte l\'injustice avant tout → tu lui révèles CE QUE PERSONNE NE DIT sur le prix. La transparence radicale active son organe.\nIllusions: La Transparence Radicale / Le Décompte du Prix / L\'Alerte Anti-Arnaque / Le Dilemme du Prix / La Justification Inversée\nRupture: "C\'est ça, le juste prix."\nMise en lumière: "Tu n\'as pas peur de payer. Tu as peur de te tromper. C\'est différent."\nCTA: Tape "Juste"\n\nMODE PEUR (Amygdale figée — fenêtre 2-4 semaines) — État transversal:\nOrgane → Piège: Il cherche le piège partout → tu lui montres que SA MÉFIANCE est une qualité. Pas de promesse. Pas de pression. Diagnostic rassurant.\nIllusions: Le Post-Contrat / Le Post-Test Rassurant / La Cicatrice / La Preuve par le Vide / Le Serment\nRupture: "Ce post est la preuve."\nMise en lumière: "Tu ne doutes pas du produit. Tu doutes de toi. Et ça, personne ne te l\'a encore dit."\n\nRÈGLE ABSOLUE SIGNATURES: JAMAIS "peace". JAMAIS dans aucune signature. Ce mot est banni.';
+
+var FORMATS = 'FORMATS OBLIGATOIRES — PALETTE COMPLÈTE:\n\nFORMAT TWEET (Valeur Brute + Curiosité/Suspense):\nUne phrase par ligne. Blanc entre chaque. Accroche + pivot + chute. Le lecteur descend sans s\'arrêter. Maximum 10 lignes totales.\n\nFORMAT COURT (tous types):\n5-8 lignes serrées. Un seul angle. Pas de développement — juste l\'impact. Entrée directe, sortie nette.\n\nFORMAT LONG (Émotion/Miroir uniquement):\nLe court-métrage. La scène qui respire. Structure Wil Aime complète T1→T2→T3. Dense émotionnellement. Peut aller jusqu\'à 25 lignes si la tension le justifie.\n\nFORMAT FIL COMMENTAIRES (optionnel sur Curiosité/Suspense):\nLe post pose une vérité courte et incomplète. Le créateur livre la suite en 3-5 commentaires avec ton Divin. Marquer: [FIL — suite en commentaires]\n\nRÈGLE ABSOLUE:\n- Valeur Brute → Tweet ou Court + Ton Divin\n- Émotion/Miroir → Long + Wil Aime T1→T2→T3\n- Curiosité/Suspense → Tweet + Fil possible';
 
 var INTENTIONS = {
-  valeur: 'VALEUR BRUTE — FORMAT TWEET OU COURT — TON DIVIN SETONDJI:\nPas d\'histoire. Pas de "il". Pas d\'émotion visible. La thèse d\'abord — le constat brutal. Phrases courtes, parfois sans verbe. Chaque ligne se lit seule et fait mal. Tutoiement de commandement. Silence entre les phrases. Pas de question finale — une affirmation froide qui tranche. Ancré dans le business réel. Zéro généralité.',
-  emotion: 'ÉMOTION/MIROIR — FORMAT LONG — MÉCANIQUE WIL AIME:\nCommence par "il" dans une scène concrète du quotidien africain. Scène réelle, pas universelle. Le lecteur est spectateur. À mi-chemin bascule vers "tu" sans transition forcée. Dense émotionnellement. Fin sans résolution — une question qui dérange ou un blanc qui force la réflexion. La mécanique se ressent — jamais expliquée avant la fin.',
-  curiosite: 'CURIOSITÉ/SUSPENSE — FORMAT TWEET — FIL POSSIBLE:\nMaximum 6 lignes dans le post. Une situation paradoxale ou un résultat inattendu. On ne donne jamais tout. La fin annonce sans expliquer. Le lecteur DOIT commenter pour savoir la suite. Si format Fil : indiquer [FIL — suite en commentaires] et préparer 3 commentaires Divin.'
+  valeur: 'VALEUR BRUTE — FORMAT TWEET OU COURT — TON DIVIN:\nPas d\'histoire. Pas de "il". La thèse d\'abord. Phrases courtes, parfois sans verbe. Tutoiement de commandement. Silence entre les phrases. Pas d\'urgence fabriquée — une affirmation froide qui tranche. Ancré dans le business réel. Zéro généralité. JAMAIS "peace" en signature.',
+  emotion: 'ÉMOTION/MIROIR — FORMAT LONG — STRUCTURE T1→T2→T3→T4:\nT1: "il" dans une scène concrète du quotidien africain — réelle, pas universelle.\nT2: bascule vers "tu" sans transition forcée — rupture signature du profil.\nT3: Mise en Lumière — nommer l\'état de suspension avec précision chirurgicale. 1-2 phrases. La pression existait déjà, tu allumes la lumière.\nT4: Permission — ouvrir la porte doucement. Pas une injonction. CTA signature.\nFin sans résolution confortable.',
+  curiosite: 'CURIOSITÉ/SUSPENSE — FORMAT TWEET — FIL POSSIBLE:\nMaximum 6 lignes. Situation paradoxale ou résultat inattendu. On ne donne jamais tout. La fin annonce sans expliquer. Si Fil: préparer 3 commentaires Divin.'
 };
 
 // STATE
@@ -1148,9 +1347,14 @@ async function callGemini(prompt, tokens, useSearch){
 
 async function callWithEval(main,evalP,tokens){
   var r1=await callGemini(main,tokens||2500);
-  var evalFull=evalP+'\n\nCONTENU:\n'+r1+'\n\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée]';
+  var evalFull=evalP+'\n\nCONTENU À ÉVALUER:\n'+r1;
   var r2=await callGemini(evalFull,tokens||2500);
-  if(r2.trim().startsWith('AMÉLIORER')){return{content:r2.replace(/^AMÉLIORER\s*/i,'').trim(),improved:true};}
+  if(r2.trim().startsWith('AMÉLIORER')){
+    var noteMatch=r2.match(/NOTE:\s*(.+)/);
+    var note=noteMatch?noteMatch[1].trim():'';
+    var cleaned=r2.replace(/^AMÉLIORER\s*/i,'').replace(/NOTE:.*\n?/,'').trim();
+    return{content:cleaned,improved:true,evalNote:note};
+  }
   return{content:r1,improved:false};
 }
 
@@ -1199,11 +1403,11 @@ function cp(text,btn){navigator.clipboard.writeText(text).then(function(){btn.te
 // MODE SWITCH
 // ═══════════════════════════════
 window.switchMode=function(m){
-  ['studio','trockit','sprint','diagnostic'].forEach(function(x){
+  ['studio','trockit','sprint','diagnostic','deconstruire'].forEach(function(x){
     document.getElementById('mode-'+x).classList.toggle('hidden',x!==m);
   });
   document.querySelectorAll('.section-tab').forEach(function(t,i){
-    t.classList.toggle('on',['studio','trockit','sprint','diagnostic'][i]===m);
+    t.classList.toggle('on',['studio','trockit','sprint','diagnostic','deconstruire'][i]===m);
   });
   window.scrollTo({top:0,behavior:'smooth'});
 };
@@ -1280,9 +1484,9 @@ window.studioGenerer=async function(){
 
   var t=statTimer('st-sub3',['Analyse des organes cibles...','Sélection des structures inédites...','Injection style Wil Aime...','Construction des pièges cognitifs...','Rédaction des posts...','Auto-évaluation angles morts...']);
 
-  var main='Tu es le Studio Moment Troc — agent de contenu expert en psychologie d\'achat neurologique.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\nGRILLE: Masque → Déclencheur → Fissure → Reconstruction\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\n'+MECANIQUE+'\n\n'+FORMATS+'\n\nCONTEXTE:\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.idee?'ANGLE: '+S.studio.idee+'\n':'')+(S.studio.douleur?'MATIÈRE BRUTE: '+S.studio.douleur+'\n':'')+(S.studio.terrain?'\nTERRAIN SCANNÉ (ce que les concurrents disent déjà / les silences à occuper):\n'+S.studio.terrain+'\n':'')+'\nPROFILS DÉTECTÉS:\n'+pd+'\nÉTAPE: '+ei.name+' — '+ei.desc+'\n\nTÂCHE: Génère 5 posts. Chaque post = PROTOTYPE INÉDIT. Architecture différente à chaque fois. Le stimulus est fixe (l\'organe). La structure change toujours.\n\nIMPORTANT SUR LE TERRAIN: Si le terrain scanné est fourni — occupe les SILENCES, pas les angles saturés. Ce que les concurrents disent déjà est interdit.\n\nDISTRIBUTION:\n- 2 posts ÉMOTION/MIROIR: '+INTENTIONS.emotion+'\n- 2 posts VALEUR BRUTE: '+INTENTIONS.valeur+'\n- 1 post CURIOSITÉ/SUSPENSE: '+INTENTIONS.curiosite+'\n\nRÈGLES ABSOLUES:\n1. Une seule intention par post — jamais mélanger\n2. Jamais de marketing visible — le mécanisme se ressent avant de s\'expliquer\n3. Ancré dans le business réel — zéro généralité\n4. Si matière brute fournie — partir de là, pas d\'une scène inventée\n5. Le lecteur est piégé sans s\'en rendre compte\n6. INTERDIT: "j\'ai été comme toi" / morale visible / explications avant la fin\n7. Si profil en mode PEUR → activer l\'Amygdale — supprimer le risque, pas promettre\n8. Respecter les formats : Valeur Brute=Tweet/Court+Divin / Émotion=Long+WilAime / Curiosité=Tweet\n\nFORMAT STRICT:\nPOST [n]\nINTENTION: [Émotion Miroir / Valeur Brute / Curiosité Suspense]\nFORMAT: [Tweet / Court / Long / Fil]\nARCHETYPE: [profil + mode]\n---\n[contenu complet]\n===';
+  var main='Tu es le Studio Moment Troc — agent de contenu expert en psychologie d\'achat neurologique.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\nGRILLE: Masque → Déclencheur → Fissure → Reconstruction\n\n'+PIÈGES_COGNITIFS+'\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\n'+SUSPENSION+'\n\n'+PROTOCOLE_RACINE+'\n\n'+MECANIQUE+'\n\n'+FORMATS+'\n\nCONTEXTE:\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.idee?'ANGLE: '+S.studio.idee+'\n':'')+(S.studio.douleur?'MATIÈRE BRUTE: '+S.studio.douleur+'\n':'')+(S.studio.terrain?'\nTERRAIN SCANNÉ:\n'+S.studio.terrain+'\n':'')+'\nPROFILS DÉTECTÉS:\n'+pd+'\nÉTAPE: '+ei.name+' — '+ei.desc+'\n\nTÂCHE: Génère 5 posts — chaque post est un piège cognitif inédit construit depuis l\'intérieur de l\'organe du profil. Pas de décor universel. Pas de scène générique. L\'expérience se passe DANS le lecteur, pas devant lui.\n\nRÉFÉRENCE DE NIVEAU: Les exemples calibrés dans PIÈGES_COGNITIFS sont le niveau minimum. Chaque post doit atteindre ce niveau de précision et d\'ancrage.\n\nSi terrain scanné fourni — occupe les silences, jamais les angles saturés.\n\nDISTRIBUTION:\n- 2 posts ÉMOTION/MIROIR: '+INTENTIONS.emotion+'\n- 2 posts VALEUR BRUTE: '+INTENTIONS.valeur+'\n- 1 post CURIOSITÉ/SUSPENSE: '+INTENTIONS.curiosite+'\n\nRÈGLES ABSOLUES:\n1. Chaque illusion part de la réaction de l\'organe — jamais d\'un décor\n2. Structure T1→T2→T3→T4 sur Émotion/Miroir — Mise en Lumière obligatoire\n3. Rupture signature du profil — JAMAIS "Stop"\n4. JAMAIS "peace" — banni\n5. Ancré dans le business réel — zéro généralité\n6. Matière brute fournie → partir de là obligatoirement\n7. Mode peur → diagnostic rassurant, permission douce\n8. Format strict par intention\n\nFORMAT STRICT:\nPOST [n]\nINTENTION: [Émotion Miroir / Valeur Brute / Curiosité Suspense]\nFORMAT: [Tweet / Court / Long / Fil]\nARCHETYPE: [profil + mode]\nILLUSION: [nom du piège utilisé]\n---\n[contenu complet]\n===';
 
-  var evalP='Tu es évaluateur expert Moment Troc.\nÉvalue ces 5 posts sur 5 critères:\n1. INTENTION PURE: Chaque post a-t-il une seule intention — pas de mélange ?\n2. ÉMOTION/MIROIR: Le "il" bascule-t-il vraiment vers "tu" sans transition forcée ?\n3. VALEUR BRUTE: Ton Divin respecté — thèse d\'abord, froid, pas de verbes doux ?\n4. CURIOSITÉ: Vraiment incomplet — le lecteur DOIT commenter pour la suite ?\n5. DÉFI COGNITIF: Les 5 posts ont-ils chacun une architecture différente ?\n6. ANCRAGE: Chaque post est-il ancré dans le business réel ou c\'est générique ?\nSi tout satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée même format strict]';
+  var evalP='Tu es évaluateur expert Moment Troc.\nÉvalue ces 5 posts sur ces critères:\n1. INTENTION PURE: chaque post a-t-il une seule intention ?\n2. ÉMOTION/MIROIR: le "il" bascule-t-il vraiment vers "tu" avec la rupture signature du profil ?\n3. VALEUR BRUTE: ton Divin respecté — thèse d\'abord, froid, pas "peace" ?\n4. CURIOSITÉ: vraiment incomplet — le lecteur doit commenter ?\n5. DÉFI COGNITIF: les 5 posts ont-ils chacun une architecture différente ?\n6. ANCRAGE: ancré dans le business réel ou générique ?\n\nSi tout satisfaisant: réponds exactement "VALIDE"\nSinon: réponds "AMÉLIORER"\nPuis sur une ligne: NOTE: [résumé en une phrase de ce qui a été corrigé]\nPuis les posts corrigés en format identique.';
 
   try{
     var res=await callWithEval(main,evalP,3000);
@@ -1291,7 +1495,16 @@ window.studioGenerer=async function(){
     if(!posts.length)throw new Error('Aucun post généré. Réessaie.');
     S._stPosts=posts;
     hide('st-load3');show('st-result');
-    if(res.improved)show('st-eval');
+    var evalBar=document.getElementById('st-eval');
+    var evalDetail=document.getElementById('st-eval-detail');
+    if(res.improved){
+      evalBar.textContent='✓ Auto-évaluation — corrections appliquées';
+      evalBar.classList.remove('hidden');
+      if(res.evalNote){
+        evalDetail.innerHTML='<strong>Ce qui a été corrigé :</strong> '+esc(res.evalNote);
+        evalDetail.classList.remove('hidden');
+      }
+    }
     stRenderPosts(posts);stRenderCal(posts);show('st-actions3');
   }catch(e){clearInterval(t);hide('st-load3');err('st-err3',e.message);show('st-err3');show('st-actions3');}
 };
@@ -1299,41 +1512,152 @@ window.studioGenerer=async function(){
 function stParse(raw,ei){
   var posts=[];
   var blocks=raw.split(/POST\s*\d+/i).filter(function(b){return b.trim();});
-  blocks.forEach(function(block){
+  blocks.forEach(function(block,i){
     var im=block.match(/INTENTION:\s*(.+)/i);
+    var fm=block.match(/FORMAT:\s*(.+)/i);
     var am=block.match(/ARCHETYPE:\s*(.+)/i);
+    var lm=block.match(/ILLUSION:\s*(.+)/i);
     var cm=block.match(/---\s*([\s\S]+?)(?:===|$)/);
     posts.push({
       etape:ei.name,
       intention:im?im[1].trim():'',
+      format:fm?fm[1].trim():'',
       archetype:am?am[1].trim():S.studio.profils[0]||'',
-      content:cm?cm[1].trim():block.replace(/INTENTION:.*\n|ARCHETYPE:.*\n|---/g,'').trim()
+      illusion:lm?lm[1].trim():'',
+      jour:Math.round(1+(i*(29/(4)))),
+      content:cm?cm[1].trim():block.replace(/INTENTION:.*\n|FORMAT:.*\n|ARCHETYPE:.*\n|ILLUSION:.*\n|---/g,'').trim()
     });
   });
   return posts;
 }
 
+// ─── MATIÈRE BRUTE SEMI-OBLIGATOIRE ───
+document.addEventListener('DOMContentLoaded',function(){
+  var biz=document.getElementById('s-biz');
+  var douleur=document.getElementById('s-douleur');
+  var warn=document.getElementById('s-douleur-warn');
+  if(biz&&douleur&&warn){
+    biz.addEventListener('blur',function(){
+      if(biz.value.trim()&&!douleur.value.trim()){
+        warn.style.display='block';
+      }
+    });
+    douleur.addEventListener('input',function(){
+      if(douleur.value.trim()) warn.style.display='none';
+    });
+  }
+});
+
+// ─── POST UN À LA FOIS ───
+var _stIdx=0;
+var _calMode='libre'; // 'libre' ou 'sequence'
+
+// Ordre psychologique 6 étapes Moment Troc pour mode séquence
+var SEQUENCE_JOURS=[2,5,8,12,16,20,24,28]; // Masque→Déclencheur→Fissure→Reconstruction→Invitation
+
 function stRenderPosts(posts){
-  var list=document.getElementById('st-posts');list.innerHTML='';
-  posts.forEach(function(p,i){
-    var d=document.createElement('div');d.className='post-item';d.style.animationDelay=(i*0.08)+'s';
-    var intentionClass=p.intention.toLowerCase().includes('valeur')?'ptag-ink':p.intention.toLowerCase().includes('curiosit')?'ptag-rust':'';
-    d.innerHTML='<div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">J'+(i*6+1)+'</span><span class="ptag">'+esc(p.etape)+'</span><span class="ptag '+intentionClass+'">'+esc(p.intention)+'</span><span class="ptag">'+esc(p.archetype)+'</span></div></div><div class="post-body">'+esc(p.content)+'</div><div class="post-footer"><span class="post-num">Post '+(i+1)+' / 5</span><button class="copy-btn" onclick="stCp(this,'+i+')">Copier</button></div>';
-    list.appendChild(d);
-  });
+  _stIdx=0;
+  S._stPosts=posts;
+  stShowPost(0);
+  stRenderDots(posts.length);
+  stRenderCal(posts);
 }
 
+function stRenderDots(total){
+  var dots=document.getElementById('st-dots');
+  dots.innerHTML='';
+  for(var i=0;i<total;i++){
+    var d=document.createElement('div');
+    d.className='post-dot'+(i===0?' active':'');
+    d.setAttribute('data-i',i);
+    (function(idx){d.onclick=function(){stGoTo(idx);};})(i);
+    dots.appendChild(d);
+  }
+}
+
+function stShowPost(idx){
+  var posts=S._stPosts;
+  if(!posts||!posts.length)return;
+  var p=posts[idx];
+  var card=document.getElementById('st-post-card');
+  var intentionClass=p.intention.toLowerCase().includes('valeur')?'ptag-ink':p.intention.toLowerCase().includes('curiosit')?'ptag-rust':'';
+  var illusionTag=p.illusion?'<span class="ptag">'+esc(p.illusion)+'</span>':'';
+  var formatTag=p.format?'<span class="ptag">'+esc(p.format)+'</span>':'';
+  card.innerHTML='<div class="post-item" style="margin-bottom:0;animation:fadeUp 0.3s ease both;"><div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">J'+p.jour+'</span><span class="ptag '+intentionClass+'">'+esc(p.intention)+'</span>'+formatTag+illusionTag+'<span class="ptag">'+esc(p.archetype)+'</span></div></div><div class="post-body">'+esc(p.content)+'</div><div class="post-footer"><span class="post-num">Post '+(idx+1)+' / '+posts.length+'</span><button class="copy-btn" onclick="stCp(this,'+idx+')">Copier</button></div></div>';
+  // counter
+  document.getElementById('st-counter').textContent='Post '+(idx+1)+' / '+posts.length;
+  // dots
+  document.querySelectorAll('#st-dots .post-dot').forEach(function(d,i){
+    d.className='post-dot'+(i<idx?' done':i===idx?' active':'');
+  });
+  // nav buttons
+  document.getElementById('st-prev').disabled=(idx===0);
+  document.getElementById('st-next').disabled=(idx===posts.length-1);
+  // highlight cal
+  document.querySelectorAll('.cal-cell').forEach(function(c){c.classList.remove('active-day');});
+  var dayCell=document.querySelector('.cal-cell[data-post="'+idx+'"]');
+  if(dayCell)dayCell.classList.add('active-day');
+  _stIdx=idx;
+}
+
+window.stNav=function(dir){stGoTo(_stIdx+dir);};
+window.stGoTo=function(idx){
+  var posts=S._stPosts;
+  if(!posts)return;
+  idx=Math.max(0,Math.min(posts.length-1,idx));
+  stShowPost(idx);
+};
+
 function stRenderCal(posts){
-  var cal=document.getElementById('st-cal');cal.innerHTML='';
-  var days=posts.map(function(p,i){return i*6+1;});
-  for(var d=1;d<=28;d++){
-    var c=document.createElement('div');c.className='cal-cell';
-    var idx=days.indexOf(d);
-    if(idx!==-1){c.classList.add('has');c.innerHTML='<span>'+d+'</span><div class="cal-pn">P'+(idx+1)+'</div>';}
-    else c.innerHTML='<span>'+d+'</span>';
+  var cal=document.getElementById('st-cal');
+  cal.innerHTML='';
+  // Calculer les jours selon le mode
+  var jours=stCalJours(posts);
+  for(var d=1;d<=30;d++){
+    var c=document.createElement('div');
+    c.className='cal-cell';
+    var postIdx=jours.indexOf(d);
+    if(postIdx!==-1){
+      var p=posts[postIdx];
+      var cls=p.intention.toLowerCase().includes('valeur')?'valeur':p.intention.toLowerCase().includes('curiosit')?'curiosite':'emotion';
+      c.classList.add('has',cls);
+      c.setAttribute('data-post',postIdx);
+      c.innerHTML='<span>'+d+'</span><div class="cal-pn">P'+(postIdx+1)+'</div>';
+      (function(idx){c.onclick=function(){stGoTo(idx);};})(postIdx);
+    } else {
+      c.innerHTML='<span>'+d+'</span>';
+    }
     cal.appendChild(c);
   }
 }
+
+function stCalJours(posts){
+  if(_calMode==='sequence'){
+    // Mode séquence : placement psychologique Moment Troc
+    return posts.map(function(p,i){
+      return SEQUENCE_JOURS[i]||((i+1)*6);
+    });
+  } else {
+    // Mode libre : espacement régulier sur 30 jours
+    return posts.map(function(p,i){
+      return Math.round(1+(i*(29/(posts.length-1||1))));
+    });
+  }
+}
+
+window.calToggleMode=function(){
+  _calMode=(_calMode==='libre')?'sequence':'libre';
+  var btn=document.getElementById('cal-toggle-btn');
+  var label=document.getElementById('cal-toggle-label');
+  if(_calMode==='sequence'){
+    btn.classList.add('on');
+    label.textContent='Séquence stratégique';
+  } else {
+    btn.classList.remove('on');
+    label.textContent='Placement libre';
+  }
+  if(S._stPosts) stRenderCal(S._stPosts);
+};
 
 window.stCp=function(btn,i){cp(S._stPosts[i].content,btn);};
 window.studioBack=function(s){if(s===1){hide('st-step2');show('st-step1');}else{hide('st-step3');show('st-step2');}};
@@ -1516,7 +1840,74 @@ function dRender(raw){
     }
   });
 }
-window.diagBack=function(){hide('d-step2');show('d-step1');};
+window.diagBack=function(){hide('d-step2');show('d-step1');};
+
+// ═══════════════════════════════
+// MODE DÉCONSTRUIRE
+// ═══════════════════════════════
+window.deconstruireGen=async function(){
+  var post=document.getElementById('dc-post').value.trim();
+  var contexte=document.getElementById('dc-contexte').value.trim();
+  if(!post){document.getElementById('dc-post').focus();return;}
+
+  hide('dc-step1');show('dc-step2');
+  show('dc-load');hide('dc-result');hide('dc-err');hide('dc-actions');
+
+  var al=Object.keys(ARCHETYPES).map(function(k){
+    var a=ARCHETYPES[k];
+    return k+' ('+a.organe+') — Rupture: "'+a.rupture+'" — Illusions: '+a.illusions.join(', ');
+  }).join('\n');
+
+  var t=statTimer('dc-sub',['Identification du profil ciblé...','Détection de la mécanique...','Analyse des silences...','Génération du contre-angle...']);
+
+  var prompt='Tu es un agent expert en déconstruction de posts Facebook — Modèle Moment Troc.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\n\nPROFILS ET MÉCANIQUES:\n'+al+'\n\nMODE PEUR (Amygdale): état transversal — activer quand le profil est dominé par la peur de perdre. Illusions: Le Post-Contrat / Le Post-Test Rassurant / La Cicatrice / La Preuve par le Vide / Le Serment. Rupture: "Ce post est la preuve."\n\nPOST À DÉCONSTRUIRE:\n'+post+'\n'+(contexte?'CONTEXTE: '+contexte+'\n':'')+'\nANALYSE COMPLÈTE:\n\n1. PROFIL_CIBLE: [quel profil est visé, mode désir ou peur, justification précise]\n\n2. ORGANE_ACTIVE: [quel organe, comment il est activé dans ce post]\n\n3. MECANIQUE_UTILISEE: [T1/T2/T3 — quelle illusion, quelle rupture, quel CTA — ce qui est bien fait]\n\n4. CE_QUI_MANQUE: [les silences laissés — ce que l\'auteur n\'a pas osé dire — les angles morts — ce qui aurait rendu le post 3x plus fort]\n\n5. VERDICT: [le post est-il calibré ou générique ? Pourquoi ?]\n\n6. CONTRE_ANGLE:\n[Un post complet et inédit sur le même sujet — angle que personne n\'a pris — utilise une mécanique différente du post original — format adapté au profil — TON DIVIN si Valeur Brute, WIL AIME si Émotion/Miroir — JAMAIS "peace" en signature]';
+
+  try{
+    var res=await callGemini(prompt,2500,false);
+    clearInterval(t);
+    hide('dc-load');show('dc-result');
+    dcRender(res);
+    show('dc-actions');
+  }catch(e){
+    clearInterval(t);
+    hide('dc-load');
+    err('dc-err',e.message);
+    show('dc-err');
+    show('dc-actions');
+  }
+};
+
+function dcRender(raw){
+  var secs=[
+    {k:'PROFIL_CIBLE',l:'Profil Ciblé',rust:true},
+    {k:'ORGANE_ACTIVE',l:'Organe Activé'},
+    {k:'MECANIQUE_UTILISEE',l:'Mécanique Utilisée'},
+    {k:'CE_QUI_MANQUE',l:'Ce Qui Manque',danger:true},
+    {k:'VERDICT',l:'Verdict',rust:true},
+    {k:'CONTRE_ANGLE',l:'Contre-Angle Inédit',highlight:true}
+  ];
+  var c=document.getElementById('dc-sections');c.innerHTML='';
+  secs.forEach(function(s,i){
+    var re=new RegExp(s.k+':\\s*([\\s\\S]+?)(?=\\n\\n\\d+\\.|$)');
+    var m=raw.match(re);
+    if(m){
+      var text=m[1].trim();
+      var d=document.createElement('div');
+      d.className='diag-item'+(s.highlight?' post-item':'');
+      var color=s.rust?'color:var(--rust);':s.danger?'color:var(--rust);opacity:0.8;':'';
+      if(s.highlight){
+        d.innerHTML='<div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">CONTRE-ANGLE</span></div></div><div class="post-body">'+esc(text)+'</div><div class="post-footer"><button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest(\'.post-item\').querySelector(\'.post-body\').innerText)">Copier</button></div>';
+      } else {
+        d.innerHTML='<div class="diag-title" style="'+color+'">'+s.l+'</div><div class="diag-body">'+esc(text)+'</div>';
+      }
+      c.appendChild(d);
+      if(i<secs.length-1){var sep=document.createElement('div');sep.className='section-break';sep.innerHTML='<span></span>';c.appendChild(sep);}
+    }
+  });
+}
+
+window.dcBack=function(){hide('dc-step2');show('dc-step1');};
+
 
 // ═══════════════════════════════
 // INIT
