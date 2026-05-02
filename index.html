@@ -3,1824 +3,487 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Moment Troc · Studio V4</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Archivo+Black&display=swap" rel="stylesheet">
+<title>Moment Troc · Studio</title>
 <style>
-/* FALLBACK FONTS si Google ne charge pas */
-@font-face {
-  font-family: 'Space Mono';
-  src: local('Courier New');
-  font-display: swap;
-}
-
 :root {
-  --ink: #F0EAD6;
-  --paper: #0D0D0D;
-  --card: #141414;
-  --card2: #1C1C1C;
-  --rust: #D4541A;
-  --rust-dim: rgba(212,84,26,0.12);
-  --rust-line: rgba(212,84,26,0.3);
-  --ink-dim: rgba(240,234,214,0.25);
-  --ink-mid: rgba(240,234,214,0.55);
-  --line: rgba(240,234,214,0.07);
-  --gold: #C9A84C;
-  --gold-dim: rgba(201,168,76,0.1);
-  --green: #4a9e4a;
+  --ink:#F0EAD6; --paper:#0D0D0D; --card:#141414; --card2:#1C1C1C;
+  --rust:#D4541A; --rust-dim:rgba(212,84,26,0.12); --rust-line:rgba(212,84,26,0.3);
+  --ink-dim:rgba(240,234,214,0.25); --ink-mid:rgba(240,234,214,0.55);
+  --line:rgba(240,234,214,0.07); --gold:#C9A84C; --green:#4a9e4a;
 }
-
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html { scroll-behavior:smooth; }
-body {
-  background:var(--paper); color:var(--ink);
-  font-family:'Space Mono', 'Courier New', monospace;
-  min-height:100vh; overflow-x:hidden; position:relative;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:'Space Mono','Courier New',monospace;
+  min-height:100vh;padding:24px 16px 120px;max-width:720px;margin:0 auto;
 }
-body::after {
-  content:''; position:fixed; inset:0; pointer-events:none; z-index:8000;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
-  will-change:auto;
+.hidden{display:none!important;}
+.center{text-align:center;}
+.divider{height:1px;background:var(--line);margin:28px 0;}
+h1{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;line-height:1;}
+h1 em{font-style:italic;color:var(--rust);}
+.eyebrow{font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--rust);margin-bottom:8px;}
+.sub{color:var(--ink-mid);font-size:0.9rem;line-height:1.6;margin:16px 0 24px;}
+textarea,input{
+  width:100%;background:var(--card2);border:1px solid var(--line);
+  border-top:2px solid var(--ink-dim);color:var(--ink);
+  padding:16px;font-family:inherit;font-size:1rem;
+  resize:vertical;outline:none;line-height:1.7;border-radius:0;
 }
-
-/* ── GATE ── */
-#gate {
-  position:fixed; inset:0; background:var(--paper);
-  display:flex; align-items:center; justify-content:center;
-  z-index:9999; padding:20px;
+textarea:focus,input:focus{border-top-color:var(--rust);}
+textarea::placeholder,input::placeholder{color:var(--ink-dim);}
+.btn{
+  display:block;width:100%;padding:16px;border:none;
+  font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;
+  cursor:pointer;transition:opacity .2s;margin-top:12px;
+  font-family:'Archivo Black',sans-serif;
 }
-.gate-box {
-  width:100%; max-width:400px;
-  background:var(--card); border-top:3px solid var(--rust);
-  padding:36px 28px 32px;
+.btn-main{background:var(--rust);color:var(--ink);}
+.btn-ghost{background:transparent;border:1px solid var(--rust-line);color:var(--rust);}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-top:3px solid var(--rust);padding:20px;margin-bottom:20px;
 }
-.gate-logo { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--rust); margin-bottom:14px; }
-.gate-title {
-  font-family:'Playfair Display','Georgia',serif;
-  font-size:34px; font-weight:900; font-style:italic;
-  color:var(--ink); line-height:1; margin-bottom:6px;
+.card.gold{border-top-color:var(--gold);}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.tag{
+  display:inline-block;background:var(--rust);color:var(--ink);
+  font-size:0.7rem;letter-spacing:2px;padding:4px 10px;text-transform:uppercase;margin-right:6px;
 }
-.gate-sub { font-size:10px; color:var(--ink-mid); line-height:1.8; margin-bottom:24px; }
-.gate-sub a { color:var(--rust); text-decoration:none; }
-.gate-input {
-  width:100%; background:transparent; border:none;
-  border-bottom:1px solid var(--ink-dim); color:var(--ink);
-  font-family:inherit; font-size:14px; letter-spacing:2px;
-  padding:12px 0; outline:none; transition:border-color .3s;
+.tag.gold{background:var(--gold);color:var(--paper);}
+.tag.line{background:transparent;border:1px solid var(--line);color:var(--ink-dim);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.maitre-card{
+  background:var(--card2);border:1px solid var(--line);border-top:3px solid var(--rust);
+  padding:16px;cursor:pointer;transition:all .2s;text-align:center;
 }
-.gate-input:focus { border-bottom-color:var(--rust); }
-.gate-input::placeholder { color:var(--ink-dim); font-size:11px; }
-.gate-err { font-size:10px; color:var(--rust); min-height:18px; margin-top:6px; }
-.gate-btn {
-  width:100%; background:var(--rust); border:none; color:var(--ink);
-  font-family:'Archivo Black','Arial Black',sans-serif;
-  font-size:12px; letter-spacing:3px; text-transform:uppercase;
-  padding:16px; cursor:pointer; transition:opacity .2s; margin-top:12px;
-  min-height:52px; display:flex; align-items:center; justify-content:center;
+.maitre-card:hover{border-top-color:var(--ink);}
+.maitre-card.selected{background:var(--rust-dim);border-color:var(--rust);}
+.maitre-name{font-size:0.9rem;font-weight:700;margin-bottom:4px;}
+.maitre-type{font-size:0.7rem;color:var(--ink-dim);}
+.chat-bubble{
+  background:var(--card);border:1px solid var(--line);
+  padding:14px 18px;margin-bottom:12px;border-radius:2px;
 }
-.gate-btn:hover { opacity:.85; }
-.gate-btn:disabled { opacity:.4; cursor:not-allowed; }
-.gate-note { font-size:9px; color:var(--ink-dim); text-align:center; margin-top:10px; }
-
-/* ── MASTHEAD ── */
-.masthead {
-  border-bottom:3px solid var(--ink);
-  padding:16px 20px 14px;
-  display:flex; align-items:center; justify-content:space-between;
-  flex-wrap:wrap; gap:8px;
-  position:sticky; top:0; background:var(--paper); z-index:200;
+.post-body{
+  font-family:'Playfair Display',serif;font-size:1.1rem;
+  line-height:1.9;white-space:pre-wrap;color:var(--ink);padding:24px 0;
 }
-.m-left { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
-.m-title {
-  font-family:'Playfair Display','Georgia',serif;
-  font-size:clamp(20px,5vw,34px); font-weight:900; line-height:1; letter-spacing:-1px;
+.arsenal-item{background:var(--card);border:1px solid var(--line);padding:16px;margin-bottom:12px;}
+.err-box{background:rgba(212,84,26,0.1);border-left:3px solid var(--rust);padding:14px 16px;margin:12px 0;font-size:0.9rem;color:var(--rust);}
+.ok-box{background:rgba(74,158,74,0.1);border-left:3px solid var(--green);padding:10px 14px;margin:8px 0;font-size:0.9rem;color:var(--green);}
+.eval-band {
+  padding:10px 14px;margin-bottom:16px;font-size:0.8rem;
+  border-left:3px solid var(--gold);background:rgba(201,168,76,0.08);
 }
-.m-title em { font-style:italic; color:var(--rust); }
-.m-v { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
-.m-right { font-size:9px; letter-spacing:1px; color:var(--ink-dim); text-align:right; }
-.m-ok { color:var(--gold); }
-
-/* ── CONVERSION BAR ── */
-.conv-bar {
-  display:flex; overflow-x:auto; scrollbar-width:none;
-  border-bottom:1px solid var(--line);
-}
-.conv-bar::-webkit-scrollbar { display:none; }
-.cs {
-  flex:1; min-width:75px; padding:10px 6px;
-  text-align:center; font-size:8px; letter-spacing:2px; text-transform:uppercase;
-  color:var(--ink-dim); border-right:1px solid var(--line);
-  transition:all .3s; display:flex; flex-direction:column; align-items:center; gap:4px;
-}
-.cs:last-child { border-right:none; }
-.cs.active { color:var(--rust); background:var(--rust-dim); }
-.cs.done { color:var(--gold); }
-.cs-dot { width:5px; height:5px; border-radius:50%; background:var(--line); transition:background .3s; }
-.cs.active .cs-dot { background:var(--rust); }
-.cs.done .cs-dot { background:var(--gold); }
-.conv-hint {
-  font-size:10px; color:var(--ink-mid); padding:8px 18px;
-  border-bottom:1px solid var(--line); line-height:1.7; display:none;
-}
-.conv-hint.show { display:block; }
-
-/* ── MODE TABS ── */
-.mode-nav {
-  display:flex; overflow-x:auto; scrollbar-width:none;
-  border-bottom:1px solid var(--line); padding:0 4px;
-}
-.mode-nav::-webkit-scrollbar { display:none; }
-.mtab {
-  font-size:9px; letter-spacing:2px; text-transform:uppercase;
-  color:var(--ink-dim); padding:13px 18px;
-  cursor:pointer; border:none; background:none;
-  border-bottom:2px solid transparent; transition:all .25s;
-  white-space:nowrap; min-height:44px;
-}
-.mtab:hover { color:var(--ink); }
-.mtab.active { color:var(--rust); border-bottom-color:var(--rust); }
-
-/* ── MAIN ── */
-main { max-width:860px; margin:0 auto; padding:28px 16px 100px; }
-
-/* ── SECTION HEADER ── */
-.s-eye { font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--rust); margin-bottom:6px; }
-.s-title {
-  font-family:'Playfair Display','Georgia',serif;
-  font-size:clamp(22px,4vw,36px); font-weight:900; line-height:1.05; letter-spacing:-.5px; margin-bottom:8px;
-}
-.s-title em { font-style:italic; }
-.s-deck { font-size:11px; color:var(--ink-mid); line-height:1.8; margin-bottom:28px; max-width:520px; }
-
-/* ── SLOTS ── */
-.slots { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
-.slot {
-  background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-dim);
-  padding:8px 14px; cursor:pointer; transition:all .2s;
-  font-size:9px; letter-spacing:2px; text-transform:uppercase;
-  color:var(--ink-dim); min-height:40px; display:flex; align-items:center; gap:6px;
-}
-.slot.active { border-top-color:var(--rust); color:var(--rust); }
-.slot.filled { color:var(--ink-mid); }
-.slot-dot { width:5px; height:5px; border-radius:50%; background:var(--line); flex-shrink:0; }
-.slot.filled .slot-dot { background:var(--gold); }
-.slot.active .slot-dot { background:var(--rust); }
-
-/* ── FIELDS ── */
-.field { margin-bottom:20px; }
-.flabel {
-  font-size:9px; letter-spacing:3px; text-transform:uppercase;
-  color:var(--ink-dim); margin-bottom:6px;
-  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-}
-.opt { font-size:8px; color:var(--rust); opacity:.6; }
-.fhint { font-size:10px; color:var(--ink-dim); margin-bottom:8px; line-height:1.6; font-style:italic; }
-textarea, input[type=text] {
-  width:100%; background:var(--card2);
-  border:1px solid var(--line); border-top:2px solid var(--ink-dim);
-  color:var(--ink); font-family:inherit; font-size:14px;
-  padding:14px 16px; resize:vertical; outline:none;
-  transition:border-color .25s; line-height:1.8;
-  -webkit-appearance:none; border-radius:0;
-}
-textarea:focus, input[type=text]:focus { border-top-color:var(--rust); }
-textarea::placeholder, input[type=text]::placeholder { color:var(--ink-dim); font-size:12px; }
-.cc { font-size:9px; color:var(--ink-dim); text-align:right; margin-top:3px; }
-.cc.warn { color:var(--rust); }
-
-/* ── SELECTORS ── */
-.sgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
-.sgrid.c3 { grid-template-columns:repeat(3,1fr); }
-@media(max-width:460px) { .sgrid.c3 { grid-template-columns:1fr 1fr; } }
-.sitem {
-  background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-dim);
-  padding:12px 14px; cursor:pointer; transition:all .2s; text-align:left; min-height:56px;
-}
-.sitem:hover { border-top-color:var(--rust); }
-.sitem.on { background:var(--ink); border-color:var(--ink); border-top-color:var(--rust); }
-.sname {
-  font-family:'Archivo Black','Arial Black',sans-serif;
-  font-size:11px; letter-spacing:1px; text-transform:uppercase;
-  color:var(--ink); transition:color .2s;
-}
-.sitem.on .sname { color:var(--paper); }
-.sdesc { font-size:9px; color:var(--ink-dim); margin-top:4px; line-height:1.4; transition:color .2s; }
-.sitem.on .sdesc { color:rgba(13,13,13,.5); }
-
-/* ── BUTTONS ── */
-.btn-p {
-  width:100%; background:var(--ink); border:none; color:var(--paper);
-  font-family:'Archivo Black','Arial Black',sans-serif;
-  font-size:12px; letter-spacing:3px; text-transform:uppercase;
-  padding:18px 24px; cursor:pointer; position:relative; overflow:hidden;
-  transition:background .25s; margin-top:8px; min-height:56px;
-}
-.btn-p::after {
-  content:''; position:absolute; bottom:0; left:0;
-  width:0; height:2px; background:var(--rust); transition:width .3s;
-}
-.btn-p:hover { background:#1e1e1e; }
-.btn-p:hover::after { width:100%; }
-.btn-p:disabled { opacity:.3; cursor:not-allowed; }
-.btn-p:disabled::after { display:none; }
-.btn-stop {
-  width:100%; background:transparent; border:1px solid var(--rust-line);
-  color:var(--rust); font-family:inherit;
-  font-size:10px; letter-spacing:2px; text-transform:uppercase;
-  padding:14px; cursor:pointer; transition:all .2s;
-  margin-top:8px; min-height:48px; display:none;
-}
-.btn-stop.show { display:block; }
-.btn-g {
-  background:transparent; border:1px solid var(--line); border-top:2px solid var(--ink-dim);
-  color:var(--ink-mid); font-family:inherit;
-  font-size:9px; letter-spacing:2px; text-transform:uppercase;
-  padding:12px 18px; cursor:pointer; transition:all .2s; min-height:44px;
-}
-.btn-g:hover { border-top-color:var(--rust); color:var(--rust); }
-.brow { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
-
-/* ── PROGRESS ── */
-.prog-wrap { padding:24px 0; }
-.prog-title {
-  font-family:'Playfair Display','Georgia',serif;
-  font-size:19px; font-style:italic; color:var(--ink-mid); margin-bottom:20px;
-}
-.psteps { display:flex; flex-direction:column; gap:12px; }
-.pstep {
-  display:flex; align-items:flex-start; gap:12px;
-  font-size:10px; letter-spacing:1px; color:var(--ink-dim);
-  transition:color .3s; line-height:1.5;
-}
-.pstep.active { color:var(--ink); }
-.pstep.done { color:var(--gold); }
-.pstep-dot {
-  width:8px; height:8px; border-radius:50%;
-  background:var(--line); flex-shrink:0; margin-top:2px; transition:background .3s;
-}
-.pstep.active .pstep-dot { background:var(--rust); animation:blink 1s infinite; }
-.pstep.done .pstep-dot { background:var(--gold); }
-
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-/* ── CARDS GÉNÉRIQUES ── */
-.result-card {
-  background:var(--card); border:1px solid var(--line);
-  border-top:3px solid var(--rust); padding:20px;
-  margin-bottom:20px; animation:fadeUp .4s ease both;
-}
-.result-card.gold { border-top-color:var(--gold); }
-.ptags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
-.ptag { font-family:'Archivo Black','Arial Black',sans-serif; font-size:9px; letter-spacing:2px; text-transform:uppercase; padding:4px 10px; }
-.ptag-r { background:var(--rust); color:var(--ink); }
-.ptag-g { background:var(--gold); color:var(--paper); }
-.ptag-i { background:var(--ink); color:var(--paper); }
-.ptag-l { border:1px solid var(--line); color:var(--ink-dim); }
-
-/* ── POST CARD ── */
-.post-nav-bar {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:14px; flex-wrap:wrap; gap:8px;
-}
-.pcounter { font-size:9px; letter-spacing:2px; color:var(--ink-dim); }
-.pdots { display:flex; gap:8px; align-items:center; }
-.pdot {
-  width:8px; height:8px; border-radius:50%; background:var(--line);
-  cursor:pointer; transition:background .2s, transform .2s; flex-shrink:0;
-}
-.pdot.active { background:var(--rust); transform:scale(1.4); }
-.pdot.done { background:var(--ink-dim); }
-.btn-nav {
-  background:none; border:1px solid var(--line); color:var(--ink-dim);
-  font-family:inherit; font-size:9px; letter-spacing:2px; text-transform:uppercase;
-  padding:10px 16px; cursor:pointer; transition:all .2s; min-height:44px;
-}
-.btn-nav:hover { border-color:var(--rust); color:var(--rust); }
-.btn-nav:disabled { opacity:.25; cursor:default; }
-
-.post-card {
-  background:var(--card); border:1px solid var(--line);
-  border-top:3px solid var(--ink-dim); animation:fadeUp .35s ease both;
-}
-.pcard-head {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:10px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:6px;
-}
-.post-signal { font-size:9px; color:var(--ink-dim); font-style:italic; max-width:220px; text-align:right; line-height:1.4; }
-.post-body {
-  padding:22px 18px;
-  font-family:'Playfair Display','Georgia',serif;
-  font-size:15px; line-height:2;
-  white-space:pre-wrap; color:var(--ink); word-break:break-word;
-}
-.post-loading {
-  padding:22px 18px; font-size:12px; color:var(--ink-dim);
-  font-style:italic; display:flex; align-items:center; gap:10px;
-}
-.post-actions {
-  padding:10px 16px; border-top:1px solid var(--line);
-  display:flex; flex-wrap:wrap; gap:8px;
-  align-items:center; justify-content:space-between;
-}
-.ag { display:flex; gap:6px; flex-wrap:wrap; }
-.abtn {
-  background:none; border:1px solid var(--line); color:var(--ink-dim);
-  font-family:inherit; font-size:8px; letter-spacing:1px; text-transform:uppercase;
-  padding:10px 12px; cursor:pointer; transition:all .2s; min-height:40px;
-}
-.abtn:hover { border-color:var(--rust); color:var(--rust); }
-.abtn.copied { color:var(--gold); border-color:var(--gold); }
-.abtn.saved { color:var(--green); border-color:var(--green); }
-.abtn.accent { background:var(--rust); border-color:var(--rust); color:var(--ink); }
-.abtn.accent:hover { opacity:.85; }
-
-/* ── DIRECTION PANEL ── */
-.dir-panel {
-  display:none; padding:14px 16px; border-top:1px solid var(--line);
-  background:var(--rust-dim);
-}
-.dir-panel.open { display:block; animation:fadeUp .3s ease both; }
-.dir-ta {
-  width:100%; background:transparent; border:none;
-  border-bottom:1px solid var(--rust-line); color:var(--ink);
-  font-family:inherit; font-size:13px; padding:10px 0;
-  outline:none; line-height:1.7; resize:none; min-height:60px;
-}
-.dir-ta::placeholder { color:var(--ink-dim); font-size:11px; font-style:italic; }
-.dir-submit {
-  margin-top:10px; background:var(--rust); border:none; color:var(--ink);
-  font-family:'Archivo Black','Arial Black',sans-serif;
-  font-size:10px; letter-spacing:2px; text-transform:uppercase;
-  padding:12px 20px; cursor:pointer; transition:opacity .2s; min-height:44px;
-}
-.dir-submit:hover { opacity:.85; }
-
-/* ── TROC KIT MESSAGES ── */
-.tk-msg {
-  background:var(--card); border:1px solid var(--line);
-  border-left:3px solid var(--rust); padding:16px 18px;
-  margin-bottom:14px; animation:fadeUp .4s ease both;
-}
-.tk-label { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--rust); margin-bottom:4px; }
-.tk-ctx { font-size:10px; color:var(--gold); margin-bottom:10px; font-style:italic; line-height:1.5; }
-.tk-body { font-size:12px; color:var(--ink-mid); line-height:1.9; white-space:pre-wrap; word-break:break-word; }
-.tk-foot { margin-top:10px; }
-
-/* ── DÉCONSTRUIRE ── */
-.dc-block {
-  background:var(--card); border:1px solid var(--line);
-  border-top:3px solid var(--gold); padding:20px;
-  margin-bottom:16px; animation:fadeUp .4s ease both;
-}
-.dc-sec { margin-bottom:14px; }
-.dc-sec-lbl { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
-.dc-sec-body { font-size:12px; color:var(--ink-mid); line-height:1.9; white-space:pre-wrap; }
-
-/* ── CALENDRIER ── */
-.cal-wrap { margin-top:36px; }
-.cal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-.tog-wrap {
-  display:flex; align-items:center; gap:8px; font-size:9px; letter-spacing:2px;
-  color:var(--ink-dim); cursor:pointer; user-select:none; min-height:44px;
-}
-.tog-pill {
-  width:36px; height:18px; background:var(--line); border-radius:9px;
-  position:relative; transition:background .2s; flex-shrink:0;
-}
-.tog-pill::after {
-  content:''; position:absolute; width:14px; height:14px; border-radius:50%;
-  background:var(--ink-dim); top:2px; left:2px; transition:transform .2s, background .2s;
-}
-.tog-wrap.on .tog-pill { background:var(--rust-dim); }
-.tog-wrap.on .tog-pill::after { transform:translateX(18px); background:var(--rust); }
-.cal-week-row { margin-bottom:10px; }
-.cal-week-lbl { font-size:8px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; }
-.cal-week-btns { display:flex; gap:6px; flex-wrap:wrap; }
-.cwbtn {
-  background:var(--card2); border:1px solid var(--line); color:var(--ink-dim);
-  font-family:inherit; font-size:9px; letter-spacing:1px; text-transform:uppercase;
-  padding:8px 12px; cursor:pointer; transition:all .2s; min-height:40px;
-}
-.cwbtn.on { border-color:var(--rust); color:var(--rust); }
-.cal-day-lbls { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:3px; }
-.cdl { font-size:7px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-dim); text-align:center; padding:4px 0; }
-.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
-.cal-cell {
-  aspect-ratio:1; background:var(--card2); border:1px solid var(--line);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  font-size:8px; color:var(--ink-dim); cursor:default; transition:all .2s; position:relative;
-}
-.cal-cell.has { border-top:2px solid var(--rust); color:var(--ink); cursor:pointer; }
-.cal-cell.has:active { background:var(--rust-dim); }
-.cal-cell.has.valeur { background:rgba(212,84,26,0.08); }
-.cal-cell.has.emotion { background:rgba(201,168,76,0.07); }
-.cal-cell.has.curiosite { background:rgba(240,234,214,0.04); }
-.cal-cell.has.miroir { background:rgba(212,84,26,0.05); }
-.cptype { font-size:6px; color:var(--rust); margin-top:1px; }
-.cal-seq-lbl {
-  grid-column:1/-1; font-size:8px; letter-spacing:2px; text-transform:uppercase;
-  color:var(--gold); background:var(--gold-dim); padding:5px 8px; text-align:center;
-}
-
-/* ── ARSENAL ── */
-.ar-item {
-  background:var(--card); border:1px solid var(--line);
-  border-top:2px solid var(--ink-dim); margin-bottom:14px;
-  animation:fadeUp .3s ease both;
-}
-.ar-item:hover { border-top-color:var(--rust); }
-.ar-head {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:10px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:6px;
-}
-.ar-body {
-  padding:18px 16px;
-  font-family:'Playfair Display','Georgia',serif;
-  font-size:14px; line-height:1.9;
-  white-space:pre-wrap; color:var(--ink-mid); word-break:break-word;
-}
-.ar-foot { padding:10px 16px; border-top:1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap; }
-.ar-empty { font-size:11px; color:var(--ink-dim); margin-top:16px; line-height:1.9; }
-
-/* ── HISTORIQUE ── */
-.hist-item {
-  display:flex; align-items:flex-start; gap:12px;
-  padding:10px 0; border-bottom:1px solid var(--line);
-}
-.hist-n { font-size:8px; color:var(--ink-dim); flex-shrink:0; width:18px; padding-top:2px; }
-.hist-int { font-size:8px; color:var(--rust); margin-bottom:3px; letter-spacing:1px; text-transform:uppercase; }
-.hist-prev { font-size:10px; color:var(--ink-dim); line-height:1.6; }
-
-/* ── BOXES ── */
-.err-box { background:rgba(212,84,26,0.08); border-left:3px solid var(--rust); padding:14px 16px; margin:12px 0; font-size:11px; color:var(--rust); line-height:1.7; }
-.ok-box { background:rgba(74,158,74,0.08); border-left:3px solid var(--green); padding:10px 14px; margin:8px 0; font-size:10px; color:var(--green); line-height:1.6; }
-.info-box { background:var(--gold-dim); border-left:3px solid var(--gold); padding:10px 14px; margin:8px 0; font-size:10px; color:var(--gold); line-height:1.6; }
-
-/* ── DIVIDERS ── */
-.div-thick { height:3px; background:var(--ink); }
-.div-line { height:1px; background:var(--line); margin:28px 0; }
-
-/* ── CONFIRM ── */
-#confirm-ov {
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,.85); z-index:9998;
-  align-items:center; justify-content:center; padding:20px;
-}
-#confirm-ov.show { display:flex; }
-.confirm-box { background:var(--card); border-top:3px solid var(--rust); padding:28px 24px; max-width:320px; width:100%; }
-.confirm-msg { font-size:12px; color:var(--ink-mid); line-height:1.8; margin-bottom:20px; }
-.confirm-btns { display:flex; gap:10px; }
-.c-yes {
-  flex:1; background:var(--rust); border:none; color:var(--ink);
-  font-family:'Archivo Black','Arial Black',sans-serif;
-  font-size:11px; letter-spacing:2px; text-transform:uppercase;
-  padding:14px; cursor:pointer; min-height:48px;
-}
-.c-no {
-  flex:1; background:transparent; border:1px solid var(--line); color:var(--ink-dim);
-  font-family:inherit; font-size:10px; letter-spacing:2px; text-transform:uppercase;
-  padding:14px; cursor:pointer; min-height:48px;
-}
+.eval-band.green {border-left-color:var(--green);background:rgba(74,158,74,0.08);}
+.eval-band.red {border-left-color:var(--rust);background:rgba(212,84,26,0.08);}
+@media(max-width:500px){.grid-2,.grid-4{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<!-- CONFIRM -->
-<div id="confirm-ov">
-  <div class="confirm-box">
-    <div class="confirm-msg" id="confirm-msg"></div>
-    <div class="confirm-btns">
-      <button class="c-yes" id="confirm-yes">Confirmer</button>
-      <button class="c-no" onclick="closeConfirm()">Annuler</button>
-    </div>
-  </div>
-</div>
-
-<!-- GATE -->
-<div id="gate">
-  <div class="gate-box">
-    <div class="gate-logo">Moment Troc · Studio V4</div>
-    <div class="gate-title">Clé API<br>Gemini</div>
-    <div class="gate-sub">
-      Gratuit → <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a><br>
-      Sauvegardée sur ton appareil. Jamais partagée.
-    </div>
-    <input class="gate-input" id="key-inp" type="password" placeholder="AIza..." autocomplete="off">
-    <div class="gate-err" id="gate-err"></div>
-    <button class="gate-btn" id="gate-btn" onclick="validateKey()">
-      <span id="gate-btn-txt">Entrer dans le Studio</span>
-    </button>
-    <div class="gate-note">La clé est vérifiée avant l'accès.</div>
-  </div>
-</div>
-
-<!-- MASTHEAD -->
-<header class="masthead">
-  <div class="m-left">
-    <div class="m-title">Moment Troc <em>Studio</em></div>
-    <div class="m-v">V4</div>
-  </div>
-  <div class="m-right" id="key-status">— aucune clé —</div>
-</header>
-<div class="div-thick"></div>
-
-<!-- CONVERSION BAR -->
-<div class="conv-bar">
-  <div class="cs" id="cs-1"><div class="cs-dot"></div>S1 · Masque</div>
-  <div class="cs" id="cs-2"><div class="cs-dot"></div>S2 · Déclencheur</div>
-  <div class="cs" id="cs-3"><div class="cs-dot"></div>S3 · Fissure</div>
-  <div class="cs" id="cs-4"><div class="cs-dot"></div>S4 · Conversion</div>
-</div>
-<div class="conv-hint" id="conv-hint"></div>
-
-<!-- MODE TABS -->
-<nav class="mode-nav">
-  <button class="mtab active" onclick="goMode('studio')">Studio</button>
-  <button class="mtab" onclick="goMode('trockit')">Troc Kit</button>
-  <button class="mtab" onclick="goMode('deconstruire')">Déconstruire</button>
-  <button class="mtab" onclick="goMode('arsenal')">Arsenal</button>
-</nav>
-
-<main>
-
-<!-- ═══════════════════════════════
-     STUDIO
-═══════════════════════════════ -->
-<section id="mode-studio">
-  <div class="s-eye">Agent terrain · Profil · 5 posts calibrés</div>
-  <div class="s-title">L'agent qui lit<br><em>ton marché.</em></div>
-  <div class="s-deck">3 questions. L'agent détecte le profil de ta cible et génère 5 posts calibrés sur sa psychologie.</div>
-
-  <div class="field">
-    <div class="flabel">Business sauvegardé <span class="opt">3 profils max</span></div>
-    <div class="slots" id="slots">
-      <div class="slot active" data-sl="0" onclick="pickSlot(0)"><div class="slot-dot"></div><span id="sl0">Profil 1</span></div>
-      <div class="slot" data-sl="1" onclick="pickSlot(1)"><div class="slot-dot"></div><span id="sl1">Profil 2</span></div>
-      <div class="slot" data-sl="2" onclick="pickSlot(2)"><div class="slot-dot"></div><span id="sl2">Profil 3</span></div>
-    </div>
-  </div>
-
-  <div id="studio-form">
-    <div class="field">
-      <div class="flabel">Ce que tu vends</div>
-      <div class="fhint">Nomme le produit ou service. Simple et précis.</div>
-      <textarea id="f1" rows="2" maxlength="300" placeholder="Ex: Formation en ligne sur la gestion financière pour entrepreneurs…" oninput="cc(this,'cc1',300)"></textarea>
-      <div class="cc" id="cc1">0 / 300</div>
-    </div>
-    <div class="field">
-      <div class="flabel">À qui exactement</div>
-      <div class="fhint">Qui est cette personne, ce qu'elle vit, où elle en est.</div>
-      <textarea id="f2" rows="2" maxlength="300" placeholder="Ex: Entrepreneurs africains 25-40 ans qui peinent à gérer leur trésorerie…" oninput="cc(this,'cc2',300)"></textarea>
-      <div class="cc" id="cc2">0 / 300</div>
-    </div>
-    <div class="field">
-      <div class="flabel">Le problème exact que tu règles</div>
-      <div class="fhint">Leur douleur — ce qu'ils vivent avant de te rencontrer.</div>
-      <textarea id="f3" rows="2" maxlength="300" placeholder="Ex: Ils génèrent des revenus mais ne savent pas où l'argent disparaît chaque mois…" oninput="cc(this,'cc3',300)"></textarea>
-      <div class="cc" id="cc3">0 / 300</div>
-    </div>
-    <div class="field">
-      <div class="flabel">Matière brute <span class="opt">optionnel</span></div>
-      <div class="fhint">Une phrase, une scène, une tension que tu veux voir dans les posts.</div>
-      <textarea id="f4" rows="2" maxlength="400" placeholder="Ex: L'image du vendeur de Poteau qui a lu ma morphologie avant de parler…" oninput="cc(this,'cc4',400)"></textarea>
-      <div class="cc" id="cc4">0 / 400</div>
-    </div>
-    <div class="field">
-      <div class="flabel">Format</div>
-      <div class="sgrid">
-        <div class="sitem on" data-f="court" onclick="s1(this,'f')"><div class="sname">Court</div><div class="sdesc">80–130 mots. Impact direct.</div></div>
-        <div class="sitem" data-f="long" onclick="s1(this,'f')"><div class="sname">Long</div><div class="sdesc">200–300 mots. Narration.</div></div>
-        <div class="sitem" data-f="thread" onclick="s1(this,'f')"><div class="sname">Thread</div><div class="sdesc">4–6 parties. Révélation.</div></div>
-        <div class="sitem" data-f="mixte" onclick="s1(this,'f')"><div class="sname">Mixte</div><div class="sdesc">L'agent adapte selon l'intention.</div></div>
-      </div>
-    </div>
-    <div class="field">
-      <div class="flabel">Intentions <span class="opt">plusieurs possibles</span></div>
-      <div class="sgrid">
-        <div class="sitem on" data-i="valeur" onclick="sN(this)"><div class="sname">Valeur Brute</div><div class="sdesc">Autorité. Le lecteur apprend.</div></div>
-        <div class="sitem on" data-i="emotion" onclick="sN(this)"><div class="sname">Émotion Miroir</div><div class="sdesc">Reconnaissance. Il se voit.</div></div>
-        <div class="sitem on" data-i="curiosite" onclick="sN(this)"><div class="sname">Curiosité</div><div class="sdesc">Suspense. Il doit finir.</div></div>
-        <div class="sitem on" data-i="miroir" onclick="sN(this)"><div class="sname">Miroir Brutal</div><div class="sdesc">Vérité. Il se reconnaît.</div></div>
-      </div>
-    </div>
-    <div class="field">
-      <div class="flabel">Langue</div>
-      <div class="sgrid c3">
-        <div class="sitem on" data-l="standard" onclick="s1(this,'l')"><div class="sname">Français</div><div class="sdesc">Autorité.</div></div>
-        <div class="sitem" data-l="local" onclick="s1(this,'l')"><div class="sname">Local</div><div class="sdesc">Terrain africain.</div></div>
-        <div class="sitem" data-l="mixte" onclick="s1(this,'l')"><div class="sname">Mixte</div><div class="sdesc">Adapté par intention.</div></div>
-      </div>
-    </div>
-    <button class="btn-p" id="btn-gen" onclick="runStudio()">Lancer l'agent → 5 posts</button>
-    <button class="btn-stop" id="btn-stop" onclick="stopGen()">⬛ Arrêter</button>
-  </div>
-
-  <div id="studio-prog" style="display:none;">
-    <div class="prog-wrap">
-      <div class="prog-title" id="prog-title">L'agent travaille…</div>
-      <div class="psteps" id="psteps"></div>
-    </div>
-  </div>
-
-  <div id="studio-res" style="display:none;">
-    <div id="scan-res"></div>
-    <div id="profil-res"></div>
-
-    <div class="s-eye" style="margin-top:28px;" id="posts-anchor">Posts générés</div>
-    <div class="post-nav-bar">
-      <button class="btn-nav" id="btn-prev" onclick="navP(-1)" disabled>← Préc.</button>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-        <div class="pcounter" id="pcounter">Post 1 / 5</div>
-        <div class="pdots" id="pdots"></div>
-      </div>
-      <button class="btn-nav" id="btn-next" onclick="navP(1)">Suiv. →</button>
-    </div>
-    <div id="post-display"></div>
-
-    <div id="tk-bridge" style="display:none;margin-top:16px;"></div>
-
-    <div class="cal-wrap" id="cal-wrap">
-      <div class="s-eye">Calendrier 30 jours</div>
-      <div class="cal-head">
-        <div class="s-title" style="font-size:20px;">Programme</div>
-        <div class="tog-wrap" id="cal-tog" onclick="togCal()">
-          <span id="cal-lbl">Simple</span>
-          <div class="tog-pill"></div>
-          <span>Séquence</span>
-        </div>
-      </div>
-      <div class="cal-week-row">
-        <div class="cal-week-lbl">Semaine de départ</div>
-        <div class="cal-week-btns">
-          <button class="cwbtn on" data-w="1" onclick="setW(1,this)">S1</button>
-          <button class="cwbtn" data-w="2" onclick="setW(2,this)">S2</button>
-          <button class="cwbtn" data-w="3" onclick="setW(3,this)">S3</button>
-          <button class="cwbtn" data-w="4" onclick="setW(4,this)">S4</button>
-        </div>
-      </div>
-      <div class="cal-day-lbls">
-        <div class="cdl">Lun</div><div class="cdl">Mar</div><div class="cdl">Mer</div>
-        <div class="cdl">Jeu</div><div class="cdl">Ven</div><div class="cdl">Sam</div><div class="cdl">Dim</div>
-      </div>
-      <div class="cal-grid" id="cal-grid"></div>
-    </div>
-
-    <div class="div-line"></div>
-    <div class="s-eye">Historique mécaniques</div>
-    <div id="hist-list" style="margin-top:8px;"></div>
-
-    <div class="brow" style="margin-top:28px;">
-      <button class="btn-g" onclick="resetStudio()">← Nouveau brief</button>
-      <button class="btn-g" onclick="runStudio()">Tout régénérer</button>
-    </div>
-  </div>
-  <div id="studio-err" style="display:none;"></div>
-</section>
-
-<!-- ═══════════════════════════════
-     TROC KIT
-═══════════════════════════════ -->
-<section id="mode-trockit" style="display:none;">
-  <div class="s-eye">Messages de prospection calibrés</div>
-  <div class="s-title">Troc Kit —<br><em>chirurgical par profil.</em></div>
-  <div class="s-deck">Messages d'approche, de valeur, de relance et de réponse aux objections. Chaque message suit la logique de conversion Moment Troc.</div>
-
-  <div id="tk-auto" style="display:none;" class="info-box" style="margin-bottom:16px;"></div>
-
-  <div class="field">
-    <div class="flabel">Ton offre</div>
-    <div class="fhint">Ce que tu proposes, à quel prix, ce que ça change pour l'acheteur.</div>
-    <textarea id="tk-offre" rows="3" maxlength="400" placeholder="Ex: Formation 3 mois, 497€ — l'entrepreneur sort avec un système financier qui tourne seul…" oninput="cc(this,'cc-tko',400)"></textarea>
-    <div class="cc" id="cc-tko">0 / 400</div>
-  </div>
-  <div class="field">
-    <div class="flabel">Profil du prospect</div>
-    <div class="sgrid">
-      <div class="sitem on" data-p="automatiseur" onclick="s1(this,'p')"><div class="sname">Automatiseur</div><div class="sdesc">Veut que ça tourne sans lui.</div></div>
-      <div class="sitem" data-p="optimiseur" onclick="s1(this,'p')"><div class="sname">Optimiseur</div><div class="sdesc">Veut les meilleurs résultats.</div></div>
-      <div class="sitem" data-p="elevateur" onclick="s1(this,'p')"><div class="sname">Élévateur</div><div class="sdesc">Veut monter en niveau.</div></div>
-      <div class="sitem" data-p="liberateur" onclick="s1(this,'p')"><div class="sname">Libérateur</div><div class="sdesc">Veut se libérer d'un fardeau.</div></div>
-    </div>
-  </div>
-  <div class="field">
-    <div class="flabel">Niveau de méfiance</div>
-    <div class="sgrid c3">
-      <div class="sitem on" data-m="faible" onclick="s1(this,'m')"><div class="sname">Faible</div><div class="sdesc">Déjà chaud.</div></div>
-      <div class="sitem" data-m="moderee" onclick="s1(this,'m')"><div class="sname">Modérée</div><div class="sdesc">Prudent.</div></div>
-      <div class="sitem" data-m="elevee" onclick="s1(this,'m')"><div class="sname">Élevée</div><div class="sdesc">Mur fort.</div></div>
-    </div>
-  </div>
-  <div class="field">
-    <div class="flabel">Ce que tu sais de lui <span class="opt">optionnel</span></div>
-    <textarea id="tk-ctx" rows="2" maxlength="300" placeholder="Ce qu'il a dit, comment vous vous êtes rencontrés…" oninput="cc(this,'cc-tkc',300)"></textarea>
-    <div class="cc" id="cc-tkc">0 / 300</div>
-  </div>
-  <button class="btn-p" onclick="runTrocKit()">Générer les messages</button>
-  <div id="tk-prog" style="display:none;"><div class="prog-wrap"><div class="prog-title">Calibration en cours…</div></div></div>
-  <div id="tk-res" style="display:none;"></div>
-  <div id="tk-err" style="display:none;"></div>
-</section>
-
-<!-- ═══════════════════════════════
-     DÉCONSTRUIRE
-═══════════════════════════════ -->
-<section id="mode-deconstruire" style="display:none;">
-  <div class="s-eye">Autopsie de contenu</div>
-  <div class="s-title">Déconstruire —<br><em>ce qui marche. Pourquoi.</em></div>
-  <div class="s-deck">Colle un post concurrent. L'agent révèle la mécanique cachée et génère une version améliorée directement exploitable.</div>
-
-  <div class="field">
-    <div class="flabel">Le post à déconstruire</div>
-    <textarea id="dc-post" rows="7" maxlength="2000" placeholder="Colle le post ici…" oninput="cc(this,'cc-dc',2000)"></textarea>
-    <div class="cc" id="cc-dc">0 / 2000</div>
-  </div>
-  <div class="field">
-    <div class="flabel">Ton secteur / cible <span class="opt">optionnel</span></div>
-    <textarea id="dc-ctx" rows="2" maxlength="300" placeholder="Pour calibrer l'analyse sur ton marché…" oninput="cc(this,'cc-dcc',300)"></textarea>
-    <div class="cc" id="cc-dcc">0 / 300</div>
-  </div>
-  <button class="btn-p" onclick="runDC()">Déconstruire + améliorer</button>
-  <div id="dc-prog" style="display:none;"><div class="prog-wrap"><div class="prog-title">Autopsie en cours…</div></div></div>
-  <div id="dc-res" style="display:none;"></div>
-  <div id="dc-err" style="display:none;"></div>
-</section>
-
-<!-- ═══════════════════════════════
-     ARSENAL
-═══════════════════════════════ -->
-<section id="mode-arsenal" style="display:none;">
-  <div class="s-eye">Bibliothèque personnelle</div>
-  <div class="s-title">Arsenal —<br><em>tes meilleurs posts.</em></div>
-  <div class="s-deck">Posts validés depuis le Studio. Recycle-les comme base de variante ou utilise-les comme matière pour de nouveaux posts.</div>
-  <div id="ar-list"></div>
-</section>
-
-</main>
+<div id="app"></div>
 
 <script>
-// ════════════════════════════════════════
-// ÉTAT GLOBAL
-// ════════════════════════════════════════
-let GK = '';
-let stopped = false;
-let isGen = false;
+// ═══════════════════════════════════════
+// MOMENT TROC · STUDIO — Version avec Auto-Évaluation
+// ═══════════════════════════════════════
 
-let scanData = '';
-let profilData = null;
-let posts = [];
-let postIdx = 0;
+const MASTER_KEY = 'MKB2000-2022A';
+const VALID_KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
+function getMomentKey(){return localStorage.getItem('mt_moment_key');}
+function setMomentKey(k){localStorage.setItem('mt_moment_key',k);}
+function getGeminiKey(){return localStorage.getItem('mt_gemini_key');}
+function setGeminiKey(k){localStorage.setItem('mt_gemini_key',k);}
 
-let calSeq = false;
-let calWeek = 1;
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
 
-let slots = JSON.parse(localStorage.getItem('mt4_slots') || '[{},{},{}]');
-let activeSlot = 0;
-
-let mechHist = JSON.parse(localStorage.getItem('mt4_mech') || '[]');
-let arsenal = JSON.parse(localStorage.getItem('mt4_arsenal') || '[]');
-
-let confirmCb = null;
-
-const CONV_HINTS = {
-  1: 'S1 · Masque — Publie des posts qui créent la reconnaissance. Ton lecteur doit se voir dans ce que tu écris.',
-  2: 'S2 · Déclencheur — Active le signal qui fissure. Ton lecteur commence à douter de sa situation actuelle.',
-  3: 'S3 · Fissure — Touche l\'émotion enfouie. Ton lecteur ressent quelque chose qu\'il n\'avait jamais nommé.',
-  4: 'S4 · Conversion — Propose la sortie. Ton lecteur passe à l\'action.'
-};
-
-const INT = {
-  valeur: {
-    label: 'Valeur Brute', tag: 'ptag-r',
-    rules: `VALEUR BRUTE :
-- Ton d'autorité directe. Affirmation forte, pas de question rhétorique.
-- Structure : Affirmation → Démonstration concrète → Vérité finale
-- Le lecteur apprend quelque chose de précis en 30 secondes.
-- Jamais de langage local. Pas d'émotion excessive.`
-  },
-  emotion: {
-    label: 'Émotion Miroir', tag: 'ptag-g',
-    rules: `ÉMOTION MIROIR — T1→T2→T3→T4 :
-- T1 MASQUE : Ce que le prospect montre au monde (sa façade)
-- T2 DÉCLENCHEUR : L'événement qui fissure ce masque
-- T3 FISSURE : L'émotion vraie, jamais dite, enfouie
-- T4 RECONSTRUCTION : La sortie — ce qui change
-- Narration à la 2ème personne (tu). Langage local si demandé.`
-  },
-  curiosite: {
-    label: 'Curiosité Suspense', tag: 'ptag-i',
-    rules: `CURIOSITÉ SUSPENSE :
-- Ouvre une boucle cognitive dès les 2 premières lignes. Ne la ferme pas.
-- Chaque paragraphe crée une tension vers le suivant.
-- Révélation progressive. Le lecteur doit scroller pour la réponse.
-- Clôture sur une vérité surprenante ou contre-intuitive.`
-  },
-  miroir: {
-    label: 'Miroir Brutal', tag: 'ptag-r',
-    rules: `MIROIR BRUTAL :
-- Tu dis la vérité quand tout le monde applaudit.
-- Pas d'accusation directe — la vérité arrive par le miroir.
-- Le lecteur se reconnaît AVANT de se défendre.
-- Registre émotionnel OU autoritaire — un seul, pas les deux.`
-  }
-};
-
-const SEQ_INT = { 1:['valeur','valeur'], 2:['emotion','curiosite'], 3:['emotion','miroir'], 4:['valeur','miroir'] };
-
-// ════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════
-window.onload = () => {
-  const saved = localStorage.getItem('mt4_key');
-  if (saved) {
-    GK = saved;
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('key-status').innerHTML = '<span class="m-ok">✓ clé active</span>';
-  }
-  loadSlot(0);
-  updateConv(1);
-  renderArsenal();
-  renderHist();
-};
-
-document.getElementById('key-inp').addEventListener('keydown', e => { if (e.key === 'Enter') validateKey(); });
-
-// ════════════════════════════════════════
-// GATE
-// ════════════════════════════════════════
-async function validateKey() {
-  const k = document.getElementById('key-inp').value.trim();
-  const errEl = document.getElementById('gate-err');
-  errEl.textContent = '';
-  if (!k.startsWith('AIza') || k.length < 30) {
-    errEl.textContent = 'Clé invalide. Elle commence par AIza...';
-    return;
-  }
-  const btn = document.getElementById('gate-btn');
-  const txt = document.getElementById('gate-btn-txt');
-  btn.disabled = true;
-  txt.textContent = 'Vérification…';
-  try {
-    const ok = await testKey(k);
-    if (!ok) throw new Error('Clé rejetée par Gemini. Vérifie sur aistudio.google.com');
-    GK = k;
-    localStorage.setItem('mt4_key', k);
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('key-status').innerHTML = '<span class="m-ok">✓ clé active</span>';
-  } catch (e) {
-    errEl.textContent = e.message;
-    btn.disabled = false;
-    txt.textContent = 'Entrer dans le Studio';
-  }
-}
-
-async function testKey(k) {
-  const r = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,
-    { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents:[{parts:[{text:'OK'}]}], generationConfig:{maxOutputTokens:3} }) }
-  );
-  return r.ok;
-}
-
-// ════════════════════════════════════════
-// MODE SWITCH
-// ════════════════════════════════════════
-function goMode(m) {
-  ['studio','trockit','deconstruire','arsenal'].forEach(id => {
-    document.getElementById('mode-' + id).style.display = id === m ? '' : 'none';
-  });
-  document.querySelectorAll('.mtab').forEach((t, i) => {
-    t.classList.toggle('active', ['studio','trockit','deconstruire','arsenal'][i] === m);
-  });
-  if (m === 'trockit') prefillTK();
-  if (m === 'arsenal') renderArsenal();
-}
-
-// ════════════════════════════════════════
-// SELECTORS
-// ════════════════════════════════════════
-function s1(el, attr) {
-  document.querySelectorAll(`[data-${attr}]`).forEach(e => e.classList.remove('on'));
-  el.classList.add('on');
-}
-function sN(el) { el.classList.toggle('on'); }
-function gv(attr) { const e = document.querySelector(`[data-${attr}].on`); return e ? e.getAttribute('data-' + attr) : ''; }
-function gvs(attr) { return [...document.querySelectorAll(`[data-${attr}].on`)].map(e => e.getAttribute('data-' + attr)); }
-
-// ════════════════════════════════════════
-// CHAR COUNT
-// ════════════════════════════════════════
-function cc(el, id, max) {
-  const n = el.value.length;
-  const c = document.getElementById(id);
-  if (!c) return;
-  c.textContent = `${n} / ${max}`;
-  c.classList.toggle('warn', n > max * 0.9);
-}
-
-// ════════════════════════════════════════
-// SLOTS
-// ════════════════════════════════════════
-function pickSlot(i) {
-  saveSlot(activeSlot);
-  activeSlot = i;
-  document.querySelectorAll('.slot').forEach((s, j) => s.classList.toggle('active', j === i));
-  loadSlot(i);
-}
-function saveSlot(i) {
-  const v1 = document.getElementById('f1')?.value || '';
-  const v2 = document.getElementById('f2')?.value || '';
-  const v3 = document.getElementById('f3')?.value || '';
-  if (v1 || v2 || v3) {
-    slots[i] = { v1, v2, v3, label: v1.slice(0, 18) || `Profil ${i+1}` };
-    localStorage.setItem('mt4_slots', JSON.stringify(slots));
-    updateSlotLabels();
-  }
-}
-function loadSlot(i) {
-  const s = slots[i] || {};
-  const f1 = document.getElementById('f1'); if (f1) { f1.value = s.v1 || ''; cc(f1,'cc1',300); }
-  const f2 = document.getElementById('f2'); if (f2) { f2.value = s.v2 || ''; cc(f2,'cc2',300); }
-  const f3 = document.getElementById('f3'); if (f3) { f3.value = s.v3 || ''; cc(f3,'cc3',300); }
-  updateSlotLabels();
-}
-function updateSlotLabels() {
-  slots.forEach((s, i) => {
-    const lbl = document.getElementById(`sl${i}`);
-    const el = document.querySelector(`[data-sl="${i}"]`);
-    if (lbl) lbl.textContent = s.label || `Profil ${i+1}`;
-    if (el) el.classList.toggle('filled', !!(s.v1 || s.v2));
-  });
-}
-
-// ════════════════════════════════════════
-// CONVERSION BAR
-// ════════════════════════════════════════
-function updateConv(w) {
-  [1,2,3,4].forEach(n => {
-    const el = document.getElementById('cs-' + n);
-    el.classList.remove('active','done');
-    if (n === w) el.classList.add('active');
-    else if (n < w) el.classList.add('done');
-  });
-  const hint = document.getElementById('conv-hint');
-  hint.textContent = CONV_HINTS[w] || '';
-  hint.classList.toggle('show', !!CONV_HINTS[w]);
-}
-
-// ════════════════════════════════════════
-// GEMINI CALL
-// ════════════════════════════════════════
-async function callG(prompt, temp = 0.85, maxTok = 1200) {
-  if (stopped) throw new Error('Génération arrêtée.');
-  const r = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GK}`,
-    { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:temp, maxOutputTokens:maxTok} }) }
-  );
-  if (!r.ok) {
-    const e = await r.json().catch(() => ({}));
-    const code = e?.error?.code || r.status;
-    if (code === 429) throw new Error('Limite API atteinte. Attends 1 minute et relance.');
-    if (code === 401 || code === 403) throw new Error('Clé API invalide ou expirée. Vérifie sur aistudio.google.com');
-    throw new Error(e?.error?.message || `Erreur Gemini (${code})`);
-  }
-  const d = await r.json();
-  const txt = d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  // Nettoyer markdown de Gemini
-  return txt
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/#{1,6}\s/g, '')
-    .replace(/`{1,3}/g, '')
-    .trim();
-}
-
-// ════════════════════════════════════════
-// STOP
-// ════════════════════════════════════════
-function stopGen() {
-  stopped = true; isGen = false;
-  document.getElementById('btn-stop').classList.remove('show');
-  document.getElementById('studio-prog').style.display = 'none';
-  document.getElementById('studio-form').style.display = '';
-  showErr('studio-err', 'Génération arrêtée. Tu peux relancer.');
-}
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// ════════════════════════════════════════
-// PROGRESS
-// ════════════════════════════════════════
-function buildSteps(steps) {
-  document.getElementById('psteps').innerHTML = steps.map((s, i) =>
-    `<div class="pstep" id="ps${i}"><div class="pstep-dot"></div><span>${s}</span></div>`
-  ).join('');
-}
-function setPS(i, state) {
-  const el = document.getElementById('ps' + i);
-  if (!el) return;
-  el.classList.remove('active','done');
-  if (state) el.classList.add(state);
-}
-function actPS(i) {
-  for (let j = 0; j < i; j++) setPS(j, 'done');
-  setPS(i, 'active');
-}
-
-// ════════════════════════════════════════
-// VALIDATION BRIEF
-// ════════════════════════════════════════
-function validBrief() {
-  const v1 = document.getElementById('f1').value.trim();
-  const v2 = document.getElementById('f2').value.trim();
-  const v3 = document.getElementById('f3').value.trim();
-  if (!v1 || v1.length < 8) return 'Décris ce que tu vends — champ 1 (min. 8 caractères).';
-  if (!v2 || v2.length < 8) return 'Décris à qui tu vends — champ 2 (min. 8 caractères).';
-  if (!v3 || v3.length < 8) return 'Décris le problème que tu règles — champ 3 (min. 8 caractères).';
-  return null;
-}
-
-// ════════════════════════════════════════
-// STUDIO — ORCHESTRATION
-// ════════════════════════════════════════
-async function runStudio() {
-  const err = validBrief();
-  if (err) { showErr('studio-err', err); return; }
-  if (!GK) { document.getElementById('gate').style.display = 'flex'; return; }
-  if (isGen) return;
-
-  isGen = true; stopped = false;
-
-  const v1 = document.getElementById('f1').value.trim();
-  const v2 = document.getElementById('f2').value.trim();
-  const v3 = document.getElementById('f3').value.trim();
-  const v4 = document.getElementById('f4').value.trim();
-  const fmt = gv('f') || 'court';
-  const lng = gv('l') || 'standard';
-  const ints = gvs('i');
-  const five = ints.length ? Array.from({length:5}, (_,i) => ints[i % ints.length]) : ['valeur','emotion','curiosite','miroir','emotion'];
-
-  saveSlot(activeSlot);
-
-  document.getElementById('studio-form').style.display = 'none';
-  document.getElementById('studio-err').style.display = 'none';
-  document.getElementById('studio-res').style.display = 'none';
-  document.getElementById('studio-prog').style.display = '';
-  document.getElementById('btn-stop').classList.add('show');
-
-  buildSteps([
-    'Analyse du terrain et du marché…',
-    'Détection du profil dominant…',
-    'Génération Post 1 / 5…',
-    'Génération Post 2 / 5…',
-    'Génération Post 3 / 5…',
-    'Génération Post 4 / 5…',
-    'Génération Post 5 / 5…',
-    'Construction du calendrier…'
-  ]);
-
-  posts = []; postIdx = 0;
-
-  try {
-    actPS(0);
-    scanData = await doScan(v1, v2, v3);
-
-    actPS(1);
-    profilData = await doProfil(v1, v2, v3, scanData);
-
-    for (let i = 0; i < 5; i++) {
-      if (stopped) break;
-      actPS(2 + i);
-      const int = five[i];
-      const f = fmt === 'mixte' ? fmtFor(int) : fmt;
-      let post = null;
-      let tries = 0;
-      while (tries < 2 && !post) {
-        try {
-          post = await doPost(profilData, scanData, int, f, lng, v4, i);
-        } catch (e) {
-          tries++;
-          if (tries >= 2) throw e;
-          await delay(1500);
-        }
-      }
-      if (post) { posts.push(post); addMech(post); }
-    }
-
-    actPS(7);
-    await delay(300);
-
-    document.getElementById('btn-stop').classList.remove('show');
-    document.getElementById('studio-prog').style.display = 'none';
-    document.getElementById('studio-res').style.display = '';
-    isGen = false;
-
-    renderScan(scanData);
-    renderProfil(profilData);
-    renderPosts();
-    renderCal();
-    renderHist();
-
-    // Bridge Troc Kit
-    const bridge = document.getElementById('tk-bridge');
-    if (bridge && profilData) {
-      bridge.style.display = '';
-      bridge.innerHTML = `<div class="ok-box">Profil détecté → <strong>${esc(profilData.profil)}</strong> · Mode ${esc(profilData.mode)}</div>
-        <button class="btn-g" style="margin-top:8px;" onclick="goMode('trockit')">Ouvrir le Troc Kit avec ce profil →</button>`;
-    }
-    updateConv(calWeek);
-
-  } catch (e) {
-    isGen = false;
-    document.getElementById('btn-stop').classList.remove('show');
-    document.getElementById('studio-prog').style.display = 'none';
-    document.getElementById('studio-form').style.display = '';
-    showErr('studio-err', e.message);
-  }
-}
-
-function fmtFor(int) {
-  if (int === 'emotion') return 'long';
-  if (int === 'curiosite') return 'thread';
-  return 'court';
-}
-
-// ════════════════════════════════════════
-// BLOC 1 — SCAN
-// ════════════════════════════════════════
-async function doScan(v1, v2, v3) {
-  const p = `Tu es un analyste de contenu marketing pour les marchés africains francophones.
-
-Business :
-- Ce qui est vendu : "${v1}"
-- La cible : "${v2}"
-- Le problème réglé : "${v3}"
-
-Analyse en 4 axes (150 mots max, dense, directement exploitable) :
-
-1. CE QUI ENGAGE SUR CE MARCHÉ : types de contenus qui fonctionnent, formats, tonalités performantes
-2. STRUCTURES NARRATIVES : micro-scène, chiffre choc, question miroir — lesquelles reviennent
-3. SILENCES ET ANGLES INEXPLOITÉS : ce que personne ne dit sur cette thématique
-4. LANGAGE LOCAL : mots, expressions, références culturelles qui circulent
-
-Commence directement par l'analyse. Pas de titre. Pas d'introduction.`;
-  return await callG(p, 0.7, 700);
-}
-
-// ════════════════════════════════════════
-// BLOC 2 — PROFIL
-// ════════════════════════════════════════
-async function doProfil(v1, v2, v3, scan) {
-  const p = `Tu es un expert du framework Moment Troc — lecture comportementale des acheteurs.
-
-Business :
-- Ce qui est vendu : "${v1}"
-- La cible : "${v2}"
-- Le problème réglé : "${v3}"
-- Analyse terrain : "${scan.slice(0, 350)}"
-
-4 profils Moment Troc :
-- AUTOMATISEUR : veut que ça tourne sans lui, fuit la charge mentale
-- OPTIMISEUR : veut les meilleurs résultats, compare, rationnel
-- ÉLÉVATEUR : veut progresser, apprendre, monter en niveau
-- LIBÉRATEUR : veut se libérer d'un fardeau, sortir d'une prison
-
-Retourne UNIQUEMENT ce JSON exact (rien d'autre, zéro markdown) :
-{"profil":"AUTOMATISEUR","mode":"désir","organe":"image mentale précise qui fait basculer","tension":"phrase intérieure que ce prospect se dit","simple":"ce que ça veut dire en clair sans jargon"}`;
-
-  const raw = await callG(p, 0.7, 500);
-  const m = raw.match(/\{[\s\S]*?\}/);
-  if (!m) throw new Error('Profil non détecté. Relance l\'agent.');
-  try { return JSON.parse(m[0]); }
-  catch { throw new Error('Profil invalide. Relance l\'agent.'); }
-}
-
-// ════════════════════════════════════════
-// BLOC 3 — POST
-// ════════════════════════════════════════
-async function doPost(profil, scan, int, fmt, lng, matiere, idx) {
-  const cfg = INT[int] || INT.valeur;
-  const hist = mechHist.slice(0, 5).map((h, i) => `${i+1}. [${h.int}] Ouverture: "${h.ouv}"`).join('\n');
-  const histSec = hist ? `\nSTRUCTURES DÉJÀ UTILISÉES — NE PAS RÉPÉTER :\n${hist}\n` : '';
-
-  const langRule = lng === 'local' && (int === 'emotion' || int === 'miroir')
-    ? 'Langage de terrain africain francophone intégré naturellement. Expressions locales authentiques.'
-    : lng === 'mixte' && int === 'emotion'
-    ? 'Langage de terrain si pertinent pour créer la proximité.'
-    : 'Français standard. Pas de langage local.';
-
-  const fmtRule = fmt === 'thread'
-    ? 'Format THREAD : 4 à 6 parties numérotées (1/, 2/, etc.). Chaque partie = une révélation. Hook fort en ouverture.'
-    : fmt === 'long'
-    ? 'Format LONG : 220 à 320 mots. Narration développée, rythme, respiration entre les paragraphes.'
-    : 'Format COURT : 80 à 130 mots. Chaque mot compte. Impact immédiat. Zéro remplissage.';
-
-  const matSec = matiere ? `\nMATIÈRE BRUTE — pars de là en priorité, construis depuis cette matière :\n"${matiere}"\n` : '';
-
-  const p = `Tu es un ghostwriter expert en marketing comportemental pour entrepreneurs africains francophones.
-
-PROFIL DE LA CIBLE :
-- Archétype : ${profil.profil}
-- Mode : ${profil.mode}
-- Ce qui fait basculer : ${profil.organe}
-- Ce qu'il se dit intérieurement : "${profil.tension}"
-
-DONNÉES TERRAIN :
-${scan.slice(0, 450)}
-${matSec}
-INTENTION : ${cfg.label}
-${cfg.rules}
-
-FORMAT : ${fmtRule}
-LANGUE : ${langRule}
-${histSec}
-RÈGLES ABSOLUES :
-- Commence directement par le contenu du post. Zéro titre, zéro label, zéro "Voici le post".
-- Écris comme un humain expert, pas comme une IA
-- Pas de bullet points sauf format thread
-- Pas de conclusion moralisatrice type "alors n'attends plus" ou "passe à l'action"
-- Pas de call to action commercial explicite
-- Sauts de ligne pour le rythme
-- Respecte strictement la longueur du format demandé`;
-
-  const text = await callG(p, 0.88, 1400);
-  if (!text || text.length < 40) throw new Error(`Post ${idx+1} vide.`);
-
-  return {
-    text, int, fmt, lng,
-    label: cfg.label, tag: cfg.tag,
-    ouv: text.slice(0, 70),
-    signal: `${profil.profil} · ${cfg.label} · mode ${profil.mode}`
+async function callGemini(prompt, useSearch=false, maxTokens=1400){
+  const key = getGeminiKey();
+  if(!key) throw new Error('Clé Gemini manquante');
+  const body = {
+    contents:[{parts:[{text:prompt}]}],
+    generationConfig:{temperature:0.88,maxOutputTokens:maxTokens}
   };
-}
-
-// ════════════════════════════════════════
-// RENDER SCAN
-// ════════════════════════════════════════
-function renderScan(data) {
-  document.getElementById('scan-res').innerHTML = `
-    <div class="result-card gold">
-      <div class="s-eye">Bloc 1 — Rapport terrain</div>
-      <div style="font-size:11px;color:var(--ink-mid);line-height:1.9;white-space:pre-wrap;">${esc(data)}</div>
-    </div>`;
-}
-
-// ════════════════════════════════════════
-// RENDER PROFIL
-// ════════════════════════════════════════
-function renderProfil(p) {
-  document.getElementById('profil-res').innerHTML = `
-    <div class="result-card">
-      <div class="s-eye">Bloc 2 — Profil détecté</div>
-      <div class="ptags">
-        <span class="ptag ptag-r">${esc(p.profil)}</span>
-        <span class="ptag ptag-g">${esc(p.mode)}</span>
-        <span class="ptag ptag-l">${esc(p.organe)}</span>
-      </div>
-      <div style="font-family:'Playfair Display','Georgia',serif;font-size:14px;font-style:italic;color:var(--ink-mid);line-height:1.9;border-left:2px solid var(--rust);padding-left:14px;margin-bottom:10px;">
-        "${esc(p.tension)}"
-      </div>
-      <div style="font-size:11px;color:var(--ink-dim);line-height:1.7;">${esc(p.simple || '')}</div>
-    </div>`;
-}
-
-// ════════════════════════════════════════
-// RENDER POSTS
-// ════════════════════════════════════════
-function renderPosts() {
-  document.getElementById('pdots').innerHTML = posts.map((_, i) =>
-    `<div class="pdot${i===0?' active':''}" onclick="goP(${i})"></div>`
-  ).join('');
-  showP(0);
-}
-
-function showP(i) {
-  postIdx = i;
-  const p = posts[i];
-  if (!p) return;
-  document.getElementById('pcounter').textContent = `Post ${i+1} / ${posts.length}`;
-  document.querySelectorAll('.pdot').forEach((d, j) => {
-    d.classList.toggle('active', j === i);
-    d.classList.toggle('done', j < i);
+  if(useSearch) body.tools = [{google_search:{}}];
+  const res = await fetch(GEMINI_URL+key,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
   });
-  document.getElementById('btn-prev').disabled = i === 0;
-  document.getElementById('btn-next').disabled = i === posts.length - 1;
-  document.getElementById('post-display').innerHTML = buildCard(p, i);
+  if(!res.ok){
+    const e = await res.json().catch(()=>({}));
+    if(res.status===429) throw new Error('Limite API atteinte. Reviens dans 1 minute.');
+    throw new Error(e?.error?.message||'Erreur API');
+  }
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  return text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/#{1,6}\s/g,'').trim();
 }
 
-function buildCard(p, i) {
-  return `<div class="post-card">
-    <div class="pcard-head">
-      <div class="ptags">
-        <span class="ptag ${p.tag}">${esc(p.label)}</span>
-        <span class="ptag ptag-l">${esc(p.fmt)}</span>
-      </div>
-      <div class="post-signal">${esc(p.signal)}</div>
+const state = {
+  step:'unlock',
+  biz:'',cible:'',probleme:'',matiere:'',
+  dialogAnswers:[],
+  profilData:null,
+  mode:'désir',
+  maitre:null,
+  currentPost:null,
+  evalData:null,
+  arsenal:JSON.parse(localStorage.getItem('mt_arsenal')||'[]')
+};
+
+const PROFILS = {
+  AUTOMATISEUR:{organe:'Cortex Préfrontal',desir:'Un rail clair sans options',peur:'Le chaos, la surcharge mentale'},
+  OPTIMISEUR:{organe:'Striatum',desir:'Le meilleur retour sur investissement',peur:'Perdre du temps ou de l\'argent'},
+  ÉLÉVATEUR:{organe:'Noyau Accumbens',desir:'La reconnaissance, le statut',peur:'Être exclu, dépassé'},
+  LIBÉRATEUR:{organe:'Cortex Cingulaire',desir:'La singularité, la liberté',peur:'Être enfermé dans une case'}
+};
+
+const MAITRES = [
+  {id:'scofield',nom:'Michael Scofield',categorie:'Architecte de l\'Ombre',ton:'Plan froid, imparable, chirurgical.',prompt:'Mode Scofield — Présente le contenu comme un plan étape par étape (1/, 2/, 3/). Chaque étape est froide et méthodique. La dernière étape révèle que le plan était un piège pour le lecteur. Chirurgical, imparable.'},
+  {id:'moriarty',nom:'James Moriarty',categorie:'Architecte de l\'Ombre',ton:'Toujours trois coups d\'avance sur la pensée du lecteur.',prompt:'Mode Moriarty — Écris un post qui sait ce que le lecteur va penser avant qu\'il ne le pense. Anticipe ses objections, ses peurs, ses désirs. Chaque phrase est une pièce d\'échec. Le lecteur ne voit le piège qu\'à la fin.'},
+  {id:'palpatine',nom:'Empereur Palpatine',categorie:'Architecte de l\'Ombre',ton:'Le faux mentor, le piège à long terme.',prompt:'Mode Palpatine — Posture de mentor bienveillant. Offre une solution simple à un problème complexe. Le lecteur se sent guidé, en sécurité. À la fin, une phrase glissée qui suggère un piège bien plus vaste.'},
+  {id:'iago',nom:'Iago',categorie:'Architecte de l\'Ombre',ton:'Le poison des mots qui dégrade la certitude.',prompt:'Mode Iago — Insinue le doute chez le lecteur. Ne l\'attaque pas frontalement. Glisse des "et si" qui érodent. Le lecteur finit le post moins sûr de lui qu\'au début.'},
+  {id:'itachi',nom:'Itachi Uchiha',categorie:'Briseur de Réalité',ton:'Projection noire puis réveil brutal.',prompt:'Mode Itachi — Projette le lecteur dans un futur négatif plausible s\'il ne change rien. Fais-lui vivre des détails sensoriels. Puis rupture: "Ouvre les yeux. Ceci n\'est pas encore réel." puis vérité froide.'},
+  {id:'cobb',nom:'Dominick Cobb',categorie:'Briseur de Réalité',ton:'Plante une idée dans l\'esprit en faisant croire qu\'elle vient du lecteur.',prompt:'Mode Cobb — Le post doit faire croire au lecteur qu\'il a eu l\'idée par lui-même. Ne donne pas de conseil direct. Ils arrivent à la conclusion seuls. La dernière ligne referme la boucle.'},
+  {id:'mrrobot',nom:'Mr. Robot',categorie:'Briseur de Réalité',ton:'La rupture du système, le bug dans la matrice.',prompt:'Mode Mr. Robot — Post anarchique. Brise les conventions du copywriting. Peut être agressif, décousu, mais lucide. Le lecteur sent que quelque chose ne va pas. La fin est un appel à tout casser.'},
+  {id:'tyler',nom:'Tyler Durden',categorie:'Briseur de Réalité',ton:'Brûler le faux confort pour révéler la vérité nue.',prompt:'Mode Tyler Durden — Post frontal, brutal. Détruis les illusions que le lecteur chérit. Ne caresse pas, ne console pas. Révèle la vérité crue. Le lecteur doit se sentir secoué.'},
+  {id:'will',nom:'Will Aime',categorie:'Miroir Vivant',ton:'Un "il" qui devient "tu". Fin sans résolution.',prompt:'Mode Will Aime — Commence par un "il" ou "elle" dans une scène du quotidien africain réel. Bascule vers "tu" à la fin sans transition forcée. Le lecteur réalise que c\'était lui. JAMAIS de morale explicite. Fin ouverte.'},
+  {id:'tyrion',nom:'Tyrion Lannister',categorie:'Miroir Vivant',ton:'La faiblesse retournée en pouvoir suprême.',prompt:'Mode Tyrion — Commence par un aveu de faiblesse ou d\'exclusion. Retourne cette faiblesse en démonstration de force. Le lecteur qui se sent exclu doit se sentir puissant à la fin. Froid, intelligent.'},
+  {id:'hannibal',nom:'Hannibal Lecter',categorie:'Miroir Vivant',ton:'L\'observation si fine qu\'elle en devient terrifiante.',prompt:'Mode Hannibal — Analyse le lecteur avec une précision chirurgicale et malaisante. Nomme ce qu\'il cache, ce qu\'il ne dit pas, ce qu\'il se dit seul la nuit. Le post est un miroir. Pas d\'émotion. Juste la vérité froide.'},
+  {id:'joker',nom:'Le Joker',categorie:'Miroir Vivant',ton:'La provocation qui révèle la vraie nature.',prompt:'Mode Joker — Post provocateur qui force le lecteur à se révéler. Pousse-le à réagir, à se défendre. La fin retourne sa réaction contre lui. Ce n\'est pas toi qui es fou. C\'est lui qui se croit sain d\'esprit.'},
+  {id:'bismarck',nom:'Otto von Bismarck',categorie:'Stratège Silencieux',ton:'La force tranquille, le pragmatisme froid.',prompt:'Mode Bismarck — Post sobre, pragmatique, sans émotion. Parle de faits, de conséquences, de pouvoir. Ne promets rien. Constates. Le lecteur doit sentir la force du silence.'},
+  {id:'baelish',nom:'Petyr Baelish',categorie:'Stratège Silencieux',ton:'Tirer avantage de chaque événement, surtout les pires.',prompt:'Mode Baelish — Post cynique. Montre comment tirer profit du chaos, des échecs, des crises. Le lecteur apprend à voir l\'opportunité dans chaque désastre. Fin subtile, jamais explicite.'},
+  {id:'frank',nom:'Frank Underwood',categorie:'Stratège Silencieux',ton:'La confession directe au lecteur, faire de lui un complice.',prompt:'Mode Frank — Post en confidence. Le lecteur est un complice. Parle-lui comme à un initié. Dévoile des coulisses, des stratégies. Fin avec un clin d\'œil. "Tu sais maintenant."'},
+  {id:'v',nom:'V',categorie:'Stratège Silencieux',ton:'Faire exploser un système de croyances pour le reconstruire.',prompt:'Mode V — Post révolutionnaire. Attaque une croyance établie. La détruit méthodiquement. Puis propose une reconstruction. Le lecteur doit ressortir transformé.'}
+];
+
+const CATEGORIES = ['Architecte de l\'Ombre','Briseur de Réalité','Miroir Vivant','Stratège Silencieux'];
+
+const app = document.getElementById('app');
+function render(html){app.innerHTML=html;}
+function esc(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function showErr(id,msg){const el=document.getElementById(id);if(el)el.innerHTML=`<div class="err-box">⚠ ${esc(msg)}</div>`;}
+
+// ═══════════════════════════════════════
+// ÉTAPES (identiques à la version précédente)
+// ═══════════════════════════════════════
+
+function renderUnlock(){
+  render(`
+    <div class="center" style="margin-top:60px;">
+      <div class="eyebrow">Moment Troc · Studio</div>
+      <h1>Clé<br>d'Accès</h1>
+      <p class="sub">Entre la clé fournie par Kabou Meshak.</p>
+      <input id="key-input" type="text" placeholder="MT-2024X..." autocomplete="off" style="text-transform:uppercase;" />
+      <div id="gate-err" style="min-height:20px;color:var(--rust);font-size:0.8rem;margin-top:8px;"></div>
+      <button class="btn btn-main" onclick="validateMomentKey()">Entrer →</button>
     </div>
-    <div class="post-body">${esc(p.text)}</div>
-    <div class="post-actions">
-      <div class="ag">
-        <button class="abtn" onclick="copyP(${i},this)">Copier</button>
-        <button class="abtn" onclick="regenP(${i})">Régénérer</button>
-        <button class="abtn" onclick="changeAngle(${i})">Autre angle</button>
-        <button class="abtn" onclick="togDir(${i})">Ma direction</button>
-      </div>
-      <button class="abtn accent" onclick="saveAr(${i},this)">+ Arsenal</button>
+  `);
+}
+
+window.validateMomentKey = function(){
+  const k = document.getElementById('key-input').value.trim().toUpperCase();
+  const err = document.getElementById('gate-err');
+  if(k===MASTER_KEY||VALID_KEYS.includes(k)){
+    setMomentKey(k);
+    state.step='gemini';
+    renderGeminiGate();
+  } else {err.textContent='Clé invalide.';}
+};
+
+function renderGeminiGate(){
+  render(`
+    <div class="center" style="margin-top:60px;">
+      <div class="eyebrow">Étape 2/2</div>
+      <h1>Clé API<br>Gemini</h1>
+      <p class="sub">
+        Obtiens-la gratuitement sur <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--rust);">aistudio.google.com</a><br>
+        <small style="color:var(--ink-dim);">Stockée localement, jamais partagée.</small>
+      </p>
+      <input id="gemini-input" type="password" placeholder="AIza..." autocomplete="off" />
+      <div id="gemini-err" style="min-height:20px;color:var(--rust);font-size:0.8rem;margin-top:8px;"></div>
+      <button class="btn btn-main" onclick="validateGeminiKey()">Activer le moteur →</button>
     </div>
-    <div class="dir-panel" id="dir${i}">
-      <div class="flabel" style="margin-bottom:8px;">Ta phrase, ta scène, ta tension de départ</div>
-      <textarea class="dir-ta" id="dirin${i}" rows="2" placeholder="Je veux que ce post parte de…"></textarea>
-      <button class="dir-submit" onclick="runDir(${i})">Reconstruire depuis ma matière →</button>
-    </div>
-  </div>`;
+  `);
 }
 
-function navP(d) { const n = postIdx + d; if (n >= 0 && n < posts.length) showP(n); }
-function goP(i) { showP(i); }
-
-// ════════════════════════════════════════
-// POST ACTIONS
-// ════════════════════════════════════════
-function copyP(i, btn) {
-  navigator.clipboard.writeText(posts[i]?.text || '').then(() => {
-    btn.textContent = 'Copié ✓'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-async function regenP(i) {
-  if (!profilData) return;
-  const p = posts[i];
-  loadingP(i, 'Régénération…');
-  try {
-    const tempHist = [{ int:p.int, ouv:p.ouv }, ...mechHist];
-    const orig = mechHist;
-    mechHist = tempHist;
-    const np = await doPost(profilData, scanData, p.int, p.fmt, p.lng || 'standard', '', i);
-    mechHist = orig;
-    posts[i] = np; addMech(np); showP(i);
-  } catch (e) { showP(i); showErr('studio-err', e.message); }
-}
-
-async function changeAngle(i) {
-  if (!profilData) return;
-  const p = posts[i];
-  const order = ['valeur','emotion','curiosite','miroir'];
-  const ci = order.indexOf(p.int);
-  const ni = order[(ci + 1) % order.length];
-  loadingP(i, `Changement d'angle → ${INT[ni].label}…`);
-  try {
-    const np = await doPost(profilData, scanData, ni, fmtFor(ni), p.lng || 'standard', '', i);
-    posts[i] = np; addMech(np); showP(i);
-  } catch (e) { showP(i); showErr('studio-err', e.message); }
-}
-
-function togDir(i) {
-  const el = document.getElementById('dir' + i);
-  if (el) el.classList.toggle('open');
-}
-
-async function runDir(i) {
-  const mat = document.getElementById('dirin' + i)?.value.trim();
-  if (!mat || !profilData) return;
-  const p = posts[i];
-  loadingP(i, 'Reconstruction depuis ta matière…');
-  try {
-    const np = await doPost(profilData, scanData, p.int, p.fmt, p.lng || 'standard', mat, i);
-    posts[i] = np; addMech(np);
-    const inp = document.getElementById('dirin' + i);
-    if (inp) inp.value = '';
-    showP(i);
-  } catch (e) { showP(i); showErr('studio-err', e.message); }
-}
-
-function loadingP(i, msg) {
-  document.getElementById('post-display').innerHTML = `
-    <div class="post-card">
-      <div class="post-loading">
-        <span>${esc(msg)}</span>
-        <span style="width:8px;height:8px;border-radius:50%;background:var(--rust);animation:blink 1s infinite;display:inline-block;flex-shrink:0;"></span>
-      </div>
-    </div>`;
-}
-
-function saveAr(i, btn) {
-  const p = posts[i];
-  if (!p) return;
-  arsenal.unshift({ ...p, savedAt: Date.now(), id: Date.now() });
-  if (arsenal.length > 50) arsenal.pop();
-  localStorage.setItem('mt4_arsenal', JSON.stringify(arsenal));
-  btn.textContent = 'Sauvegardé ✓'; btn.classList.add('saved');
-  setTimeout(() => { btn.textContent = '+ Arsenal'; btn.classList.remove('saved'); }, 2000);
-}
-
-// ════════════════════════════════════════
-// HISTORIQUE MÉCANIQUES
-// ════════════════════════════════════════
-function addMech(post) {
-  mechHist.unshift({ int:post.int, ouv:post.ouv, savedAt:Date.now() });
-  if (mechHist.length > 10) mechHist.pop();
-  localStorage.setItem('mt4_mech', JSON.stringify(mechHist));
-}
-
-function renderHist() {
-  const el = document.getElementById('hist-list');
-  if (!el) return;
-  if (!mechHist.length) {
-    el.innerHTML = '<div style="font-size:11px;color:var(--ink-dim);">Aucun post généré encore.</div>';
-    return;
-  }
-  el.innerHTML = mechHist.map((h, i) => `
-    <div class="hist-item">
-      <div class="hist-n">${i+1}</div>
-      <div>
-        <div class="hist-int">${esc(h.int)}</div>
-        <div class="hist-prev">${esc(h.ouv)}…</div>
-      </div>
-    </div>`).join('');
-}
-
-function resetStudio() {
-  document.getElementById('studio-form').style.display = '';
-  document.getElementById('studio-res').style.display = 'none';
-  document.getElementById('studio-err').style.display = 'none';
-  document.getElementById('studio-prog').style.display = 'none';
-  document.getElementById('tk-bridge').style.display = 'none';
-  posts = []; postIdx = 0; profilData = null; scanData = '';
-}
-
-// ════════════════════════════════════════
-// CALENDRIER
-// ════════════════════════════════════════
-function togCal() {
-  calSeq = !calSeq;
-  document.getElementById('cal-tog').classList.toggle('on', calSeq);
-  document.getElementById('cal-lbl').textContent = calSeq ? 'Séquence' : 'Simple';
-  renderCal();
-}
-
-function setW(w, btn) {
-  calWeek = w;
-  document.querySelectorAll('.cwbtn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  updateConv(w);
-  renderCal();
-}
-
-function renderCal() {
-  const grid = document.getElementById('cal-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  if (calSeq) renderSeqCal(grid);
-  else renderSimCal(grid);
-}
-
-function renderSimCal(grid) {
-  const pdays = [0,2,4,5];
-  let pc = 0;
-  for (let day = 1; day <= 30; day++) {
-    const wd = (day - 1) % 7;
-    const hasP = pdays.includes(wd) && posts.length > 0;
-    const pi = hasP ? pc % posts.length : -1;
-    const post = pi >= 0 ? posts[pi] : null;
-    if (hasP) pc++;
-    const cell = document.createElement('div');
-    cell.className = 'cal-cell' + (post ? ' has ' + post.int : '');
-    cell.innerHTML = `<span>${day}</span>${post ? `<span class="cptype">${post.int.slice(0,2).toUpperCase()}</span>` : ''}`;
-    if (post) {
-      const fi = pi;
-      cell.onclick = () => { goP(fi); document.getElementById('posts-anchor').scrollIntoView({behavior:'smooth'}); };
-    }
-    grid.appendChild(cell);
-  }
-}
-
-function renderSeqCal(grid) {
-  const labels = { 1:'S1 · Masque · Reconnaissance', 2:'S2 · Déclencheur · Activation', 3:'S3 · Fissure · Émotion', 4:'S4 · Conversion' };
-  const weeks = [calWeek, calWeek%4+1, (calWeek+1)%4+1, (calWeek+2)%4+1];
-  let day = 1;
-  weeks.forEach(w => {
-    const lbl = document.createElement('div');
-    lbl.className = 'cal-seq-lbl';
-    lbl.textContent = labels[w] || `S${w}`;
-    grid.appendChild(lbl);
-    const ints = SEQ_INT[w] || ['valeur','emotion'];
-    const pdays = [0,2,4,5];
-    let wi = 0;
-    for (let wd = 0; wd < 7; wd++) {
-      const hasP = pdays.includes(wd) && wi < ints.length && posts.length > 0;
-      const int = hasP ? ints[wi] : null;
-      if (hasP) wi++;
-      const cell = document.createElement('div');
-      cell.className = 'cal-cell' + (hasP ? ' has ' + int : '');
-      cell.innerHTML = `<span>${day}</span>${hasP ? `<span class="cptype">${(int||'').slice(0,2).toUpperCase()}</span>` : ''}`;
-      grid.appendChild(cell);
-      day++;
-    }
-  });
-}
-
-// ════════════════════════════════════════
-// TROC KIT
-// ════════════════════════════════════════
-function prefillTK() {
-  if (!profilData) return;
-  const notice = document.getElementById('tk-auto');
-  if (notice) {
-    notice.style.display = '';
-    notice.textContent = `Profil détecté dans le Studio : ${profilData.profil} · Mode ${profilData.mode}. Sélectionné automatiquement.`;
-  }
-  const map = { AUTOMATISEUR:'automatiseur', OPTIMISEUR:'optimiseur', ÉLÉVATEUR:'elevateur', LIBÉRATEUR:'liberateur' };
-  const key = map[profilData.profil] || 'automatiseur';
-  document.querySelectorAll('[data-p]').forEach(e => e.classList.toggle('on', e.getAttribute('data-p') === key));
-}
-
-async function runTrocKit() {
-  const offre = document.getElementById('tk-offre').value.trim();
-  if (!offre) { showErr('tk-err', 'Décris ton offre.'); return; }
-  if (!GK) { document.getElementById('gate').style.display = 'flex'; return; }
-
-  const profil = gv('p') || 'automatiseur';
-  const mef = gv('m') || 'faible';
-  const ctx = document.getElementById('tk-ctx').value.trim();
-
-  document.getElementById('tk-prog').style.display = '';
-  document.getElementById('tk-res').style.display = 'none';
-  document.getElementById('tk-err').style.display = 'none';
-
-  const mefDesc = {
-    faible: 'Déjà chaud. Approche directe possible.',
-    moderee: 'Prudent. Crée la confiance avant de proposer.',
-    elevee: 'Mur fort. Commence par reconnaître sa situation, ne propose rien tout de suite.'
-  };
-
-  const seqNote = profilData ? `Ce prospect a été exposé à des contenus de séquence Moment Troc et se rapproche de la décision.` : '';
-
-  const p = `Tu es un expert en vente comportementale Moment Troc pour entrepreneurs africains francophones.
-
-OFFRE : "${offre}"
-PROFIL DU PROSPECT : ${profil}
-MÉFIANCE : ${mef} — ${mefDesc[mef] || ''}
-${ctx ? `CE QU'ON SAIT DE LUI : "${ctx}"` : ''}
-${seqNote ? `\nCONTEXTE : ${seqNote}` : ''}
-
-Profils Moment Troc :
-- AUTOMATISEUR : active la vision "pendant que tu dors", fuit la charge mentale
-- OPTIMISEUR : active la comparaison et la performance, veut les meilleurs résultats
-- ÉLÉVATEUR : active la transformation et la montée en niveau
-- LIBÉRATEUR : active la sortie de prison, le soulagement d'un fardeau
-
-Génère 4 messages séparés par "---SEP---" :
-
-MESSAGE 1 : APPROCHE INITIALE
-QUAND : [quand utiliser]
-[le message]
-
----SEP---
-
-MESSAGE 2 : VALEUR SANS VENTE
-QUAND : [quand utiliser]
-[le message]
-
----SEP---
-
-MESSAGE 3 : RELANCE
-QUAND : [quand utiliser — après 48h sans réponse]
-[le message]
-
----SEP---
-
-MESSAGE 4 : RÉPONSE À OBJECTION
-QUAND : [quand utiliser — "je vais réfléchir" ou "pas le budget"]
-[le message]
-
-Règles : messages humains, calibrés sur ${profil} et méfiance ${mef}. Pas de templates génériques. Pas de "bonjour cher ami". Naturel et chirurgical.`;
-
-  try {
-    const raw = await callG(p, 0.85, 1600);
-    document.getElementById('tk-prog').style.display = 'none';
-    document.getElementById('tk-res').style.display = '';
-    renderTK(raw);
-  } catch (e) {
-    document.getElementById('tk-prog').style.display = 'none';
-    showErr('tk-err', e.message);
-  }
-}
-
-function renderTK(raw) {
-  const parts = raw.split('---SEP---').map(s => s.trim()).filter(Boolean);
-  const labels = ['Approche initiale','Valeur sans vente','Relance 48h','Réponse à objection'];
-  let html = '<div style="margin-top:24px;">';
-  parts.forEach((part, i) => {
-    const ctxM = part.match(/QUAND\s*:\s*(.+?)(?:\n|$)/i);
-    const ctx = ctxM ? ctxM[1].trim() : '';
-    const msg = part.replace(/^MESSAGE\s*\d+\s*:.*\n?/im,'').replace(/QUAND\s*:.*\n?/im,'').trim();
-    const safeMsg = JSON.stringify(msg);
-    html += `<div class="tk-msg">
-      <div class="tk-label">${labels[i] || `Message ${i+1}`}</div>
-      ${ctx ? `<div class="tk-ctx">${esc(ctx)}</div>` : ''}
-      <div class="tk-body">${esc(msg)}</div>
-      <div class="tk-foot"><button class="abtn" onclick="copyTxt(${safeMsg},this)">Copier</button></div>
-    </div>`;
-  });
-  html += '</div>';
-  document.getElementById('tk-res').innerHTML = html;
-}
-
-// ════════════════════════════════════════
-// DÉCONSTRUIRE
-// ════════════════════════════════════════
-async function runDC() {
-  const post = document.getElementById('dc-post').value.trim();
-  if (!post) { showErr('dc-err', 'Colle un post à déconstruire.'); return; }
-  if (!GK) { document.getElementById('gate').style.display = 'flex'; return; }
-
-  const ctx = document.getElementById('dc-ctx').value.trim();
-  document.getElementById('dc-prog').style.display = '';
-  document.getElementById('dc-res').style.display = 'none';
-  document.getElementById('dc-err').style.display = 'none';
-
-  const p1 = `Tu es un analyste expert du framework Moment Troc.
-
-POST À ANALYSER :
-"${post}"
-${ctx ? `\nCONTEXTE : "${ctx}"` : ''}
-
-Analyse ce post en 6 points. Sépare chaque point par "---S---" :
-
-T1 — MASQUE : Quelle façade ce post attaque-t-il ? Quel persona le lecteur protège ?
----S---
-T2 — DÉCLENCHEUR : Quel signal ce post active-t-il ? Ce qui fait basculer le lecteur.
----S---
-T3 — FISSURE : Quelle émotion enfouie ce post touche-t-il ? Ce que le lecteur ne nomme jamais à voix haute.
----S---
-T4 — RECONSTRUCTION : Quelle sortie ce post propose-t-il ? Vers quoi il attire ?
----S---
-PROFIL CIBLÉ + MÉCANIQUE : Quel archétype Moment Troc est visé et quelle est la mécanique principale en 5 mots max.
----S---
-CE QUI MANQUE + ANGLE INEXPLOITÉ : Qu'est-ce qui n'est pas exploité ? Propose une phrase d'ouverture alternative plus puissante.`;
-
-  const p2Labels = ['T1 · Masque','T2 · Déclencheur','T3 · Fissure','T4 · Reconstruction','Profil · Mécanique','Ce qui manque · Angle inexploité'];
-
-  try {
-    const analysis = await callG(p1, 0.75, 900);
-
-    // Version améliorée
-    const p2 = `Tu es un ghostwriter expert Moment Troc.
-
-POST ORIGINAL :
-"${post}"
-
-ANALYSE :
-${analysis.slice(0, 500)}
-
-Génère une version améliorée de ce post qui exploite l'angle inexploité identifié.
-Conserve le sujet. Change la structure d'entrée. Amplifie l'impact émotionnel.
-Commence directement par le post. Zéro commentaire avant ou après.`;
-
-    const improved = await callG(p2, 0.88, 1200);
-
-    document.getElementById('dc-prog').style.display = 'none';
-    document.getElementById('dc-res').style.display = '';
-
-    const sections = analysis.split('---S---').map(s => s.trim()).filter(Boolean);
-    const safeImproved = JSON.stringify(improved);
-    const safeImpText = JSON.stringify(improved);
-
-    let html = `<div style="margin-top:24px;">
-      <div class="dc-block">
-        <div class="s-eye">Analyse T1 → T4</div>`;
-    sections.forEach((s, i) => {
-      html += `<div class="dc-sec">
-        <div class="dc-sec-lbl">${p2Labels[i] || ''}</div>
-        <div class="dc-sec-body">${esc(s)}</div>
-      </div>`;
+window.validateGeminiKey = async function(){
+  const k = document.getElementById('gemini-input').value.trim();
+  const err = document.getElementById('gemini-err');
+  if(!k.startsWith('AIza')||k.length<30){err.textContent='Clé invalide.';return;}
+  try{
+    const test = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${k}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:'OK'}]}],generationConfig:{maxOutputTokens:3}})
     });
-    html += `</div>
-      <div class="dc-block" style="border-top-color:var(--rust);">
-        <div class="s-eye">Version améliorée</div>
-        <div style="font-family:'Playfair Display','Georgia',serif;font-size:15px;line-height:2;white-space:pre-wrap;color:var(--ink);word-break:break-word;margin-bottom:16px;">${esc(improved)}</div>
-        <div class="ag">
-          <button class="abtn" onclick="copyTxt(${safeImproved},this)">Copier</button>
-          <button class="abtn" onclick="injectAngle(${safeImpText})">→ Exploiter dans le Studio</button>
+    if(!test.ok) throw new Error('Clé rejetée');
+    setGeminiKey(k);
+    state.step='brief';
+    renderBrief();
+  }catch(e){err.textContent='Clé rejetée par Gemini. Vérifie ton compte.';}
+};
+
+function renderBrief(){
+  const saved = JSON.parse(localStorage.getItem('mt_brief')||'{}');
+  if(saved.biz){state.biz=saved.biz;state.cible=saved.cible;state.probleme=saved.probleme;state.matiere=saved.matiere;}
+  render(`
+    <div class="eyebrow">Brief</div>
+    <h1>Décharge<br><em>ton idée.</em></h1>
+    <p class="sub">Décris ton business, ta cible, le problème. Même en vrac.</p>
+    <textarea id="brief-input" rows="6" placeholder="Ex: Je vends une formation en ligne aux entrepreneurs africains qui n'arrivent pas à gérer leur trésorerie...">${esc(state.biz + (state.cible ? '\n' + state.cible : '') + (state.probleme ? '\n' + state.probleme : ''))}</textarea>
+    <button class="btn btn-main" onclick="submitBrief()">Analyser mon marché →</button>
+  `);
+}
+
+window.submitBrief = async function(){
+  const raw = document.getElementById('brief-input').value.trim();
+  if(!raw||raw.length<15){alert('Décris ton business un peu plus.');return;}
+  state.biz = raw;
+  localStorage.setItem('mt_brief',JSON.stringify({biz:raw,cible:state.cible,probleme:state.probleme,matiere:state.matiere}));
+  state.step='dialogue';
+  renderDialogue();
+  try{
+    const qPrompt = `Tu es l'agent Moment Troc. Business : "${raw}". Pose exactement 2 questions stratégiques pour affiner le brief.
+    Choisis parmi : "Qu'est-ce que ton client se dit quand il n'arrive pas à dormir ?", "Qu'a-t-il déjà essayé ? Pourquoi ça n'a pas marché ?", "Qui est son plus grand concurrent ? Pourquoi es-tu meilleur ?".
+    Retourne chaque question sur une ligne séparée, sans numéro.`;
+    const qRaw = await callGemini(qPrompt, true, 400);
+    const questions = qRaw.split('\n').filter(l=>l.trim().length>10).slice(0,2);
+    document.getElementById('dialogue-questions').innerHTML = questions.map((q,i)=>`
+      <div class="chat-bubble"><strong>Agent</strong> : ${esc(q)}</div>
+      <textarea id="dial-answer-${i}" rows="2" placeholder="Ta réponse..."></textarea>
+    `).join('');
+    document.getElementById('dialogue-box').classList.remove('hidden');
+  }catch(e){showErr('dialogue-err',e.message);}
+};
+
+function renderDialogue(){
+  render(`
+    <div class="eyebrow">Dialogue</div>
+    <h1>L'agent<br><em>t'écoute.</em></h1>
+    <div id="dialogue-questions"></div>
+    <div id="dialogue-box" class="hidden">
+      <button class="btn btn-main" onclick="submitDialogue()">Continuer →</button>
+    </div>
+    <div id="dialogue-err"></div>
+  `);
+}
+
+window.submitDialogue = async function(){
+  const answers = [];
+  for(let i=0;i<2;i++){const el=document.getElementById('dial-answer-'+i);if(el)answers.push(el.value.trim());}
+  state.dialogAnswers = answers;
+  const saved = JSON.parse(localStorage.getItem('mt_brief')||'{}');
+  saved.dialogue = answers;
+  localStorage.setItem('mt_brief',JSON.stringify(saved));
+  try{
+    const detectPrompt = `Tu es un expert du framework Moment Troc.
+    Business : "${state.biz}". Réponses aux questions : "${answers.join(' ')}".
+    Retourne UNIQUEMENT ce JSON (rien d'autre) :
+    {"profil":"AUTOMATISEUR","mode":"peur","organe":"Cortex Préfrontal","tension":"phrase intérieure","simple":"explication simple"}
+    Profils possibles : AUTOMATISEUR, OPTIMISEUR, ÉLÉVATEUR, LIBÉRATEUR. Mode: désir ou peur.`;
+    const raw = await callGemini(detectPrompt, false, 500);
+    const match = raw.match(/\{[\s\S]*?\}/);
+    if(!match) throw new Error('Profil non détecté');
+    state.profilData = JSON.parse(match[0]);
+    state.step='mode';
+    renderMode();
+  }catch(e){showErr('dialogue-err',e.message);}
+};
+
+function renderMode(){
+  const p = state.profilData;
+  const info = PROFILS[p.profil]||PROFILS.AUTOMATISEUR;
+  render(`
+    <div class="eyebrow">Profil détecté</div>
+    <h1>${esc(p.profil)}<br><em>mode ${esc(p.mode)}</em></h1>
+    <div class="card">
+      <div class="tag">${esc(p.organe)}</div>
+      <p style="margin-top:12px;font-style:italic;color:var(--ink-mid);">"${esc(p.tension)}"</p>
+      <p style="color:var(--ink-dim);margin-top:8px;">${esc(p.simple)}</p>
+    </div>
+    <div class="grid-2">
+      <div class="card ${state.mode==='désir'?'':'gold'}" style="cursor:pointer;" onclick="setMode('désir')">
+        <div class="tag">🟢 Désir</div>
+        <p style="margin-top:8px;color:var(--ink-mid);">Attiré par : ${esc(info.desir)}</p>
+      </div>
+      <div class="card ${state.mode==='peur'?'':'gold'}" style="cursor:pointer;" onclick="setMode('peur')">
+        <div class="tag">🔴 Peur</div>
+        <p style="margin-top:8px;color:var(--ink-mid);">Fuit : ${esc(info.peur)}</p>
+      </div>
+    </div>
+    <button class="btn btn-main" onclick="goToPantheon()">Choisir le Maître →</button>
+  `);
+}
+
+window.setMode = function(m){state.mode=m;renderMode();};
+window.goToPantheon = function(){state.step='pantheon';renderPantheon();};
+
+function renderPantheon(){
+  let currentCat = '';
+  let html = `
+    <div class="eyebrow">Arsenal des Maîtres</div>
+    <h1>Choisis<br><em>ton illusion.</em></h1>
+    <p class="sub">16 esprits. Une infinité de voix.</p>
+  `;
+  html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+    <button class="btn btn-ghost" onclick="filterMaitres('Tous')" style="width:auto;padding:8px 14px;font-size:0.7rem;">Tous</button>
+    ${CATEGORIES.map(c=>`<button class="btn btn-ghost" onclick="filterMaitres('${c}')" style="width:auto;padding:8px 14px;font-size:0.7rem;">${c}</button>`).join('')}
+  </div>`;
+  html += `<div class="grid-2" id="maitres-grid">
+    ${MAITRES.map(m=>`
+      <div class="maitre-card" id="maitre-${m.id}" data-cat="${m.categorie}" onclick="selectMaitre('${m.id}')">
+        <div class="maitre-name">${m.nom}</div>
+        <div class="maitre-type">${m.categorie}</div>
+        <p style="font-size:0.7rem;color:var(--ink-dim);margin-top:6px;">${m.ton}</p>
+      </div>
+    `).join('')}
+  </div>
+  <button class="btn btn-main" id="btn-generate" onclick="generatePost()" disabled>Générer le post →</button>`;
+  render(html);
+}
+
+window.filterMaitres = function(cat){
+  document.querySelectorAll('.maitre-card').forEach(card=>{
+    if(cat==='Tous'||card.getAttribute('data-cat')===cat){
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+};
+
+window.selectMaitre = function(id){
+  state.maitre = MAITRES.find(m=>m.id===id);
+  document.querySelectorAll('.maitre-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('maitre-'+id).classList.add('selected');
+  document.getElementById('btn-generate').disabled = false;
+};
+
+// ═══════════════════════════════════════
+// GÉNÉRATION (AVEC AUTO-ÉVALUATION INTÉGRÉE)
+// ═══════════════════════════════════════
+window.generatePost = async function(){
+  const m = state.maitre;
+  const p = state.profilData;
+  const info = PROFILS[p.profil];
+  const modeDesc = state.mode==='peur'?info.peur:info.desir;
+  render(`
+    <div class="eyebrow">Génération</div>
+    <h1>L'agent<br><em>travaille…</em></h1>
+    <div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)} en cours…</p></div>
+  `);
+  try{
+    const prompt = `Tu es un ghostwriter expert Moment Troc. Tu actives le Maître ${m.nom}.
+
+PROFIL CIBLE :
+- Archétype : ${p.profil}
+- Organe : ${info.organe}
+- Mode : ${state.mode} (${modeDesc})
+- Tension intérieure : "${p.tension}"
+
+BUSINESS : ${state.biz}
+
+MÉCANIQUE DU MAÎTRE :
+${m.prompt}
+
+INTENTION : Miroir / Valeur
+STRUCTURE : T1 (Expérience) → T2 (Rupture) → T3 (Mise en lumière + Permission). JAMAIS d'urgence.
+
+RÈGLES :
+- Commence directement par le contenu. Pas de titre.
+- Respecte la longueur de 80-150 mots.
+- Langage africain francophone naturel.
+- JAMAIS "peace". JAMAIS de conclusion moralisatrice.
+
+À LA FIN, après le post, ajoute une ligne "AUTOEVAL:" suivie de l'évaluation.
+L'auto-évaluation doit être une phrase concise qui juge si le post active bien le ${info.organe} et respecte la mécanique ${m.nom}.
+Exemples :
+AUTOEVAL: [OK] Le post active précisément le ${info.organe} et respecte la mécanique ${m.nom}.
+AUTOEVAL: [MOYEN] Le post active le ${info.organe} mais la mécanique ${m.nom} pourrait être plus marquée.
+AUTOEVAL: [FAIBLE] Le post est trop générique, il manque la rupture propre à ${m.nom}.
+
+Retourne le post PUIS la ligne AUTOEVAL.`;
+    const text = await callGemini(prompt, false, 1400);
+    // Parser l'auto-évaluation
+    const evalMatch = text.match(/AUTOEVAL:\s*(.*)/i);
+    let evalText = '';
+    if(evalMatch){
+      evalText = evalMatch[1].trim();
+      state.currentPost = text.replace(/AUTOEVAL:.*/i,'').trim();
+    } else {
+      state.currentPost = text;
+      evalText = 'Auto-évaluation non disponible.';
+    }
+    // Déterminer la couleur du bandeau
+    let evalClass = '';
+    if(evalText.startsWith('[OK]')) evalClass = 'green';
+    else if(evalText.startsWith('[FAIBLE]')) evalClass = 'red';
+    state.evalData = {text: evalText, cls: evalClass};
+    state.step='result';
+    renderResult();
+  }catch(e){app.innerHTML+=`<div class="err-box">${esc(e.message)}</div>`;}
+};
+
+// ═══════════════════════════════════════
+// RÉSULTAT (AVEC BANDEAU D'ÉVALUATION)
+// ═══════════════════════════════════════
+function renderResult(){
+  const ev = state.evalData;
+  render(`
+    <div class="eyebrow">Post généré</div>
+    <h1>Ton<br><em>missile.</em></h1>
+    ${ev ? `
+    <div class="eval-band ${ev.cls}">
+      <strong>Auto-évaluation :</strong> ${esc(ev.text)}
+    </div>` : ''}
+    <div class="card" style="border-top-color:var(--gold);">
+      <div class="card-header">
+        <div>
+          <span class="tag">${esc(state.profilData.profil)}</span>
+          <span class="tag gold">${esc(state.maitre.nom)}</span>
         </div>
       </div>
-    </div>`;
-    document.getElementById('dc-res').innerHTML = html;
-
-  } catch (e) {
-    document.getElementById('dc-prog').style.display = 'none';
-    showErr('dc-err', e.message);
-  }
-}
-
-function injectAngle(text) {
-  const el = document.getElementById('f4');
-  if (el) { el.value = text.slice(0, 400); cc(el,'cc4',400); }
-  goMode('studio');
-  setTimeout(() => el?.scrollIntoView({behavior:'smooth'}), 300);
-}
-
-// ════════════════════════════════════════
-// ARSENAL
-// ════════════════════════════════════════
-function renderArsenal() {
-  const el = document.getElementById('ar-list');
-  if (!el) return;
-  if (!arsenal.length) {
-    el.innerHTML = `<div class="ar-empty">
-      Ton Arsenal est vide.<br><br>
-      Génère des posts dans le Studio, puis appuie sur <strong>+ Arsenal</strong> pour garder les meilleurs ici.<br><br>
-      Depuis l'Arsenal : recycle un post comme base de variante, ou injecte-le dans le Studio comme matière brute.
-    </div>`;
-    return;
-  }
-  el.innerHTML = arsenal.map((p, i) => {
-    const safeText = JSON.stringify(p.text);
-    return `<div class="ar-item">
-      <div class="ar-head">
-        <div class="ptags">
-          <span class="ptag ${p.tag || 'ptag-l'}">${esc(p.label || p.int || '')}</span>
-          <span class="ptag ptag-l">${esc(p.fmt || '')}</span>
-        </div>
-        <button class="abtn" onclick="confirmDel(${i})">Supprimer</button>
+      <div class="post-body">${esc(state.currentPost)}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="copyPost()">Copier</button>
+        <button class="btn btn-ghost" onclick="recyclePost()">Recycler</button>
+        <button class="btn btn-main" onclick="goBackToPantheon()">Nouveau Maître</button>
       </div>
-      <div class="ar-body">${esc(p.text)}</div>
-      <div class="ar-foot">
-        <button class="abtn" onclick="copyTxt(${safeText},this)">Copier</button>
-        <button class="abtn" onclick="recycleAr(${i})">Recycler → variante</button>
-      </div>
-    </div>`;
-  }).join('');
+    </div>
+    <button class="btn btn-ghost" onclick="resetAll()">← Nouveau brief</button>
+  `);
 }
 
-function recycleAr(i) {
-  const p = arsenal[i];
-  if (!p) return;
-  const el = document.getElementById('f4');
-  if (el) { el.value = p.text.slice(0, 400); cc(el,'cc4',400); }
-  goMode('studio');
-  setTimeout(() => el?.scrollIntoView({behavior:'smooth'}), 300);
-}
+window.copyPost = function(){navigator.clipboard.writeText(state.currentPost).then(()=>alert('Post copié !'));};
+window.recyclePost = function(){
+  state.matiere = state.currentPost;
+  const saved = JSON.parse(localStorage.getItem('mt_brief')||'{}');
+  saved.matiere = state.currentPost;
+  localStorage.setItem('mt_brief',JSON.stringify(saved));
+  state.step='pantheon';
+  renderPantheon();
+};
+window.goBackToPantheon = function(){state.step='pantheon';renderPantheon();};
+window.resetAll = function(){state.step='brief';renderBrief();};
 
-function confirmDel(i) {
-  showConfirm('Supprimer ce post de l\'Arsenal ? Action irréversible.', () => {
-    arsenal.splice(i, 1);
-    localStorage.setItem('mt4_arsenal', JSON.stringify(arsenal));
-    renderArsenal();
-  });
-}
-
-// ════════════════════════════════════════
-// CONFIRM
-// ════════════════════════════════════════
-function showConfirm(msg, cb) {
-  confirmCb = cb;
-  document.getElementById('confirm-msg').textContent = msg;
-  document.getElementById('confirm-ov').classList.add('show');
-  document.getElementById('confirm-yes').onclick = () => { closeConfirm(); if (confirmCb) confirmCb(); };
-}
-function closeConfirm() {
-  document.getElementById('confirm-ov').classList.remove('show');
-  confirmCb = null;
-}
-
-// ════════════════════════════════════════
-// UTILS
-// ════════════════════════════════════════
-function esc(s) {
-  return String(s || '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#39;');
-}
-
-function copyTxt(text, btn) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'Copié ✓'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
-  }).catch(() => {
-    // Fallback pour navigateurs sans clipboard API
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent = 'Copié ✓';
-    setTimeout(() => { btn.textContent = 'Copier'; }, 2000);
-  });
-}
-
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.style.display = '';
-  el.innerHTML = `<div class="err-box">⚠ ${esc(msg)}</div>`;
-}
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.onload = function(){
+  const momentKey = getMomentKey();
+  if(!momentKey||(momentKey!==MASTER_KEY&&!VALID_KEYS.includes(momentKey))){
+    state.step='unlock';renderUnlock();
+  } else if(!getGeminiKey()){
+    state.step='gemini';renderGeminiGate();
+  } else {
+    state.step='brief';renderBrief();
+  }
+};
 </script>
 </body>
 </html>
