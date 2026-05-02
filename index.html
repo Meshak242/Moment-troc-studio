@@ -1,1931 +1,1826 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moment Troc · Studio</title>
-<meta property="og:title" content="Moment Troc Studio">
-<meta property="og:description" content="L'agent qui lit le marché. Calibré sur ta cible.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Archivo+Black&display=swap">
-<style>
-:root {
-  --ink:#F0EAD6;
-  --paper:#0D0D0D;
-  --paper2:#161616;
-  --rust:#D4541A;
-  --rust-dim:rgba(212,84,26,0.18);
-  --rust-line:rgba(212,84,26,0.35);
-  --ink-dim:rgba(240,234,214,0.3);
-  --ink-mid:rgba(240,234,214,0.6);
-  --white:#1A1A1A;
-  --line:rgba(240,234,214,0.1);
-  --gold:#C9A84C;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-
-body {
-  background:var(--paper);
-  color:var(--ink);
-  font-family:'Space Mono',monospace;
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
-
-/* GRAIN */
-body::after {
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events:none;
-  z-index:9000;
-}
-
-/* HORIZONTAL RULES DECORATIFS */
-.hr-thick{height:3px;background:var(--ink);margin:0;}
-.hr-thin{height:1px;background:var(--line);margin:0;}
-.hr-rust{height:2px;background:var(--rust);margin:0;}
-
-/* LOADER */
-#loader {
-  position:fixed;inset:0;background:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  z-index:99999;
-}
-.loader-title {
-  font-family:'Archivo Black',sans-serif;
-  font-size:clamp(32px,8vw,64px);
-  letter-spacing:-1px;
-  color:var(--paper);
-  line-height:1;
-  text-align:center;
-}
-.loader-sub {
-  font-family:'Space Mono',monospace;
-  font-size:10px;
-  letter-spacing:4px;
-  color:rgba(242,237,228,0.4);
-  margin-top:16px;
-  text-transform:uppercase;
-}
-.loader-bar {
-  width:200px;height:1px;
-  background:rgba(242,237,228,0.15);
-  margin-top:32px;
-  position:relative;
-  overflow:hidden;
-}
-.loader-bar::after {
-  content:'';
-  position:absolute;
-  left:-100%;top:0;
-  width:100%;height:100%;
-  background:var(--rust);
-  animation:barLoad 1.6s ease forwards;
-}
-@keyframes barLoad{to{left:0;}}
-
-/* KEY GATE */
-#keygate {
-  position:fixed;inset:0;background:var(--ink);
-  display:none;align-items:center;justify-content:center;
-  z-index:9999;padding:24px;
-}
-.gate-inner {
-  max-width:420px;width:100%;
-  border-top:3px solid var(--paper);
-  border-bottom:1px solid rgba(242,237,228,0.2);
-  padding:48px 40px;
-}
-.gate-label {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:4px;
-  color:rgba(242,237,228,0.4);
-  text-transform:uppercase;margin-bottom:12px;
-}
-.gate-title {
-  font-family:'Playfair Display',serif;
-  font-size:48px;font-weight:900;font-style:italic;
-  color:var(--paper);line-height:0.95;margin-bottom:40px;
-}
-.gate-input {
-  width:100%;background:transparent;
-  border:none;border-bottom:1px solid rgba(242,237,228,0.3);
-  color:var(--paper);
-  font-family:'Space Mono',monospace;
-  font-size:18px;letter-spacing:6px;
-  padding:12px 0;outline:none;
-  text-transform:uppercase;
-  transition:border-color 0.3s;
-}
-.gate-input:focus{border-bottom-color:var(--rust);}
-.gate-input::placeholder{color:rgba(242,237,228,0.2);font-size:12px;letter-spacing:3px;}
-#gate-err {
-  font-size:10px;letter-spacing:1px;
-  color:var(--rust);margin-top:8px;
-  min-height:14px;font-family:'Space Mono',monospace;
-}
-.gate-btn {
-  margin-top:24px;width:100%;
-  background:var(--rust);border:none;
-  color:var(--paper);
-  font-family:'Archivo Black',sans-serif;
-  font-size:14px;letter-spacing:3px;
-  padding:16px;cursor:pointer;
-  text-transform:uppercase;
-  transition:opacity 0.2s;
-}
-.gate-btn:hover{opacity:0.85;}
-
-/* GEMINI GATE */
-#geminigate {
-  position:fixed;inset:0;background:rgba(0,0,0,0.95);
-  display:none;align-items:center;justify-content:center;
-  z-index:9998;padding:24px;
-  backdrop-filter:blur(6px);
-}
-.ggate-inner {
-  max-width:420px;width:100%;
-  background:#161616;
-  border-top:3px solid var(--rust);
-  border-bottom:1px solid rgba(212,84,26,0.2);
-  padding:44px 40px;
-}
-.ggate-label {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:4px;
-  color:var(--rust);
-  text-transform:uppercase;margin-bottom:10px;
-}
-.ggate-title {
-  font-family:'Playfair Display',serif;
-  font-size:36px;font-weight:900;font-style:italic;
-  color:var(--ink);line-height:1;margin-bottom:8px;
-}
-.ggate-sub {
-  font-family:'Space Mono',monospace;
-  font-size:10px;color:var(--ink-mid);
-  margin-bottom:28px;line-height:1.7;
-}
-.ggate-sub a{color:var(--rust);text-decoration:none;}
-.ggate-input {
-  width:100%;background:transparent;
-  border:none;border-bottom:1px solid rgba(240,234,214,0.25);
-  color:var(--ink);
-  font-family:'Space Mono',monospace;
-  font-size:14px;letter-spacing:3px;
-  padding:12px 0;outline:none;
-  transition:border-color 0.3s;
-}
-.ggate-input:focus{border-bottom-color:var(--rust);}
-.ggate-input::placeholder{color:var(--ink-dim);font-size:11px;letter-spacing:2px;}
-#ggate-err {
-  font-size:10px;letter-spacing:1px;
-  color:var(--rust);margin-top:8px;
-  min-height:14px;font-family:'Space Mono',monospace;
-}
-.ggate-btn {
-  margin-top:20px;width:100%;
-  background:var(--rust);border:none;
-  color:#F0EAD6;
-  font-family:'Archivo Black',sans-serif;
-  font-size:13px;letter-spacing:3px;
-  padding:16px;cursor:pointer;
-  text-transform:uppercase;
-  transition:opacity 0.2s;
-}
-.ggate-btn:hover{opacity:0.85;}
-.ggate-note {
-  font-family:'Space Mono',monospace;
-  font-size:9px;color:var(--ink-dim);
-  margin-top:14px;letter-spacing:1px;
-  text-align:center;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Moment Troc · Studio V4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+/* FALLBACK FONTS si Google ne charge pas */
+@font-face {
+  font-family: 'Space Mono';
+  src: local('Courier New');
+  font-display: swap;
 }
 
-/* MASTHEAD */
-.masthead {
-  border-bottom:3px solid var(--ink);
-  padding:20px 32px 16px;
-  display:flex;align-items:flex-end;justify-content:space-between;
-  flex-wrap:wrap;gap:12px;
-}
-.masthead-title {
-  font-family:'Playfair Display',serif;
-  font-size:clamp(28px,6vw,48px);
-  font-weight:900;line-height:1;
-  letter-spacing:-1px;
-}
-.masthead-title em{font-style:italic;color:var(--rust);}
-.masthead-meta {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;
-  color:var(--ink-dim);
-  text-align:right;
-  text-transform:uppercase;
-  line-height:1.8;
-}
-
-/* MODE NAV — NEWSPAPER SECTION TABS */
-.section-nav {
-  border-bottom:1px solid var(--line);
-  display:flex;overflow-x:auto;
-  padding:0 32px;
-  gap:0;
-}
-.section-tab {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--ink-dim);
-  padding:12px 20px;
-  cursor:pointer;
-  border:none;background:none;
-  border-bottom:2px solid transparent;
-  transition:all 0.25s;white-space:nowrap;
-}
-.section-tab:hover{color:var(--ink);}
-.section-tab.on{color:var(--rust);border-bottom-color:var(--rust);}
-
-/* MAIN */
-main{max-width:860px;margin:0 auto;padding:40px 28px 120px;}
-
-/* COLUMN LAYOUT */
-.col-layout{display:grid;grid-template-columns:1fr 280px;gap:40px;}
-.col-main{}
-.col-aside{border-left:1px solid var(--line);padding-left:32px;}
-
-/* SECTION TITLE */
-.section-eyebrow {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:4px;
-  text-transform:uppercase;
-  color:var(--rust);
-  margin-bottom:6px;
-}
-.section-headline {
-  font-family:'Playfair Display',serif;
-  font-size:clamp(28px,5vw,44px);
-  font-weight:900;line-height:1.05;
-  letter-spacing:-0.5px;
-  margin-bottom:8px;
-}
-.section-headline em{font-style:italic;}
-.section-deck {
-  font-family:'Space Mono',monospace;
-  font-size:11px;color:var(--ink-mid);
-  line-height:1.7;margin-bottom:32px;
-  max-width:520px;
-}
-
-/* FIELDS */
-.field{margin-bottom:24px;}
-.field-label {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--ink-dim);
-  margin-bottom:8px;
-  display:flex;align-items:center;gap:8px;
-}
-.field-label .opt{
-  font-size:8px;letter-spacing:1px;
-  color:var(--rust);opacity:0.6;
-}
-textarea,input[type=text] {
-  width:100%;
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:2px solid var(--ink);
-  color:var(--ink);
-  font-family:'Space Mono',monospace;
-  font-size:13px;
-  padding:14px 16px;
-  resize:vertical;outline:none;
-  transition:border-color 0.25s;
-  line-height:1.7;
-}
-textarea:focus,input:focus{border-color:var(--rust);border-top-color:var(--rust);}
-textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;font-size:12px;}
-
-/* SELECTOR GRID */
-.sel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.sel-grid.cols3{grid-template-columns:repeat(3,1fr);}
-.sel-item {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:2px solid var(--ink);
-  padding:14px 16px;
-  cursor:pointer;
-  transition:all 0.2s;
-  text-align:left;
-  position:relative;
-}
-.sel-item:hover{border-top-color:var(--rust);}
-.sel-item.on{
-  background:var(--ink);
-  border-color:var(--ink);
-  border-top-color:var(--rust);
-}
-.sel-item-name {
-  font-family:'Archivo Black',sans-serif;
-  font-size:13px;letter-spacing:1px;
-  color:var(--ink);
-  text-transform:uppercase;
-  transition:color 0.2s;
-}
-.sel-item.on .sel-item-name{color:var(--paper);}
-.sel-item-desc {
-  font-family:'Space Mono',monospace;
-  font-size:9px;color:var(--ink-dim);
-  margin-top:4px;line-height:1.4;
-  transition:color 0.2s;
-}
-.sel-item.on .sel-item-desc{color:rgba(242,237,228,0.5);}
-
-/* BUTTONS */
-.btn-primary {
-  width:100%;
-  background:var(--ink);border:none;
-  color:var(--paper);
-  font-family:'Archivo Black',sans-serif;
-  font-size:13px;letter-spacing:3px;
-  padding:18px 24px;
-  cursor:pointer;text-transform:uppercase;
-  position:relative;overflow:hidden;
-  transition:background 0.25s;
-  margin-top:8px;
-}
-.btn-primary::after {
-  content:'';
-  position:absolute;bottom:0;left:0;
-  width:0;height:2px;
-  background:var(--rust);
-  transition:width 0.3s;
-}
-.btn-primary:hover{background:#1a1a1a;}
-.btn-primary:hover::after{width:100%;}
-.btn-primary:disabled{opacity:0.3;cursor:not-allowed;}
-.btn-primary:disabled::after{display:none;}
-.btn-ghost {
-  background:transparent;
-  border:1px solid var(--line);
-  border-top:2px solid var(--ink);
-  color:var(--ink);
-  font-family:'Space Mono',monospace;
-  font-size:10px;letter-spacing:2px;
-  padding:12px 20px;
-  cursor:pointer;text-transform:uppercase;
-  transition:all 0.2s;
-}
-.btn-ghost:hover{border-top-color:var(--rust);color:var(--rust);}
-.btn-row{display:flex;gap:10px;margin-top:8px;}
-
-/* LOADING */
-.loading{padding:24px 0;}
-.loading-head {
-  font-family:'Playfair Display',serif;
-  font-size:22px;font-style:italic;
-  color:var(--ink-mid);
-  margin-bottom:16px;
-}
-.loading-steps{display:flex;flex-direction:column;gap:6px;}
-.loading-step {
-  font-family:'Space Mono',monospace;
-  font-size:10px;letter-spacing:1px;
-  color:var(--ink-dim);
-  display:flex;align-items:center;gap:10px;
-}
-.loading-step .dot {
-  width:6px;height:6px;
-  border-radius:50%;
-  background:var(--rust);
-  animation:pulse 1.2s infinite;
-}
-.loading-step:nth-child(2) .dot{animation-delay:0.2s;}
-.loading-step:nth-child(3) .dot{animation-delay:0.4s;}
-.loading-status{
-  font-family:'Space Mono',monospace;
-  font-size:10px;color:var(--rust);
-  margin-top:12px;letter-spacing:1px;
-}
-
-/* PROFIL TAGS */
-.profil-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
-.profil-tag {
-  font-family:'Archivo Black',sans-serif;
-  font-size:10px;letter-spacing:2px;
-  text-transform:uppercase;
-  background:var(--ink);
-  color:var(--paper);
-  padding:5px 12px;
-  border-top:2px solid var(--rust);
-}
-.reasoning {
-  font-family:'Playfair Display',serif;
-  font-size:14px;font-style:italic;
-  color:var(--ink-mid);
-  line-height:1.8;
-  padding:16px;
-  border-left:3px solid var(--rust);
-  background:var(--white);
-  margin-top:12px;
-}
-
-/* EVAL BAR */
-.eval-bar {
-  display:flex;align-items:center;gap:10px;
-  padding:10px 16px;
-  background:var(--ink);
-  color:var(--paper);
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:20px;
-  border-top:2px solid var(--rust);
-}
-
-/* POST ITEMS */
-.post-item {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:3px solid var(--ink);
-  margin-bottom:20px;
-  animation:fadeUp 0.4s ease both;
-  position:relative;
-}
-.post-item:hover{border-top-color:var(--rust);}
-.post-header {
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 18px;
-  border-bottom:1px solid var(--line);
-  flex-wrap:wrap;gap:8px;
-}
-.post-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-.ptag {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:2px;
-  text-transform:uppercase;
-  padding:3px 8px;
-  border:1px solid var(--line);
-  color:var(--ink-dim);
-}
-.ptag-rust{border-color:var(--rust-line);color:var(--rust);}
-.ptag-ink{background:var(--ink);color:var(--paper);border-color:var(--ink);}
-.post-body {
-  padding:24px 18px;
-  font-family:'Playfair Display',serif;
-  font-size:15px;font-weight:400;
-  line-height:2;
-  white-space:pre-wrap;
-  color:var(--ink);
-}
-.post-footer {
-  padding:10px 18px;
-  border-top:1px solid var(--line);
-  display:flex;justify-content:space-between;
-  align-items:center;
-}
-.post-num{
-  font-family:'Space Mono',monospace;
-  font-size:9px;color:var(--ink-dim);letter-spacing:1px;
-}
-.copy-btn {
-  background:none;border:none;
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--ink-dim);cursor:pointer;
-  transition:color 0.2s;padding:4px 0;
-}
-.copy-btn:hover,.copy-btn.on{color:var(--rust);}
-
-/* SCRIPT SECTIONS (Troc Kit) */
-.script-block{margin-bottom:20px;}
-.script-label {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:3px;
-  text-transform:uppercase;color:var(--rust);
-  margin-bottom:8px;
-}
-.script-body {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-left:3px solid var(--ink);
-  padding:16px 18px;
-  font-family:'Space Mono',monospace;
-  font-size:12px;line-height:1.8;
-  white-space:pre-wrap;
-  position:relative;
-}
-.script-copy {
-  position:absolute;top:10px;right:10px;
-  background:none;border:none;
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:1px;
-  color:var(--ink-dim);cursor:pointer;
-  text-transform:uppercase;
-  transition:color 0.2s;
-}
-.script-copy:hover{color:var(--rust);}
-
-/* DIAGNOSTIC */
-.diag-block{margin-bottom:28px;}
-.diag-title {
-  font-family:'Archivo Black',sans-serif;
-  font-size:14px;letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:10px;
-  display:flex;align-items:center;gap:10px;
-}
-.diag-title::after{content:'';flex:1;height:1px;background:var(--line);}
-.diag-body {
-  font-family:'Space Mono',monospace;
-  font-size:12px;line-height:1.8;
-  color:var(--ink-mid);
-}
-.angle-bloc {
-  background:var(--ink);
-  padding:16px 18px;
-  border-top:2px solid var(--rust);
-  margin-top:8px;
-}
-.angle-label {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:3px;
-  text-transform:uppercase;color:var(--rust);
-  margin-bottom:8px;
-}
-.angle-body {
-  font-family:'Space Mono',monospace;
-  font-size:12px;line-height:1.8;
-  color:rgba(242,237,228,0.8);
-}
-
-/* ASIDE WIDGETS */
-.widget{margin-bottom:32px;}
-.widget-title {
-  font-family:'Archivo Black',sans-serif;
-  font-size:10px;letter-spacing:3px;
-  text-transform:uppercase;
-  padding-bottom:8px;
-  border-bottom:2px solid var(--ink);
-  margin-bottom:14px;
-}
-.widget-item {
-  font-family:'Space Mono',monospace;
-  font-size:10px;line-height:1.7;
-  color:var(--ink-mid);
-  padding:8px 0;
-  border-bottom:1px solid var(--line);
-}
-.widget-item strong{color:var(--ink);font-weight:700;}
-
-/* CAL GRID */
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px;}
-.cal-cell {
-  aspect-ratio:1;
-  background:var(--white);
-  border:1px solid var(--line);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  font-family:'Space Mono',monospace;
-  font-size:8px;color:var(--ink-dim);
-}
-.cal-cell.has{
-  background:var(--ink);
-  border-color:var(--ink);
-  color:var(--paper);
-  border-top:2px solid var(--rust);
-}
-.cal-pn{font-size:6px;color:var(--rust);margin-top:1px;}
-
-/* CAL GRID */
-.cal-wrap{margin-top:20px;}
-.cal-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:10px;
+:root {
+  --ink: #F0EAD6;
+  --paper: #0D0D0D;
+  --card: #141414;
+  --card2: #1C1C1C;
+  --rust: #D4541A;
+  --rust-dim: rgba(212,84,26,0.12);
+  --rust-line: rgba(212,84,26,0.3);
+  --ink-dim: rgba(240,234,214,0.25);
+  --ink-mid: rgba(240,234,214,0.55);
+  --line: rgba(240,234,214,0.07);
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.1);
+  --green: #4a9e4a;
 }
-.cal-title{
-  font-family:'Archivo Black',sans-serif;
-  font-size:9px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--ink-mid);
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--paper); color:var(--ink);
+  font-family:'Space Mono', 'Courier New', monospace;
+  min-height:100vh; overflow-x:hidden; position:relative;
 }
-.cal-toggle{
-  display:flex;align-items:center;gap:8px;
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:1px;color:var(--ink-dim);
-  cursor:pointer;user-select:none;
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:8000;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  will-change:auto;
 }
-.cal-toggle-pill{
-  width:32px;height:16px;
-  background:var(--line);
-  border-radius:8px;position:relative;
-  transition:background 0.2s;
+
+/* ── GATE ── */
+#gate {
+  position:fixed; inset:0; background:var(--paper);
+  display:flex; align-items:center; justify-content:center;
+  z-index:9999; padding:20px;
 }
-.cal-toggle-pill::after{
-  content:'';position:absolute;
-  width:12px;height:12px;
-  background:var(--ink-dim);
-  border-radius:50%;top:2px;left:2px;
-  transition:transform 0.2s,background 0.2s;
+.gate-box {
+  width:100%; max-width:400px;
+  background:var(--card); border-top:3px solid var(--rust);
+  padding:36px 28px 32px;
 }
-.cal-toggle.on .cal-toggle-pill{background:var(--rust-dim);}
-.cal-toggle.on .cal-toggle-pill::after{transform:translateX(16px);background:var(--rust);}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:0;}
+.gate-logo { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--rust); margin-bottom:14px; }
+.gate-title {
+  font-family:'Playfair Display','Georgia',serif;
+  font-size:34px; font-weight:900; font-style:italic;
+  color:var(--ink); line-height:1; margin-bottom:6px;
+}
+.gate-sub { font-size:10px; color:var(--ink-mid); line-height:1.8; margin-bottom:24px; }
+.gate-sub a { color:var(--rust); text-decoration:none; }
+.gate-input {
+  width:100%; background:transparent; border:none;
+  border-bottom:1px solid var(--ink-dim); color:var(--ink);
+  font-family:inherit; font-size:14px; letter-spacing:2px;
+  padding:12px 0; outline:none; transition:border-color .3s;
+}
+.gate-input:focus { border-bottom-color:var(--rust); }
+.gate-input::placeholder { color:var(--ink-dim); font-size:11px; }
+.gate-err { font-size:10px; color:var(--rust); min-height:18px; margin-top:6px; }
+.gate-btn {
+  width:100%; background:var(--rust); border:none; color:var(--ink);
+  font-family:'Archivo Black','Arial Black',sans-serif;
+  font-size:12px; letter-spacing:3px; text-transform:uppercase;
+  padding:16px; cursor:pointer; transition:opacity .2s; margin-top:12px;
+  min-height:52px; display:flex; align-items:center; justify-content:center;
+}
+.gate-btn:hover { opacity:.85; }
+.gate-btn:disabled { opacity:.4; cursor:not-allowed; }
+.gate-note { font-size:9px; color:var(--ink-dim); text-align:center; margin-top:10px; }
+
+/* ── MASTHEAD ── */
+.masthead {
+  border-bottom:3px solid var(--ink);
+  padding:16px 20px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:8px;
+  position:sticky; top:0; background:var(--paper); z-index:200;
+}
+.m-left { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.m-title {
+  font-family:'Playfair Display','Georgia',serif;
+  font-size:clamp(20px,5vw,34px); font-weight:900; line-height:1; letter-spacing:-1px;
+}
+.m-title em { font-style:italic; color:var(--rust); }
+.m-v { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
+.m-right { font-size:9px; letter-spacing:1px; color:var(--ink-dim); text-align:right; }
+.m-ok { color:var(--gold); }
+
+/* ── CONVERSION BAR ── */
+.conv-bar {
+  display:flex; overflow-x:auto; scrollbar-width:none;
+  border-bottom:1px solid var(--line);
+}
+.conv-bar::-webkit-scrollbar { display:none; }
+.cs {
+  flex:1; min-width:75px; padding:10px 6px;
+  text-align:center; font-size:8px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--ink-dim); border-right:1px solid var(--line);
+  transition:all .3s; display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.cs:last-child { border-right:none; }
+.cs.active { color:var(--rust); background:var(--rust-dim); }
+.cs.done { color:var(--gold); }
+.cs-dot { width:5px; height:5px; border-radius:50%; background:var(--line); transition:background .3s; }
+.cs.active .cs-dot { background:var(--rust); }
+.cs.done .cs-dot { background:var(--gold); }
+.conv-hint {
+  font-size:10px; color:var(--ink-mid); padding:8px 18px;
+  border-bottom:1px solid var(--line); line-height:1.7; display:none;
+}
+.conv-hint.show { display:block; }
+
+/* ── MODE TABS ── */
+.mode-nav {
+  display:flex; overflow-x:auto; scrollbar-width:none;
+  border-bottom:1px solid var(--line); padding:0 4px;
+}
+.mode-nav::-webkit-scrollbar { display:none; }
+.mtab {
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--ink-dim); padding:13px 18px;
+  cursor:pointer; border:none; background:none;
+  border-bottom:2px solid transparent; transition:all .25s;
+  white-space:nowrap; min-height:44px;
+}
+.mtab:hover { color:var(--ink); }
+.mtab.active { color:var(--rust); border-bottom-color:var(--rust); }
+
+/* ── MAIN ── */
+main { max-width:860px; margin:0 auto; padding:28px 16px 100px; }
+
+/* ── SECTION HEADER ── */
+.s-eye { font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--rust); margin-bottom:6px; }
+.s-title {
+  font-family:'Playfair Display','Georgia',serif;
+  font-size:clamp(22px,4vw,36px); font-weight:900; line-height:1.05; letter-spacing:-.5px; margin-bottom:8px;
+}
+.s-title em { font-style:italic; }
+.s-deck { font-size:11px; color:var(--ink-mid); line-height:1.8; margin-bottom:28px; max-width:520px; }
+
+/* ── SLOTS ── */
+.slots { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.slot {
+  background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-dim);
+  padding:8px 14px; cursor:pointer; transition:all .2s;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--ink-dim); min-height:40px; display:flex; align-items:center; gap:6px;
+}
+.slot.active { border-top-color:var(--rust); color:var(--rust); }
+.slot.filled { color:var(--ink-mid); }
+.slot-dot { width:5px; height:5px; border-radius:50%; background:var(--line); flex-shrink:0; }
+.slot.filled .slot-dot { background:var(--gold); }
+.slot.active .slot-dot { background:var(--rust); }
+
+/* ── FIELDS ── */
+.field { margin-bottom:20px; }
+.flabel {
+  font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--ink-dim); margin-bottom:6px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.opt { font-size:8px; color:var(--rust); opacity:.6; }
+.fhint { font-size:10px; color:var(--ink-dim); margin-bottom:8px; line-height:1.6; font-style:italic; }
+textarea, input[type=text] {
+  width:100%; background:var(--card2);
+  border:1px solid var(--line); border-top:2px solid var(--ink-dim);
+  color:var(--ink); font-family:inherit; font-size:14px;
+  padding:14px 16px; resize:vertical; outline:none;
+  transition:border-color .25s; line-height:1.8;
+  -webkit-appearance:none; border-radius:0;
+}
+textarea:focus, input[type=text]:focus { border-top-color:var(--rust); }
+textarea::placeholder, input[type=text]::placeholder { color:var(--ink-dim); font-size:12px; }
+.cc { font-size:9px; color:var(--ink-dim); text-align:right; margin-top:3px; }
+.cc.warn { color:var(--rust); }
+
+/* ── SELECTORS ── */
+.sgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.sgrid.c3 { grid-template-columns:repeat(3,1fr); }
+@media(max-width:460px) { .sgrid.c3 { grid-template-columns:1fr 1fr; } }
+.sitem {
+  background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-dim);
+  padding:12px 14px; cursor:pointer; transition:all .2s; text-align:left; min-height:56px;
+}
+.sitem:hover { border-top-color:var(--rust); }
+.sitem.on { background:var(--ink); border-color:var(--ink); border-top-color:var(--rust); }
+.sname {
+  font-family:'Archivo Black','Arial Black',sans-serif;
+  font-size:11px; letter-spacing:1px; text-transform:uppercase;
+  color:var(--ink); transition:color .2s;
+}
+.sitem.on .sname { color:var(--paper); }
+.sdesc { font-size:9px; color:var(--ink-dim); margin-top:4px; line-height:1.4; transition:color .2s; }
+.sitem.on .sdesc { color:rgba(13,13,13,.5); }
+
+/* ── BUTTONS ── */
+.btn-p {
+  width:100%; background:var(--ink); border:none; color:var(--paper);
+  font-family:'Archivo Black','Arial Black',sans-serif;
+  font-size:12px; letter-spacing:3px; text-transform:uppercase;
+  padding:18px 24px; cursor:pointer; position:relative; overflow:hidden;
+  transition:background .25s; margin-top:8px; min-height:56px;
+}
+.btn-p::after {
+  content:''; position:absolute; bottom:0; left:0;
+  width:0; height:2px; background:var(--rust); transition:width .3s;
+}
+.btn-p:hover { background:#1e1e1e; }
+.btn-p:hover::after { width:100%; }
+.btn-p:disabled { opacity:.3; cursor:not-allowed; }
+.btn-p:disabled::after { display:none; }
+.btn-stop {
+  width:100%; background:transparent; border:1px solid var(--rust-line);
+  color:var(--rust); font-family:inherit;
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  padding:14px; cursor:pointer; transition:all .2s;
+  margin-top:8px; min-height:48px; display:none;
+}
+.btn-stop.show { display:block; }
+.btn-g {
+  background:transparent; border:1px solid var(--line); border-top:2px solid var(--ink-dim);
+  color:var(--ink-mid); font-family:inherit;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  padding:12px 18px; cursor:pointer; transition:all .2s; min-height:44px;
+}
+.btn-g:hover { border-top-color:var(--rust); color:var(--rust); }
+.brow { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+
+/* ── PROGRESS ── */
+.prog-wrap { padding:24px 0; }
+.prog-title {
+  font-family:'Playfair Display','Georgia',serif;
+  font-size:19px; font-style:italic; color:var(--ink-mid); margin-bottom:20px;
+}
+.psteps { display:flex; flex-direction:column; gap:12px; }
+.pstep {
+  display:flex; align-items:flex-start; gap:12px;
+  font-size:10px; letter-spacing:1px; color:var(--ink-dim);
+  transition:color .3s; line-height:1.5;
+}
+.pstep.active { color:var(--ink); }
+.pstep.done { color:var(--gold); }
+.pstep-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--line); flex-shrink:0; margin-top:2px; transition:background .3s;
+}
+.pstep.active .pstep-dot { background:var(--rust); animation:blink 1s infinite; }
+.pstep.done .pstep-dot { background:var(--gold); }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── CARDS GÉNÉRIQUES ── */
+.result-card {
+  background:var(--card); border:1px solid var(--line);
+  border-top:3px solid var(--rust); padding:20px;
+  margin-bottom:20px; animation:fadeUp .4s ease both;
+}
+.result-card.gold { border-top-color:var(--gold); }
+.ptags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.ptag { font-family:'Archivo Black','Arial Black',sans-serif; font-size:9px; letter-spacing:2px; text-transform:uppercase; padding:4px 10px; }
+.ptag-r { background:var(--rust); color:var(--ink); }
+.ptag-g { background:var(--gold); color:var(--paper); }
+.ptag-i { background:var(--ink); color:var(--paper); }
+.ptag-l { border:1px solid var(--line); color:var(--ink-dim); }
+
+/* ── POST CARD ── */
+.post-nav-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px; flex-wrap:wrap; gap:8px;
+}
+.pcounter { font-size:9px; letter-spacing:2px; color:var(--ink-dim); }
+.pdots { display:flex; gap:8px; align-items:center; }
+.pdot {
+  width:8px; height:8px; border-radius:50%; background:var(--line);
+  cursor:pointer; transition:background .2s, transform .2s; flex-shrink:0;
+}
+.pdot.active { background:var(--rust); transform:scale(1.4); }
+.pdot.done { background:var(--ink-dim); }
+.btn-nav {
+  background:none; border:1px solid var(--line); color:var(--ink-dim);
+  font-family:inherit; font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  padding:10px 16px; cursor:pointer; transition:all .2s; min-height:44px;
+}
+.btn-nav:hover { border-color:var(--rust); color:var(--rust); }
+.btn-nav:disabled { opacity:.25; cursor:default; }
+
+.post-card {
+  background:var(--card); border:1px solid var(--line);
+  border-top:3px solid var(--ink-dim); animation:fadeUp .35s ease both;
+}
+.pcard-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:6px;
+}
+.post-signal { font-size:9px; color:var(--ink-dim); font-style:italic; max-width:220px; text-align:right; line-height:1.4; }
+.post-body {
+  padding:22px 18px;
+  font-family:'Playfair Display','Georgia',serif;
+  font-size:15px; line-height:2;
+  white-space:pre-wrap; color:var(--ink); word-break:break-word;
+}
+.post-loading {
+  padding:22px 18px; font-size:12px; color:var(--ink-dim);
+  font-style:italic; display:flex; align-items:center; gap:10px;
+}
+.post-actions {
+  padding:10px 16px; border-top:1px solid var(--line);
+  display:flex; flex-wrap:wrap; gap:8px;
+  align-items:center; justify-content:space-between;
+}
+.ag { display:flex; gap:6px; flex-wrap:wrap; }
+.abtn {
+  background:none; border:1px solid var(--line); color:var(--ink-dim);
+  font-family:inherit; font-size:8px; letter-spacing:1px; text-transform:uppercase;
+  padding:10px 12px; cursor:pointer; transition:all .2s; min-height:40px;
+}
+.abtn:hover { border-color:var(--rust); color:var(--rust); }
+.abtn.copied { color:var(--gold); border-color:var(--gold); }
+.abtn.saved { color:var(--green); border-color:var(--green); }
+.abtn.accent { background:var(--rust); border-color:var(--rust); color:var(--ink); }
+.abtn.accent:hover { opacity:.85; }
+
+/* ── DIRECTION PANEL ── */
+.dir-panel {
+  display:none; padding:14px 16px; border-top:1px solid var(--line);
+  background:var(--rust-dim);
+}
+.dir-panel.open { display:block; animation:fadeUp .3s ease both; }
+.dir-ta {
+  width:100%; background:transparent; border:none;
+  border-bottom:1px solid var(--rust-line); color:var(--ink);
+  font-family:inherit; font-size:13px; padding:10px 0;
+  outline:none; line-height:1.7; resize:none; min-height:60px;
+}
+.dir-ta::placeholder { color:var(--ink-dim); font-size:11px; font-style:italic; }
+.dir-submit {
+  margin-top:10px; background:var(--rust); border:none; color:var(--ink);
+  font-family:'Archivo Black','Arial Black',sans-serif;
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  padding:12px 20px; cursor:pointer; transition:opacity .2s; min-height:44px;
+}
+.dir-submit:hover { opacity:.85; }
+
+/* ── TROC KIT MESSAGES ── */
+.tk-msg {
+  background:var(--card); border:1px solid var(--line);
+  border-left:3px solid var(--rust); padding:16px 18px;
+  margin-bottom:14px; animation:fadeUp .4s ease both;
+}
+.tk-label { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--rust); margin-bottom:4px; }
+.tk-ctx { font-size:10px; color:var(--gold); margin-bottom:10px; font-style:italic; line-height:1.5; }
+.tk-body { font-size:12px; color:var(--ink-mid); line-height:1.9; white-space:pre-wrap; word-break:break-word; }
+.tk-foot { margin-top:10px; }
+
+/* ── DÉCONSTRUIRE ── */
+.dc-block {
+  background:var(--card); border:1px solid var(--line);
+  border-top:3px solid var(--gold); padding:20px;
+  margin-bottom:16px; animation:fadeUp .4s ease both;
+}
+.dc-sec { margin-bottom:14px; }
+.dc-sec-lbl { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+.dc-sec-body { font-size:12px; color:var(--ink-mid); line-height:1.9; white-space:pre-wrap; }
+
+/* ── CALENDRIER ── */
+.cal-wrap { margin-top:36px; }
+.cal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+.tog-wrap {
+  display:flex; align-items:center; gap:8px; font-size:9px; letter-spacing:2px;
+  color:var(--ink-dim); cursor:pointer; user-select:none; min-height:44px;
+}
+.tog-pill {
+  width:36px; height:18px; background:var(--line); border-radius:9px;
+  position:relative; transition:background .2s; flex-shrink:0;
+}
+.tog-pill::after {
+  content:''; position:absolute; width:14px; height:14px; border-radius:50%;
+  background:var(--ink-dim); top:2px; left:2px; transition:transform .2s, background .2s;
+}
+.tog-wrap.on .tog-pill { background:var(--rust-dim); }
+.tog-wrap.on .tog-pill::after { transform:translateX(18px); background:var(--rust); }
+.cal-week-row { margin-bottom:10px; }
+.cal-week-lbl { font-size:8px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; }
+.cal-week-btns { display:flex; gap:6px; flex-wrap:wrap; }
+.cwbtn {
+  background:var(--card2); border:1px solid var(--line); color:var(--ink-dim);
+  font-family:inherit; font-size:9px; letter-spacing:1px; text-transform:uppercase;
+  padding:8px 12px; cursor:pointer; transition:all .2s; min-height:40px;
+}
+.cwbtn.on { border-color:var(--rust); color:var(--rust); }
+.cal-day-lbls { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:3px; }
+.cdl { font-size:7px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-dim); text-align:center; padding:4px 0; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
 .cal-cell {
-  aspect-ratio:1;
-  background:var(--white);
-  border:1px solid var(--line);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  font-family:'Space Mono',monospace;
-  font-size:8px;color:var(--ink-dim);
-  cursor:default;transition:border-color 0.2s;
-  position:relative;
+  aspect-ratio:1; background:var(--card2); border:1px solid var(--line);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:8px; color:var(--ink-dim); cursor:default; transition:all .2s; position:relative;
 }
-.cal-cell.has{
-  border-top:2px solid var(--rust);
-  color:var(--ink);cursor:pointer;
-}
-.cal-cell.has.valeur{background:rgba(212,84,26,0.12);}
-.cal-cell.has.emotion{background:rgba(201,168,76,0.10);}
-.cal-cell.has.curiosite{background:rgba(240,234,214,0.06);}
-.cal-cell.active-day{border-color:var(--rust)!important;box-shadow:0 0 0 1px var(--rust);}
-.cal-pn{font-size:6px;color:var(--rust);margin-top:1px;letter-spacing:1px;}
-
-/* POST CARD — un à la fois */
-.post-card-wrap{position:relative;}
-.post-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;
-}
-.post-counter{
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;color:var(--ink-dim);
-}
-.post-dots{display:flex;gap:6px;align-items:center;}
-.post-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--line);transition:background 0.2s,transform 0.2s;
-}
-.post-dot.active{background:var(--rust);transform:scale(1.3);}
-.post-dot.done{background:var(--ink-dim);}
-.btn-nav{
-  background:none;border:1px solid var(--line);
-  color:var(--ink-dim);
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;
-  padding:8px 16px;cursor:pointer;
-  text-transform:uppercase;
-  transition:border-color 0.2s,color 0.2s;
-}
-.btn-nav:hover{border-color:var(--rust);color:var(--rust);}
-.btn-nav:disabled{opacity:0.3;cursor:default;}
-
-/* EVAL DETAIL */
-.eval-detail{
-  background:rgba(212,84,26,0.08);
-  border-left:2px solid var(--rust);
-  padding:10px 14px;
-  font-family:'Space Mono',monospace;
-  font-size:9px;line-height:1.8;
-  color:var(--ink-mid);
-  margin-bottom:16px;
-}
-.eval-detail strong{color:var(--rust);}
-
-/* MATIERE BRUTE WARNING */
-.field-warn{
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:1px;
-  color:var(--rust);margin-top:6px;
-  display:none;
+.cal-cell.has { border-top:2px solid var(--rust); color:var(--ink); cursor:pointer; }
+.cal-cell.has:active { background:var(--rust-dim); }
+.cal-cell.has.valeur { background:rgba(212,84,26,0.08); }
+.cal-cell.has.emotion { background:rgba(201,168,76,0.07); }
+.cal-cell.has.curiosite { background:rgba(240,234,214,0.04); }
+.cal-cell.has.miroir { background:rgba(212,84,26,0.05); }
+.cptype { font-size:6px; color:var(--rust); margin-top:1px; }
+.cal-seq-lbl {
+  grid-column:1/-1; font-size:8px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--gold); background:var(--gold-dim); padding:5px 8px; text-align:center;
 }
 
-/* ERROR */
-.error-box {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:2px solid var(--rust);
-  padding:16px 18px;
-  font-family:'Space Mono',monospace;
-  font-size:11px;color:var(--rust);
-  line-height:1.6;margin-top:12px;
-}
-
-/* DIVIDER */
-.section-break{
-  display:flex;align-items:center;gap:16px;
-  margin:28px 0;
-}
-.section-break::before,.section-break::after{content:'';flex:1;height:1px;background:var(--line);}
-.section-break span{
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:3px;
-  color:var(--ink-dim);text-transform:uppercase;
-}
-
-.hidden{display:none!important;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
-
-@media(max-width:700px){
-  .col-layout{grid-template-columns:1fr;}
-  .col-aside{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:32px;}
-  .masthead{padding:16px 20px 12px;}
-  main{padding:28px 16px 80px;}
-  .section-nav{padding:0 16px;}
-  .sel-grid.cols3{grid-template-columns:repeat(2,1fr);}
-}
-</style>
-</head>
-<body>
-
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-title">MOMENT<br><em style="font-family:'Playfair Display',serif;font-style:italic;color:#C4440A;">Troc</em><br>STUDIO</div>
-  <div class="loader-sub">Agent IA · V3</div>
-  <div class="loader-bar"></div>
-</div>
-
-<!-- GEMINI GATE -->
-<div id="geminigate" style="display:none;">
-  <div class="ggate-inner">
-    <div class="ggate-label">Moteur IA — Étape 2 / 2</div>
-    <div class="ggate-title">Clé<br>Gemini</div>
-    <div class="ggate-sub">
-      Obtiens ta clé gratuite sur<br>
-      <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a> → Get API Key → Create API Key
-    </div>
-    <input class="ggate-input" id="gemini-input" type="text" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')validerGeminiKey()">
-    <div id="ggate-err"></div>
-    <button class="ggate-btn" onclick="validerGeminiKey()">Activer le moteur →</button>
-    <div class="ggate-note">Stockée dans ton navigateur · Jamais envoyée ailleurs</div>
-  </div>
-</div>
+/* ── ARSENAL ── */
+.ar-item {
+  background:var(--card); border:1px solid var(--line);
+  border-top:2px solid var(--ink-dim); margin-bottom:14px;
+  animation:fadeUp .3s ease both;
+}
+.ar-item:hover { border-top-color:var(--rust); }
+.ar-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:6px;
+}
+.ar-body {
+  padding:18px 16px;
+  font-family:'Playfair Display','Georgia',serif;
+  font-size:14px; line-height:1.9;
+  white-space:pre-wrap; color:var(--ink-mid); word-break:break-word;
+}
+.ar-foot { padding:10px 16px; border-top:1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap; }
+.ar-empty { font-size:11px; color:var(--ink-dim); margin-top:16px; line-height:1.9; }
 
-<!-- KEY GATE -->
-<div id="keygate" style="display:none;">
-  <div class="gate-inner">
-    <div class="gate-label">Moment Troc · Accès</div>
-    <div class="gate-title">Studio<br>V3</div>
-    <input type="text" class="gate-input" id="key-input" placeholder="Clé d'accès" autocomplete="off" onkeydown="if(event.key==='Enter')verifierCle()" oninput="this.value=this.value.toUpperCase()">
-    <div id="gate-err"></div>
-    <button class="gate-btn" onclick="verifierCle()">Activer →</button>
-    <div style="margin-top:20px;font-family:'Space Mono',monospace;font-size:9px;color:rgba(242,237,228,0.2);letter-spacing:1px;">Accès réservé aux membres Moment Troc</div>
-  </div>
-</div>
-
-<!-- MASTHEAD -->
-<div class="hr-thick"></div>
-<div class="masthead">
-  <div class="masthead-title">Moment <em>Troc</em> Studio</div>
-  <div class="masthead-meta">
-    Agent IA · Gemini<br>
-    Framework Moment Troc<br>
-    Vendre c'est reconnaître
-  </div>
-</div>
-<div class="hr-thin"></div>
-
-<!-- MODE NAV -->
-<nav class="section-nav">
-  <button class="section-tab on" onclick="switchMode('studio')">Studio</button>
-  <button class="section-tab" onclick="switchMode('trockit')">Troc Kit</button>
-  <button class="section-tab" onclick="switchMode('sprint')">Content Sprint</button>
-  <button class="section-tab" onclick="switchMode('diagnostic')">Diagnostic</button>
-  <button class="section-tab" onclick="switchMode('deconstruire')">Déconstruire</button>
-</nav>
-<div class="hr-thin"></div>
-
-<main>
-
-<!-- ══════════════ MODE STUDIO ══════════════ -->
-<div id="mode-studio">
-  <div class="col-layout">
-    <div class="col-main">
-
-      <div id="st-step1">
-        <div class="section-eyebrow">Mode Studio</div>
-        <div class="section-headline">L'agent<br><em>lit ta cible.</em></div>
-        <div class="section-deck">Décris ton univers. L'agent scanne le marché, détecte les profils, et génère du contenu qui piège.</div>
-
-        <div class="field">
-          <div class="field-label">Ton business ou produit <span class="opt">requis</span></div>
-          <textarea id="s-biz" rows="4" placeholder="Ce que tu fais, pour qui, ce que ça change dans leur vie..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Angle ou idée de départ <span class="opt">optionnel</span></div>
-          <textarea id="s-idee" rows="2" placeholder="Un angle spécifique que tu veux explorer..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Matière brute <span class="opt">recommandé — c'est ici que ça devient réel</span></div>
-          <textarea id="s-douleur" rows="4" placeholder="Une scène vécue. Une tension réelle. Une anecdote. Un moment qui t'a frappé. Le Studio part de là — pas d'une scène inventée.&#10;&#10;Exemple : &quot;Un client m'a dit qu'il avait essayé 3 formations et abandonné à chaque fois au bout d'une semaine.&quot;"></textarea>
-          <div class="field-warn" id="s-douleur-warn">Sans matière réelle, le Studio génère du générique. Donne une scène vraie.</div>
-        </div>
-        <button class="btn-primary" onclick="studioAnalyser()">Analyser les profils →</button>
-      </div>
-
-      <div id="st-step2" class="hidden">
-        <div class="section-eyebrow">Étape 02</div>
-        <div class="section-headline"><em>Profils</em><br>détectés.</div>
-
-        <div id="st-load1" class="loading">
-          <div class="loading-head">Lecture du marché...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Analyse des archétypes</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Détection des fissures</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Calibration Moment Troc</span></div>
-          </div>
-          <div class="loading-status" id="st-sub1"></div>
-        </div>
-
-        <div id="st-profils" class="hidden">
-          <div id="st-tags" class="profil-tags"></div>
-          <div class="reasoning" id="st-reasoning"></div>
-        </div>
-        <div id="st-err1" class="hidden error-box"></div>
-
-        <div class="hidden" id="st-etape-card" style="margin-top:28px;">
-          <div class="hr-rust" style="margin-bottom:20px;"></div>
-          <div class="field-label" style="margin-bottom:12px;">Choisis une étape Moment Troc</div>
-          <div class="sel-grid" id="st-etapes"></div>
-        </div>
-
-        <div class="btn-row hidden" id="st-actions2">
-          <button class="btn-ghost" onclick="studioBack(1)">← Retour</button>
-          <button class="btn-primary" id="st-btn-gen" onclick="studioGenerer()" disabled style="flex:1">Générer la série →</button>
-        </div>
-      </div>
-
-      <div id="st-step3" class="hidden">
-        <div class="section-eyebrow">Arsenal</div>
-        <div class="section-headline"><em>Contenu</em><br>calibré.</div>
-
-        <div id="st-load3" class="loading">
-          <div class="loading-head">Génération en cours...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Protocole Racine activé</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Injection bibliothèque d'illusions</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Auto-évaluation des angles morts</span></div>
-          </div>
-          <div class="loading-status" id="st-sub3"></div>
-        </div>
-
-        <div id="st-result" class="hidden">
-          <div id="st-eval" class="eval-bar hidden"></div>
-          <div id="st-eval-detail" class="eval-detail hidden"></div>
-
-          <!-- POST UN À LA FOIS -->
-          <div class="post-card-wrap">
-            <div class="post-nav">
-              <div class="post-dots" id="st-dots"></div>
-              <div class="post-counter" id="st-counter">Post 1 / 5</div>
-            </div>
-            <div id="st-post-card"></div>
-            <div class="btn-row" style="margin-top:16px;">
-              <button class="btn-nav" id="st-prev" onclick="stNav(-1)" disabled>← Préc.</button>
-              <button class="btn-nav" id="st-next" onclick="stNav(1)">Suiv. →</button>
-            </div>
-          </div>
-
-          <!-- CALENDRIER 30 JOURS -->
-          <div class="cal-wrap">
-            <div class="cal-header">
-              <div class="cal-title">Calendrier — 30 jours</div>
-              <div class="cal-toggle" id="cal-toggle-btn" onclick="calToggleMode()">
-                <span id="cal-toggle-label">Placement libre</span>
-                <div class="cal-toggle-pill"></div>
-              </div>
-            </div>
-            <div class="cal" id="st-cal"></div>
-            <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
-              <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(212,84,26,0.3);border-top:1px solid var(--rust);"></span> Valeur Brute</span>
-              <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(201,168,76,0.15);border-top:1px solid var(--gold);"></span> Émotion</span>
-              <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(240,234,214,0.08);border-top:1px solid var(--ink-dim);"></span> Curiosité</span>
-            </div>
-          </div>
-        </div>
-        <div id="st-err3" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="st-actions3" style="margin-top:24px;">
-          <button class="btn-ghost" onclick="studioBack(2)">← Retour</button>
-          <button class="btn-primary" onclick="studioNouvelle()" style="flex:1">Changer d'étape →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">Les 3 Intentions</div>
-        <div class="widget-item"><strong>Valeur Brute</strong><br>Une vérité sèche. Aucune histoire. Actionnable.</div>
-        <div class="widget-item"><strong>Émotion / Miroir</strong><br>La scène. Le "il" qui bascule vers "tu". Mécanique Wil Aime.</div>
-        <div class="widget-item"><strong>Curiosité / Suspense</strong><br>Incomplet. Le lecteur veut la suite.</div>
-      </div>
-      <div class="widget">
-        <div class="widget-title">Les 4 Niveaux</div>
-        <div class="widget-item"><strong>Masque</strong> — Ce que le prospect montre</div>
-        <div class="widget-item"><strong>Déclencheur</strong> — Ce qui active la décision</div>
-        <div class="widget-item"><strong>Fissure</strong> — Ce qu'il n'ose pas dire</div>
-        <div class="widget-item"><strong>Reconstruction</strong> — Ce qu'il se raconte après</div>
-      </div>
-      <div class="widget">
-        <div class="widget-title">Philosophie</div>
-        <div class="widget-item" style="font-family:'Playfair Display',serif;font-style:italic;font-size:13px;line-height:1.6;color:var(--ink);">"Vendre c'est pas convaincre.<br>C'est reconnaître."</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODE TROC KIT ══════════════ -->
-<div id="mode-trockit" class="hidden">
-  <div class="col-layout">
-    <div class="col-main">
-      <div id="tk-step1">
-        <div class="section-eyebrow">Mode Troc Kit</div>
-        <div class="section-headline">Le script<br><em>qui vend.</em></div>
-        <div class="section-deck">Décris ton prospect. L'agent détecte son archétype et génère le script complet — du premier message au closing.</div>
-
-        <div class="field">
-          <div class="field-label">Décris ton prospect <span class="opt">requis</span></div>
-          <textarea id="tk-prospect" rows="4" placeholder="Qui est-il ? Que fait-il ? Quelle est sa situation maintenant ?..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Ton produit ou service <span class="opt">requis</span></div>
-          <textarea id="tk-produit" rows="3" placeholder="Ce que tu proposes à ce prospect..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Canal de contact <span class="opt">requis</span></div>
-          <div class="sel-grid cols3">
-            <button class="sel-item" onclick="selCanal(this,'whatsapp')"><div class="sel-item-name">WhatsApp</div></button>
-            <button class="sel-item" onclick="selCanal(this,'dm')"><div class="sel-item-name">DM Facebook</div></button>
-            <button class="sel-item" onclick="selCanal(this,'commentaire')"><div class="sel-item-name">Commentaire</div></button>
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">Objection probable <span class="opt">optionnel</span></div>
-          <input type="text" id="tk-objection" placeholder="Ex: trop cher, pas le bon moment...">
-        </div>
-        <button class="btn-primary" onclick="trocKitGen()">Générer le script →</button>
-      </div>
-
-      <div id="tk-step2" class="hidden">
-        <div class="section-eyebrow">Script généré</div>
-        <div class="section-headline"><em>Arsenal</em><br>de vente.</div>
-
-        <div id="tk-load" class="loading">
-          <div class="loading-head">Analyse du profil...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Détection archétype</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Calibration psychologique</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Auto-évaluation angles morts</span></div>
-          </div>
-          <div class="loading-status" id="tk-sub"></div>
-        </div>
-
-        <div id="tk-result" class="hidden">
-          <div id="tk-eval" class="eval-bar hidden">✓ Script auto-évalué — angles morts corrigés</div>
-          <div id="tk-arch" class="profil-tags" style="margin-bottom:20px;"></div>
-          <div id="tk-scripts"></div>
-        </div>
-        <div id="tk-err" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="tk-actions">
-          <button class="btn-ghost" onclick="trocKitBack()">← Modifier</button>
-          <button class="btn-primary" onclick="trocKitGen()" style="flex:1">Regénérer →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">Script complet</div>
-        <div class="widget-item"><strong>Premier message</strong><br>Calibré pour le canal et l'archétype</div>
-        <div class="widget-item"><strong>Relance</strong><br>Si pas de réponse après 24h</div>
-        <div class="widget-item"><strong>Gestion objection</strong><br>Réponse psychologique — pas argumentative</div>
-        <div class="widget-item"><strong>Closing</strong><br>La phrase exacte pour conclure</div>
-        <div class="widget-item"><strong>Erreurs à éviter</strong><br>Ce qui tue la vente avec ce profil</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODE CONTENT SPRINT ══════════════ -->
-<div id="mode-sprint" class="hidden">
-  <div class="col-layout">
-    <div class="col-main">
-      <div id="sp-step1">
-        <div class="section-eyebrow">Mode Content Sprint</div>
-        <div class="section-headline">30 jours.<br><em>Prêt à publier.</em></div>
-        <div class="section-deck">Un mois de contenu généré, auto-évalué, et organisé. Progression semaine par semaine vers la vente.</div>
-
-        <div class="field">
-          <div class="field-label">Ton business <span class="opt">requis</span></div>
-          <textarea id="sp-biz" rows="3" placeholder="Ton activité et ta cible..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Objectif du mois <span class="opt">requis</span></div>
-          <div class="sel-grid">
-            <button class="sel-item" onclick="selSprint(this,'notoriete')"><div class="sel-item-name">Notoriété</div><div class="sel-item-desc">Se faire connaître</div></button>
-            <button class="sel-item" onclick="selSprint(this,'vente')"><div class="sel-item-name">Vente</div><div class="sel-item-desc">Convertir des prospects</div></button>
-            <button class="sel-item" onclick="selSprint(this,'confiance')"><div class="sel-item-name">Confiance</div><div class="sel-item-desc">Bâtir l'autorité</div></button>
-            <button class="sel-item" onclick="selSprint(this,'lancement')"><div class="sel-item-name">Lancement</div><div class="sel-item-desc">Lancer une offre</div></button>
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">Archétype cible <span class="opt">optionnel</span></div>
-          <input type="text" id="sp-arch" placeholder="Ex: Élévateur, Automatiseur...">
-        </div>
-        <button class="btn-primary" onclick="sprintGen()">Lancer le Sprint →</button>
-      </div>
-
-      <div id="sp-step2" class="hidden">
-        <div class="section-eyebrow">Plan éditorial</div>
-        <div class="section-headline"><em>30 jours</em><br>de contenu.</div>
-
-        <div id="sp-load" class="loading">
-          <div class="loading-head">Construction du plan...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Planification semaine par semaine</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Génération des 15 posts</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Vérification progression</span></div>
-          </div>
-          <div class="loading-status" id="sp-sub"></div>
-        </div>
-
-        <div id="sp-result" class="hidden">
-          <div id="sp-eval" class="eval-bar hidden">✓ Sprint auto-évalué — équilibre et progression vérifiés</div>
-          <div id="sp-posts"></div>
-          <div class="section-break"><span>Calendrier 30 jours</span></div>
-          <div id="sp-cal" class="cal"></div>
-        </div>
-        <div id="sp-err" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="sp-actions">
-          <button class="btn-ghost" onclick="sprintBack()">← Modifier</button>
-          <button class="btn-primary" onclick="sprintGen()" style="flex:1">Regénérer →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">La progression</div>
-        <div class="widget-item"><strong>Semaine 1</strong><br>Notoriété + accroche</div>
-        <div class="widget-item"><strong>Semaine 2</strong><br>Valeur + preuve</div>
-        <div class="widget-item"><strong>Semaine 3</strong><br>Tension + désir</div>
-        <div class="widget-item"><strong>Semaine 4</strong><br>Closing + réassurance</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODE DIAGNOSTIC ══════════════ -->
-<div id="mode-diagnostic" class="hidden">
-  <div class="col-layout">
-    <div class="col-main">
-      <div id="d-step1">
-        <div class="section-eyebrow">Mode Diagnostic</div>
-        <div class="section-headline">Révèle tes<br><em>angles morts.</em></div>
-        <div class="section-deck">L'agent analyse ton marché, identifie ce que tu ne vois pas, et forge ton avantage comparatif réel.</div>
-
-        <div class="field">
-          <div class="field-label">Ton activité <span class="opt">requis</span></div>
-          <textarea id="d-activite" rows="3" placeholder="Ce que tu fais, pour qui, depuis combien de temps..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Tes résultats actuels <span class="opt">requis</span></div>
-          <textarea id="d-resultats" rows="2" placeholder="Ventes actuelles, audience, ce qui marche ou pas..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Tes concurrents <span class="opt">requis</span></div>
-          <textarea id="d-concurrents" rows="3" placeholder="Qui vend la même chose ? Comment ils se positionnent ?..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Ta force perçue <span class="opt">optionnel</span></div>
-          <textarea id="d-force" rows="2" placeholder="Ce qui te différencie selon toi..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Ta plus grande frustration <span class="opt">optionnel</span></div>
-          <textarea id="d-frustration" rows="2" placeholder="Ce qui bloque ta croissance..."></textarea>
-        </div>
-        <button class="btn-primary" onclick="diagGen()">Lancer le diagnostic →</button>
-      </div>
-
-      <div id="d-step2" class="hidden">
-        <div class="section-eyebrow">Rapport</div>
-        <div class="section-headline"><em>Diagnostic</em><br>complet.</div>
-
-        <div id="d-load" class="loading">
-          <div class="loading-head">Analyse en profondeur...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Analyse du positionnement</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Identification angles morts</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Forge de l'avantage comparatif</span></div>
-          </div>
-          <div class="loading-status" id="d-sub"></div>
-        </div>
-
-        <div id="d-result" class="hidden">
-          <div id="d-eval" class="eval-bar hidden">✓ Diagnostic auto-évalué — angles morts confirmés</div>
-          <div id="d-sections"></div>
-        </div>
-        <div id="d-err" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="d-actions">
-          <button class="btn-ghost" onclick="diagBack()">← Modifier</button>
-          <button class="btn-primary" onclick="diagGen()" style="flex:1">Relancer →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">Le rapport inclut</div>
-        <div class="widget-item"><strong>Archétype principal</strong><br>Le vrai profil de ta cible</div>
-        <div class="widget-item"><strong>Positionnement réel</strong><br>Comment tu te positionnes vraiment vs ce que tu crois</div>
-        <div class="widget-item"><strong>Angles morts</strong><br>Ce que tu ne vois pas, ce que les concurrents exploitent</div>
-        <div class="widget-item"><strong>Avantage comparatif</strong><br>Ton vrai différenciateur unique</div>
-        <div class="widget-item"><strong>Stratégie immédiate</strong><br>3 actions à faire cette semaine</div>
-        <div class="widget-item"><strong>Message clé</strong><br>La phrase qui résume ton positionnement</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODE DÉCONSTRUIRE ══════════════ -->
-<div id="mode-deconstruire" class="hidden">
-  <div class="col-layout">
-    <div class="col-main">
+/* ── HISTORIQUE ── */
+.hist-item {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:10px 0; border-bottom:1px solid var(--line);
+}
+.hist-n { font-size:8px; color:var(--ink-dim); flex-shrink:0; width:18px; padding-top:2px; }
+.hist-int { font-size:8px; color:var(--rust); margin-bottom:3px; letter-spacing:1px; text-transform:uppercase; }
+.hist-prev { font-size:10px; color:var(--ink-dim); line-height:1.6; }
 
-      <div id="dc-step1">
-        <div class="section-eyebrow">Mode Déconstruire</div>
-        <div class="section-headline">L'agent<br><em>dissèque.</em></div>
-        <div class="section-deck">Colle un post — n'importe lequel. L'agent identifie la mécanique utilisée, l'organe activé, ce qui manque, et génère un contre-angle que personne n'a encore pris.</div>
+/* ── BOXES ── */
+.err-box { background:rgba(212,84,26,0.08); border-left:3px solid var(--rust); padding:14px 16px; margin:12px 0; font-size:11px; color:var(--rust); line-height:1.7; }
+.ok-box { background:rgba(74,158,74,0.08); border-left:3px solid var(--green); padding:10px 14px; margin:8px 0; font-size:10px; color:var(--green); line-height:1.6; }
+.info-box { background:var(--gold-dim); border-left:3px solid var(--gold); padding:10px 14px; margin:8px 0; font-size:10px; color:var(--gold); line-height:1.6; }
 
-        <div class="field">
-          <div class="field-label">Le post à déconstruire <span class="opt">requis</span></div>
-          <textarea id="dc-post" rows="10" placeholder="Colle ici le post complet à analyser..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Contexte <span class="opt">optionnel</span></div>
-          <input type="text" id="dc-contexte" placeholder="Qui a écrit ce post ? Quel business ? Quel résultat ?">
-        </div>
-        <button class="btn-primary" onclick="deconstruireGen()">Déconstruire →</button>
-      </div>
+/* ── DIVIDERS ── */
+.div-thick { height:3px; background:var(--ink); }
+.div-line { height:1px; background:var(--line); margin:28px 0; }
 
-      <div id="dc-step2" class="hidden">
-        <div class="section-eyebrow">Analyse</div>
-        <div class="section-headline"><em>Mécanique</em><br>révélée.</div>
+/* ── CONFIRM ── */
+#confirm-ov {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.85); z-index:9998;
+  align-items:center; justify-content:center; padding:20px;
+}
+#confirm-ov.show { display:flex; }
+.confirm-box { background:var(--card); border-top:3px solid var(--rust); padding:28px 24px; max-width:320px; width:100%; }
+.confirm-msg { font-size:12px; color:var(--ink-mid); line-height:1.8; margin-bottom:20px; }
+.confirm-btns { display:flex; gap:10px; }
+.c-yes {
+  flex:1; background:var(--rust); border:none; color:var(--ink);
+  font-family:'Archivo Black','Arial Black',sans-serif;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  padding:14px; cursor:pointer; min-height:48px;
+}
+.c-no {
+  flex:1; background:transparent; border:1px solid var(--line); color:var(--ink-dim);
+  font-family:inherit; font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  padding:14px; cursor:pointer; min-height:48px;
+}
+</style>
+</head>
+<body>
 
-        <div id="dc-load" class="loading">
-          <div class="loading-head">Dissection en cours...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Identification profil ciblé</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Détection mécanique utilisée</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Analyse des angles morts</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Génération contre-angle</span></div>
-          </div>
-          <div class="loading-status" id="dc-sub"></div>
-        </div>
-
-        <div id="dc-result" class="hidden">
-          <div id="dc-sections"></div>
-        </div>
-        <div id="dc-err" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="dc-actions">
-          <button class="btn-ghost" onclick="dcBack()">← Retour</button>
-          <button class="btn-primary" onclick="deconstruireGen()" style="flex:1">Relancer →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">Ce que l'analyse révèle</div>
-        <div class="widget-item"><strong>Profil ciblé</strong><br>L'organe activé et le mode (désir ou peur)</div>
-        <div class="widget-item"><strong>Mécanique utilisée</strong><br>L'illusion, la rupture, le CTA</div>
-        <div class="widget-item"><strong>Ce qui manque</strong><br>Les silences. Ce que l'auteur n'a pas osé dire.</div>
-        <div class="widget-item"><strong>Contre-angle</strong><br>Un post inédit sur le même sujet — angle que personne n'a pris</div>
-      </div>
+<!-- CONFIRM -->
+<div id="confirm-ov">
+  <div class="confirm-box">
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="c-yes" id="confirm-yes">Confirmer</button>
+      <button class="c-no" onclick="closeConfirm()">Annuler</button>
     </div>
   </div>
 </div>
 
-</main>
-
-<script>
-(function(){
-'use strict';
-
-// ═══════════════════════════════
-// CONFIG
-// ═══════════════════════════════
-var GEMINI_KEY = '';
-var GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
-function getGeminiKey(){var k=localStorage.getItem('mt_gemini_key');return k?k.trim():'';}
-
-var MASTER = 'MKB2000-2022A';
-var KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
-
-// ═══════════════════════════════
-// FRAMEWORK
-// ═══════════════════════════════
-// 4 PROFILS RÉELS + MODE PEUR (Protecteur = état, pas profil)
-var ARCHETYPES = {
-  'Automatiseur':{
-    organe:'Cortex préfrontal (saturé de décisions)',
-    trigger:'gain de temps, chemin clair, systèmes qui tournent seuls',
-    desir:'Veut une décision de moins. Un chemin sans branches.',
-    peur:'Son système va s\'effondrer. Il s\'épuise et tout s\'arrête.',
-    hook:'Ce que tu fais en 3h, ça peut se faire en 20 minutes.',
-    fissure:'Il perd du temps et il le sait. Il continue quand même.',
-    structures_interdites:'Jamais deux fois le même plan en étapes. Jamais deux fois le même test. Varier : jour dans sa vie / système cassé / question révélatrice / comparaison avant-après.'
-  },
-  'Optimiseur Valeur':{
-    organe:'Striatum (calcul ROI)',
-    trigger:'résultat concret, qualité, multiplicateur',
-    desir:'Veut savoir exactement ce qu\'il va obtenir. Pas de promesse floue.',
-    peur:'Il a payé pour quelque chose qui ne tient pas. Mauvais choix.',
-    hook:'Tu ne paies pas le prix. Tu paies le résultat.',
-    fissure:'Il doute que ça vaille ce que ça coûte. Il reporte.',
-    structures_interdites:'Jamais deux fois le calendrier vivant. Jamais deux fois le ticket de caisse. Varier : projection chiffrée / décision passée analysée / deux colonnes coût-gain / témoignage inversé.'
-  },
-  'Optimiseur Prix':{
-    organe:'Insula (détecteur d\'injustice)',
-    trigger:'juste prix, transparence, meilleur deal sans arnaque',
-    desir:'Veut payer le juste prix. Pas le moins cher — le plus honnête.',
-    peur:'Se faire avoir. Payer trop. Être le naïf de la transaction.',
-    hook:'Il y a une différence entre cheap et juste. Tu la connais ?',
-    fissure:'Il compare tout. Il reporte parce qu\'il cherche encore.',
-    structures_interdites:'Jamais deux fois le post-énigme A/B. Varier : révélation du vrai coût du cheap / anatomie d\'une arnaque / test de cohérence prix-valeur / la question que personne ne pose.'
-  },
-  'Élévateur':{
-    organe:'Noyau Accumbens (statut, appartenance)',
-    trigger:'reconnaissance, transformation visible, changer de ligue',
-    desir:'Être vu différemment. Monter. Appartenir au cercle d\'en haut.',
-    peur:'Rester là où il est. Voir le train partir. Être dépassé.',
-    hook:'Dans 90 jours, les gens autour de toi vont remarquer quelque chose.',
-    fissure:'Il veut monter mais il attend le bon moment. Le bon moment ne vient pas.',
-    structures_interdites:'Jamais deux fois le court-métrage ascension. Varier : la chute de celui qui n\'a pas embarqué / le cercle d\'en haut décrit de l\'intérieur / la scène du regard des autres / le faux closing retourné.'
-  },
-  'Libérateur':{
-    organe:'Cortex cingulaire (rejet du générique)',
-    trigger:'liberté, sortir d\'une contrainte, être reconnu dans sa singularité',
-    desir:'Sortir. Arrêter de faire comme tout le monde. Être vu comme cas unique.',
-    peur:'Ne jamais sortir. Rester prisonnier du système des autres.',
-    hook:'Et si la vraie solution c\'était de tout arrêter et recommencer autrement ?',
-    fissure:'Il étouffe. Il cherche une sortie mais les conseils génériques ne lui parlent pas.',
-    structures_interdites:'Jamais deux fois le miroir inversé. Varier : le conseil refusé / la permission de faire autrement / le cas particulier révélé / la rupture avec le discours dominant.'
-  }
-};
-
-var ETAPES = [
-  {id:'masque',name:'MASQUE',desc:'Ce que le prospect montre — la surface de sa demande'},
-  {id:'declencheur',name:'DÉCLENCHEUR',desc:'Ce qui active réellement la décision d\'achat'},
-  {id:'fissure',name:'FISSURE',desc:'La tension cachée — ce qu\'il n\'ose pas dire'},
-  {id:'reconstruction',name:'RECONSTRUCTION',desc:'Comment il se raconte l\'histoire après l\'achat'}
-];
-
-var SUSPENSION = 'LA SUSPENSION — MISE EN LUMIÈRE CHIRURGICALE:\nEntre la rupture et le CTA, il y a un moment précis — la Mise en Lumière.\nCe n\'est pas du FOMO. Ce n\'est pas une urgence fabriquée.\nC\'est nommer avec précision l\'état interne que le lecteur vivait dans l\'ombre.\n\nDéfinition : La Suspension est cet espace entre la décision et le mouvement. Pas du doute. Pas de la peur. Quelque chose de plus étrange — une partie de la personne sait, et une autre partie fait semblant de ne pas savoir. Les deux coexistent en silence.\n\nLa Suspension devient insupportable dès qu\'elle est vue. Tu n\'as pas besoin de créer de pression. La pression existait déjà. Tu allumes juste la lumière.\n\nAPRÈS la mise en lumière vient la PERMISSION — la porte de sortie naturelle.\nPas une injonction. Pas "achète maintenant".\nUne ouverture douce vers le mouvement.\n\nSTRUCTURE COMPLÈTE T1→T2→T3:\nT1 — L\'Expérience: le lecteur VIT sans savoir qu\'il est dedans\nT2 — La Rupture: il réalise que c\'est lui (rupture signature du profil)\nT3 — Mise en Lumière + Permission + CTA:\n  → Nommer l\'état de suspension avec précision chirurgicale (1-2 phrases)\n  → Donner la permission de bouger (pas forcer — ouvrir)\n  → CTA signature du profil\n\nEXEMPLES DE MISE EN LUMIÈRE PAR PROFIL:\nÉlévateur: "Tu le sais depuis le début. Tu attendais juste que quelqu\'un le dise."\nAutomatiseur: "Tu n\'hésites pas. Tu procrastines en portant le costume de quelqu\'un qui réfléchit."\nOptimiseur Valeur: "Tu connais déjà la réponse. Tu cherches juste une permission de faire confiance au chiffre."\nOptimiseur Prix: "Tu n\'as pas peur de payer. Tu as peur de te tromper. C\'est différent."\nLibérateur: "Tu savais que les conseils des autres ne marchaient pas pour toi. Tu attendais que quelqu\'un te le confirme."\nMode peur: "Tu ne doutes pas du produit. Tu doutes de toi. Et ça, personne ne te l\'a encore dit."\n\nEXEMPLES DE PERMISSION:\n"Si tu es prêt à sortir de là — le lien est en commentaire."\n"La prochaine étape existe. Elle t\'attend."\n"Tu n\'as plus besoin de faire semblant."\n"Quand tu es prêt — tape [CTA]."\n\nRÈGLE ABSOLUE: La Permission n\'est JAMAIS une urgence. Jamais "dernière chance". Jamais "plus que X places". C\'est une sortie, pas une pression.';
+<!-- GATE -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">Moment Troc · Studio V4</div>
+    <div class="gate-title">Clé API<br>Gemini</div>
+    <div class="gate-sub">
+      Gratuit → <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a><br>
+      Sauvegardée sur ton appareil. Jamais partagée.
+    </div>
+    <input class="gate-input" id="key-inp" type="password" placeholder="AIza..." autocomplete="off">
+    <div class="gate-err" id="gate-err"></div>
+    <button class="gate-btn" id="gate-btn" onclick="validateKey()">
+      <span id="gate-btn-txt">Entrer dans le Studio</span>
+    </button>
+    <div class="gate-note">La clé est vérifiée avant l'accès.</div>
+  </div>
+</div>
 
-var WIL_AIME = 'MÉCANIQUE WIL AIME — LE GENDRE IDÉAL:\nCommence par "il" — une scène concrète du quotidien africain (marché, bureau, téléphone le matin, famille, café chaud, cour vide). Le lecteur croit être spectateur. À mi-chemin, sans transition forcée, bascule vers "tu" — il réalise que c\'est lui. Le personnage attendu n\'arrive jamais — quelqu\'un d\'autre a pris sa place. Fin sans résolution confortable.\nLOI ABSOLUE: JAMAIS deux fois la même forme de twist dans une série. JAMAIS la morale expliquée avant que le lecteur ait ressenti. Le mécanisme se ressent — il ne s\'explique pas.';
-
-var DIVIN = 'STYLE DIVIN SETONDJI — TON CHEF DE GUERRE (Valeur Brute uniquement):\n1. La thèse d\'abord — jamais l\'histoire. Commence par la vérité brute. Le constat, pas l\'anecdote.\n2. Brièveté comme autorité — phrases courtes. Parfois sans verbe. Chaque phrase se lit seule et fait mal.\n3. Tutoiement de commandement — pas "tu devrais". Des ordres : "Arrête." "Commence." "Regarde."\n4. Silence comme outil — laisser des trous. Le blanc entre les phrases fait plus mal que le mot suivant.\n5. Neutralité froide — jamais de colère, jamais d\'émotion visible. Le froid est plus intimidant que le cri.\n6. JAMAIS "peace" ou équivalent en signature. Terminer par une affirmation froide ou rien.\nATTENTION: Ce ton est INTERDIT sur Émotion/Miroir. Il tue l\'empathie. Réservé strictement à Valeur Brute.';
-
-var MIROIR = 'MIROIR BRUTAL:\nQuand tout le monde applaudit — toi tu révèles la vérité. Précision chirurgicale. Pas d\'encouragements vides. La vérité même quand ça fait mal. Le Studio est la seule voix qui dit ce que les autres n\'osent pas.';
-
-var PROTOCOLE_RACINE = 'PROTOCOLE RACINE — STRUCTURE ANTI-GÉNÉRIQUE:\nChaque business a une Vérité Centrale — une thèse qui choque, qui divise, qui n\'est pas un constat fade.\nAutour de cette vérité : 3 Piliers — trois vérités inconfortables que personne n\'ose dire.\nAutour de chaque pilier : 5 Portes — cinq angles d\'attaque, cinq formats, cinq tons différents.\nRésultat : 15 posts uniques qui ne tombent jamais dans le générique.\n\nAPPLICATION:\n- Extraire la Vérité Centrale du business fourni\n- Identifier les 3 Piliers les plus forts pour le profil cible\n- Choisir la Porte la plus adaptée à l\'intention (Valeur Brute / Émotion / Curiosité)\nJAMAIS répéter la même Porte dans une série.';
-
-var PIÈGES_COGNITIFS = 'PHILOSOPHIE DU PIÈGE COGNITIF:\nChaque post est un piège construit depuis l\'INTÉRIEUR de l\'organe du profil.\nPas une scène décrite de l\'extérieur. Une expérience vécue de l\'intérieur.\nLe lecteur ne lit pas — il VIT. Il ne regarde pas — il EST dedans.\nIl ne sait pas qu\'il est piégé jusqu\'à la rupture. Parfois même après.\n\nLOI FONDAMENTALE: L\'illusion part de la RÉACTION DE L\'ORGANE — pas d\'un décor.\nJAMAIS "Il est 7h. Le réveil sonne." — c\'est du décor universel, ça parle à personne.\nTOUJOURS construire depuis ce que l\'organe FAIT naturellement :\n- Le Cortex préfrontal CHERCHE un rail → donne-lui un choix piégé\n- Le Cortex cingulaire REJETTE le générique → commence par l\'exclure\n- Le Striatum CALCULE → lance-lui un calcul qui se retourne\n- Le Noyau Accumbens PROJETTE → montre-lui quelqu\'un à sa place\n- L\'Insula DÉTECTE l\'injustice → révèle ce que personne ne dit sur le prix\n\nDÉFI COGNITIF PERMANENT:\nChaque nouveau post est un nouveau piège. Jamais la même structure. Jamais la même entrée.\nL\'agent doit se demander avant chaque génération : quel piège n\'a pas encore été utilisé pour activer cet organe ?\nSi un post ressemble à un autre — il est raté.\n\nEXEMPLES CALIBRÉS — NIVEAU DE RÉFÉRENCE:\n\n[LIBÉRATEUR — L\'Exclusion]\n"Ce post n\'est pas pour toi.\\n\\n✧\\n\\nSi tu as déjà trouvé ta méthode, ta case, ta routine, passe ton chemin.\\nSi tu sais exactement comment tu fonctionnes et que ça marche, ce texte n\'a rien à t\'apprendre.\\n\\n✧\\n\\nSi tu es encore là, c\'est que tu as déjà senti ce décalage.\\nCelui qui te fait prendre des bouts de méthode et jeter le reste.\\nCelui qui te fait dire : \'ça ne marchera pas pour moi, je ne suis pas comme les autres\'.\\n\\n✧\\n\\nTu n\'es pas compliqué. Tu es juste hors des cases.\\n\\n✧\\n\\nSi tu as lu jusqu\'ici, ce post n\'était pas une leçon. C\'était un tri."\nPOURQUOI ÇA MARCHE: Le Cortex cingulaire rejette le générique. En le repoussant, tu actives son organe. Ceux qui restent se sont auto-qualifiés.\n\n[AUTOMATISEUR — Le Choix Piégé]\n"Tu es à un carrefour. Il y a deux chemins.\\n\\nChemin A : un plan. Cinq étapes. Tu appliques sans réfléchir.\\nChemin B : un miroir. On te voit. On te demande ce que tu veux faire.\\n\\nTu as choisi. Ne me dis rien.\\n\\nSi tu as choisi A — tu es un Automatiseur. Ton cerveau veut un rail.\\nSi tu as choisi B — tu es un Libérateur. Tu veux être compris avant d\'être guidé."\nPOURQUOI ÇA MARCHE: Le Cortex préfrontal saturé VEUT choisir un chemin clair. Tu lui donnes deux rails. Il choisit. Son choix le diagnostique sans qu\'il pose une question.\n\n[OPTIMISEUR VALEUR — La Méta-Conscience]\n"Ce matin, j\'ai écrit un post. Il commençait par : \'La seule chose qui t\'empêche de vendre.\' Puis j\'ai effacé. C\'était un énième post qui promettait une solution miracle.\\n\\nJ\'ai réécrit : \'Tu as essayé de suivre un plan, mais tu t\'es arrêté au jour 3.\' Puis j\'ai effacé. C\'était ta vie, pas un post.\\n\\nAlors j\'ai écrit ceci : un plan pour ne plus jamais t\'arrêter.\\n1. Relis le titre. 2. Relis la première phrase. 3. Relis la troisième phrase.\\n\\nTu viens de suivre un plan jusqu\'au bout.\\nTu n\'es pas bloqué au jour 3. Tu es bloqué parce que le plan n\'était pas le tien."\nPOURQUOI ÇA MARCHE: Le Striatum calcule le ROI de chaque expérience. Tu lui montres le résultat de ce qu\'il vient de vivre. Il réalise la valeur après coup — pas avant.';
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="m-left">
+    <div class="m-title">Moment Troc <em>Studio</em></div>
+    <div class="m-v">V4</div>
+  </div>
+  <div class="m-right" id="key-status">— aucune clé —</div>
+</header>
+<div class="div-thick"></div>
 
-var MECANIQUE = 'BIBLIOTHÈQUE D\'ILLUSIONS PAR PROFIL — ORGANE → PIÈGE:\n\nRÈGLE: L\'illusion part de la réaction naturelle de l\'organe. Pas d\'un décor.\nJAMAIS deux pièges qui se ressemblent dans une série.\n\nLIBÉRATEUR (Cortex cingulaire rejette le générique — fenêtre 5-10j):\nOrgane → Piège: Il rejette ce qui est pour tout le monde → tu commences par l\'EXCLURE. Il reste. En restant, il se révèle.\nIllusions: L\'Exclusion d\'Entrée / Le Miroir Inversé / L\'Anti-Masterclass / L\'Énigme du Profil Perdu / La Non-Leçon\nRupture: "La solution, c\'était toi."\nMise en lumière: "Tu savais que les conseils des autres ne marchaient pas pour toi. Tu attendais que quelqu\'un te le confirme."\nCTA: Tape "Solo"\n\nAUTOMATISEUR (Cortex préfrontal saturé cherche un rail — fenêtre 72h):\nOrgane → Piège: Il veut un chemin clair → tu lui donnes UN CHOIX PIÉGÉ. Il choisit librement. Son choix le diagnostique.\nIllusions: Le Choix Piégé / Le Mode d\'Emploi Cassé / La Check-List Absurde / Le Rail Hypnotique / La Séquence d\'Ordres\nRupture: "Regarde ton système."\nMise en lumière: "Tu n\'hésites pas. Tu procrastines en portant le costume de quelqu\'un qui réfléchit."\nCTA: Tape "Rail"\n\nOPTIMISEUR VALEUR (Striatum calcule le ROI — fenêtre 7-10j):\nOrgane → Piège: Il calcule la valeur de chaque expérience → tu lui fais VIVRE une expérience puis tu lui montres son ROI après coup.\nIllusions: La Méta-Conscience / Le Calcul Pur / Le Ticket de Caisse / Le Client Perdu / Le Calendrier Vivant\nRupture: "Vérifie ton chiffre."\nMise en lumière: "Tu connais déjà la réponse. Tu cherches juste une permission de faire confiance au chiffre."\nCTA: Tape "Calcul"\n\nÉLÉVATEUR (Noyau Accumbens projette le statut — fenêtre 48-72h):\nOrgane → Piège: Il se projette constamment dans une version supérieure de lui-même → tu lui montres QUELQU\'UN D\'AUTRE à sa place. La jalousie fait le travail.\nIllusions: La Projection de Statut / Le Faux Closing / La Story Privée / Le Post-Brouillon / Le Mur d\'Exclusion\nRupture: "Regarde-toi."\nMise en lumière: "Tu le sais depuis le début. Tu attendais juste que quelqu\'un le dise."\nCTA: Tape "Dédicace"\n\nOPTIMISEUR PRIX (Insula détecte l\'injustice — fenêtre 3-5j):\nOrgane → Piège: Il détecte l\'injustice avant tout → tu lui révèles CE QUE PERSONNE NE DIT sur le prix. La transparence radicale active son organe.\nIllusions: La Transparence Radicale / Le Décompte du Prix / L\'Alerte Anti-Arnaque / Le Dilemme du Prix / La Justification Inversée\nRupture: "C\'est ça, le juste prix."\nMise en lumière: "Tu n\'as pas peur de payer. Tu as peur de te tromper. C\'est différent."\nCTA: Tape "Juste"\n\nMODE PEUR (Amygdale figée — fenêtre 2-4 semaines) — État transversal:\nOrgane → Piège: Il cherche le piège partout → tu lui montres que SA MÉFIANCE est une qualité. Pas de promesse. Pas de pression. Diagnostic rassurant.\nIllusions: Le Post-Contrat / Le Post-Test Rassurant / La Cicatrice / La Preuve par le Vide / Le Serment\nRupture: "Ce post est la preuve."\nMise en lumière: "Tu ne doutes pas du produit. Tu doutes de toi. Et ça, personne ne te l\'a encore dit."\n\nRÈGLE ABSOLUE SIGNATURES: JAMAIS "peace". JAMAIS dans aucune signature. Ce mot est banni.';
-
-var FORMATS = 'FORMATS OBLIGATOIRES — PALETTE COMPLÈTE:\n\nFORMAT TWEET (Valeur Brute + Curiosité/Suspense):\nUne phrase par ligne. Blanc entre chaque. Accroche + pivot + chute. Le lecteur descend sans s\'arrêter. Maximum 10 lignes totales.\n\nFORMAT COURT (tous types):\n5-8 lignes serrées. Un seul angle. Pas de développement — juste l\'impact. Entrée directe, sortie nette.\n\nFORMAT LONG (Émotion/Miroir uniquement):\nLe court-métrage. La scène qui respire. Structure Wil Aime complète T1→T2→T3. Dense émotionnellement. Peut aller jusqu\'à 25 lignes si la tension le justifie.\n\nFORMAT FIL COMMENTAIRES (optionnel sur Curiosité/Suspense):\nLe post pose une vérité courte et incomplète. Le créateur livre la suite en 3-5 commentaires avec ton Divin. Marquer: [FIL — suite en commentaires]\n\nRÈGLE ABSOLUE:\n- Valeur Brute → Tweet ou Court + Ton Divin\n- Émotion/Miroir → Long + Wil Aime T1→T2→T3\n- Curiosité/Suspense → Tweet + Fil possible';
-
-var INTENTIONS = {
-  valeur: 'VALEUR BRUTE — FORMAT TWEET OU COURT — TON DIVIN:\nPas d\'histoire. Pas de "il". La thèse d\'abord. Phrases courtes, parfois sans verbe. Tutoiement de commandement. Silence entre les phrases. Pas d\'urgence fabriquée — une affirmation froide qui tranche. Ancré dans le business réel. Zéro généralité. JAMAIS "peace" en signature.',
-  emotion: 'ÉMOTION/MIROIR — FORMAT LONG — STRUCTURE T1→T2→T3→T4:\nT1: "il" dans une scène concrète du quotidien africain — réelle, pas universelle.\nT2: bascule vers "tu" sans transition forcée — rupture signature du profil.\nT3: Mise en Lumière — nommer l\'état de suspension avec précision chirurgicale. 1-2 phrases. La pression existait déjà, tu allumes la lumière.\nT4: Permission — ouvrir la porte doucement. Pas une injonction. CTA signature.\nFin sans résolution confortable.',
-  curiosite: 'CURIOSITÉ/SUSPENSE — FORMAT TWEET — FIL POSSIBLE:\nMaximum 6 lignes. Situation paradoxale ou résultat inattendu. On ne donne jamais tout. La fin annonce sans expliquer. Si Fil: préparer 3 commentaires Divin.'
-};
-
-// STATE
-var S = {
-  studio:{profils:[],etape:null,biz:'',idee:'',douleur:''},
-  trockit:{canal:null},
-  sprint:{objectif:null},
-  _stPosts:[],_tkTexts:{},_spPosts:[]
-};
-
-// ═══════════════════════════════
-// API
-// ═══════════════════════════════
-async function callGemini(prompt, tokens, useSearch){
-  var GEMINI_KEY = getGeminiKey();
-  if(!GEMINI_KEY){showGeminiGate();throw new Error('Clé Gemini manquante.');}
-  var body = {
-    contents:[{parts:[{text:prompt}]}],
-    generationConfig:{temperature:0.88,maxOutputTokens:tokens||2048}
-  };
-  if(useSearch){
-    body.tools = [{google_search:{}}];
-  }
-  var r = await fetch(GEMINI_URL+GEMINI_KEY,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error(e.error&&e.error.message?e.error.message:'Erreur API ('+r.status+')');}
-  var d=await r.json();
-  if(!d.candidates||!d.candidates[0]||!d.candidates[0].content)throw new Error('Réponse vide');
-  return d.candidates[0].content.parts[0].text;
-}
-
-async function callWithEval(main,evalP,tokens){
-  var r1=await callGemini(main,tokens||2500);
-  var evalFull=evalP+'\n\nCONTENU À ÉVALUER:\n'+r1;
-  var r2=await callGemini(evalFull,tokens||2500);
-  if(r2.trim().startsWith('AMÉLIORER')){
-    var noteMatch=r2.match(/NOTE:\s*(.+)/);
-    var note=noteMatch?noteMatch[1].trim():'';
-    var cleaned=r2.replace(/^AMÉLIORER\s*/i,'').replace(/NOTE:.*\n?/,'').trim();
-    return{content:cleaned,improved:true,evalNote:note};
-  }
-  return{content:r1,improved:false};
-}
-
-// ═══════════════════════════════
-// GEMINI KEY GATE
-// ═══════════════════════════════
-function showGeminiGate(){
-  document.getElementById('geminigate').style.display='flex';
-  setTimeout(function(){var i=document.getElementById('gemini-input');if(i)i.focus();},100);
-}
-window.validerGeminiKey=function(){
-  var v=document.getElementById('gemini-input').value.trim();
-  var e=document.getElementById('ggate-err');
-  if(!v||v.length<30){e.textContent='Clé invalide — vérifie la copie complète.';return;}
-  localStorage.setItem('mt_gemini_key',v);
-  document.getElementById('geminigate').style.display='none';
-  e.textContent='';
-};
-
-// ═══════════════════════════════
-// KEY GATE
-// ═══════════════════════════════
-window.verifierCle=function(){
-  var v=document.getElementById('key-input').value.trim().toUpperCase();
-  var e=document.getElementById('gate-err');
-  if(v===MASTER||KEYS.indexOf(v)!==-1){
-    localStorage.setItem('mt_k',v);
-    document.getElementById('keygate').style.display='none';
-    e.textContent='';
-    if(!localStorage.getItem('mt_gemini_key')){showGeminiGate();}
-  } else {e.textContent='Clé invalide.';}
-};
-
-// ═══════════════════════════════
-// UTILS
-// ═══════════════════════════════
-function show(id){document.getElementById(id).classList.remove('hidden');}
-function hide(id){document.getElementById(id).classList.add('hidden');}
-function txt(id,t){document.getElementById(id).textContent=t;}
-function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function err(id,msg){var e=document.getElementById(id);e.className='error-box';e.textContent='⚠ '+msg;e.classList.remove('hidden');}
-function statTimer(id,msgs,ms){var i=0;return setInterval(function(){if(i<msgs.length)txt(id,msgs[i++]);},ms||1400);}
-function cp(text,btn){navigator.clipboard.writeText(text).then(function(){btn.textContent='✓ Copié';btn.classList.add('on');setTimeout(function(){btn.textContent='Copier';btn.classList.remove('on');},2000);});}
-
-// ═══════════════════════════════
-// MODE SWITCH
-// ═══════════════════════════════
-window.switchMode=function(m){
-  ['studio','trockit','sprint','diagnostic','deconstruire'].forEach(function(x){
-    document.getElementById('mode-'+x).classList.toggle('hidden',x!==m);
-  });
-  document.querySelectorAll('.section-tab').forEach(function(t,i){
-    t.classList.toggle('on',['studio','trockit','sprint','diagnostic','deconstruire'][i]===m);
-  });
-  window.scrollTo({top:0,behavior:'smooth'});
-};
-
-// ═══════════════════════════════
-// ═══ STUDIO ════════════════════
-// ═══════════════════════════════
-function stRenderEtapes(){
-  var g=document.getElementById('st-etapes');g.innerHTML='';
-  ETAPES.forEach(function(e){
-    var b=document.createElement('button');
-    b.className='sel-item';
-    b.innerHTML='<div class="sel-item-name">'+e.name+'</div><div class="sel-item-desc">'+e.desc+'</div>';
-    b.onclick=function(){
-      document.querySelectorAll('#st-etapes .sel-item').forEach(function(x){x.classList.remove('on');});
-      b.classList.add('on');S.studio.etape=e.id;
-      document.getElementById('st-btn-gen').disabled=false;
-    };
-    g.appendChild(b);
-  });
-}
-
-window.studioAnalyser=async function(){
-  S.studio.biz=document.getElementById('s-biz').value.trim();
-  S.studio.idee=document.getElementById('s-idee').value.trim();
-  S.studio.douleur=document.getElementById('s-douleur').value.trim();
-  if(!S.studio.biz){document.getElementById('s-biz').focus();return;}
-
-  hide('st-step1');show('st-step2');
-  show('st-load1');hide('st-profils');hide('st-err1');hide('st-etape-card');hide('st-actions2');
-
-  // ÉTAPE ZÉRO — Recherche terrain web
-  var t=statTimer('st-sub1',['Scan du marché en cours...','Détection des angles saturés...','Identification des silences...','Calibration des profils...']);
-
-  var searchPrompt='Tu es un agent de veille marché pour le copywriting africain.\n\nBUSINESS: '+S.studio.biz+'\n\nFais une recherche sur ce marché et réponds avec:\n\nMARCHÉ: [2-3 phrases sur la réalité actuelle de ce marché — ce qui se passe vraiment]\nANGLES_SATURÉS: [3-4 angles que tout le monde utilise déjà — ce qu\'il faut éviter]\nSILENCES: [2-3 angles que personne n\'exploite encore — les vides à occuper]\nTENSION_DOMINANTE: [La tension profonde non dite que porte ce marché en ce moment]';
-
-  try{
-    var searchResult = await callGemini(searchPrompt, 800, true);
-    S.studio.terrain = searchResult;
-  } catch(e){
-    S.studio.terrain = '';
-  }
-
-  var al=Object.keys(ARCHETYPES).map(function(k){var a=ARCHETYPES[k];return '- '+k+' (organe: '+a.organe+'): désir='+a.desir+' / peur='+a.peur;}).join('\n');
-
-  var prompt='Tu es expert Moment Troc — psychologie d\'achat neurologique.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\n\nLE PROTECTEUR N\'EST PAS UN PROFIL. C\'est l\'état peur de chaque profil. Quand un prospect est dominé par la peur de perdre plutôt que le désir de gagner, il est en mode Protecteur.\n\n4 PROFILS RÉELS:\n'+al+'\n\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.douleur?'MATIÈRE: '+S.studio.douleur+'\n':'')+(S.studio.terrain?'\nTERRAIN MARCHÉ SCANNÉ:\n'+S.studio.terrain+'\n':'')+'\nIdentifie 2-3 profils dominants. Précise le MODE de chaque profil : désir ou peur.\nRéponds:\nARCHETYPES: [nom1 (désir/peur), nom2 (désir/peur)]\nANALYSE: [3-4 phrases — masque visible, déclencheur réel, fissure cachée, ce qu\'il n\'ose pas dire]';
-
-  try{
-    var r=await callGemini(prompt,700);
-    clearInterval(t);
-    var am=r.match(/ARCHETYPES:\s*(.+)/i);
-    var an=r.match(/ANALYSE:\s*([\s\S]+)/i);
-    S.studio.profils=am?am[1].split(',').map(function(s){return s.trim();}):['Élévateur (désir)'];
-    hide('st-load1');show('st-profils');
-    var tags=document.getElementById('st-tags');tags.innerHTML='';
-    S.studio.profils.forEach(function(p){var tg=document.createElement('span');tg.className='profil-tag';tg.textContent=p;tags.appendChild(tg);});
-    txt('st-reasoning',an?an[1].trim():r);
-    stRenderEtapes();show('st-etape-card');show('st-actions2');
-  }catch(e){clearInterval(t);hide('st-load1');err('st-err1',e.message);show('st-err1');show('st-actions2');}
-};
-
-window.studioGenerer=async function(){
-  if(!S.studio.etape)return;
-  hide('st-step2');show('st-step3');
-  show('st-load3');hide('st-result');hide('st-err3');hide('st-actions3');hide('st-eval');
-
-  var ei=ETAPES.find(function(e){return e.id===S.studio.etape;});
-  var pd=S.studio.profils.map(function(p){
-    var k=p.replace(/\s*\(.*\)/,'').trim();
-    var a=ARCHETYPES[k];
-    var mode=p.toLowerCase().includes('peur')?'PEUR':'DÉSIR';
-    return a?p+'\n  Organe: '+a.organe+'\n  Mode '+mode+': '+(mode==='PEUR'?a.peur:a.desir)+'\n  Hook: "'+a.hook+'"':p;
-  }).join('\n');
-
-  var t=statTimer('st-sub3',['Analyse des organes cibles...','Sélection des structures inédites...','Injection style Wil Aime...','Construction des pièges cognitifs...','Rédaction des posts...','Auto-évaluation angles morts...']);
-
-  var main='Tu es le Studio Moment Troc — agent de contenu expert en psychologie d\'achat neurologique.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\nGRILLE: Masque → Déclencheur → Fissure → Reconstruction\n\n'+PIÈGES_COGNITIFS+'\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\n'+SUSPENSION+'\n\n'+PROTOCOLE_RACINE+'\n\n'+MECANIQUE+'\n\n'+FORMATS+'\n\nCONTEXTE:\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.idee?'ANGLE: '+S.studio.idee+'\n':'')+(S.studio.douleur?'MATIÈRE BRUTE: '+S.studio.douleur+'\n':'')+(S.studio.terrain?'\nTERRAIN SCANNÉ:\n'+S.studio.terrain+'\n':'')+'\nPROFILS DÉTECTÉS:\n'+pd+'\nÉTAPE: '+ei.name+' — '+ei.desc+'\n\nTÂCHE: Génère 5 posts — chaque post est un piège cognitif inédit construit depuis l\'intérieur de l\'organe du profil. Pas de décor universel. Pas de scène générique. L\'expérience se passe DANS le lecteur, pas devant lui.\n\nRÉFÉRENCE DE NIVEAU: Les exemples calibrés dans PIÈGES_COGNITIFS sont le niveau minimum. Chaque post doit atteindre ce niveau de précision et d\'ancrage.\n\nSi terrain scanné fourni — occupe les silences, jamais les angles saturés.\n\nDISTRIBUTION:\n- 2 posts ÉMOTION/MIROIR: '+INTENTIONS.emotion+'\n- 2 posts VALEUR BRUTE: '+INTENTIONS.valeur+'\n- 1 post CURIOSITÉ/SUSPENSE: '+INTENTIONS.curiosite+'\n\nRÈGLES ABSOLUES:\n1. Chaque illusion part de la réaction de l\'organe — jamais d\'un décor\n2. Structure T1→T2→T3→T4 sur Émotion/Miroir — Mise en Lumière obligatoire\n3. Rupture signature du profil — JAMAIS "Stop"\n4. JAMAIS "peace" — banni\n5. Ancré dans le business réel — zéro généralité\n6. Matière brute fournie → partir de là obligatoirement\n7. Mode peur → diagnostic rassurant, permission douce\n8. Format strict par intention\n\nFORMAT STRICT:\nPOST [n]\nINTENTION: [Émotion Miroir / Valeur Brute / Curiosité Suspense]\nFORMAT: [Tweet / Court / Long / Fil]\nARCHETYPE: [profil + mode]\nILLUSION: [nom du piège utilisé]\n---\n[contenu complet]\n===';
-
-  var evalP='Tu es évaluateur expert Moment Troc.\nÉvalue ces 5 posts sur ces critères:\n1. INTENTION PURE: chaque post a-t-il une seule intention ?\n2. ÉMOTION/MIROIR: le "il" bascule-t-il vraiment vers "tu" avec la rupture signature du profil ?\n3. VALEUR BRUTE: ton Divin respecté — thèse d\'abord, froid, pas "peace" ?\n4. CURIOSITÉ: vraiment incomplet — le lecteur doit commenter ?\n5. DÉFI COGNITIF: les 5 posts ont-ils chacun une architecture différente ?\n6. ANCRAGE: ancré dans le business réel ou générique ?\n\nSi tout satisfaisant: réponds exactement "VALIDE"\nSinon: réponds "AMÉLIORER"\nPuis sur une ligne: NOTE: [résumé en une phrase de ce qui a été corrigé]\nPuis les posts corrigés en format identique.';
-
-  try{
-    var res=await callWithEval(main,evalP,3000);
-    clearInterval(t);
-    var posts=stParse(res.content,ei);
-    if(!posts.length)throw new Error('Aucun post généré. Réessaie.');
-    S._stPosts=posts;
-    hide('st-load3');show('st-result');
-    var evalBar=document.getElementById('st-eval');
-    var evalDetail=document.getElementById('st-eval-detail');
-    if(res.improved){
-      evalBar.textContent='✓ Auto-évaluation — corrections appliquées';
-      evalBar.classList.remove('hidden');
-      if(res.evalNote){
-        evalDetail.innerHTML='<strong>Ce qui a été corrigé :</strong> '+esc(res.evalNote);
-        evalDetail.classList.remove('hidden');
-      }
-    }
-    stRenderPosts(posts);stRenderCal(posts);show('st-actions3');
-  }catch(e){clearInterval(t);hide('st-load3');err('st-err3',e.message);show('st-err3');show('st-actions3');}
-};
-
-function stParse(raw,ei){
-  var posts=[];
-  var blocks=raw.split(/POST\s*\d+/i).filter(function(b){return b.trim();});
-  blocks.forEach(function(block,i){
-    var im=block.match(/INTENTION:\s*(.+)/i);
-    var fm=block.match(/FORMAT:\s*(.+)/i);
-    var am=block.match(/ARCHETYPE:\s*(.+)/i);
-    var lm=block.match(/ILLUSION:\s*(.+)/i);
-    var cm=block.match(/---\s*([\s\S]+?)(?:===|$)/);
-    posts.push({
-      etape:ei.name,
-      intention:im?im[1].trim():'',
-      format:fm?fm[1].trim():'',
-      archetype:am?am[1].trim():S.studio.profils[0]||'',
-      illusion:lm?lm[1].trim():'',
-      jour:Math.round(1+(i*(29/(4)))),
-      content:cm?cm[1].trim():block.replace(/INTENTION:.*\n|FORMAT:.*\n|ARCHETYPE:.*\n|ILLUSION:.*\n|---/g,'').trim()
-    });
-  });
-  return posts;
-}
-
-// ─── MATIÈRE BRUTE SEMI-OBLIGATOIRE ───
-document.addEventListener('DOMContentLoaded',function(){
-  var biz=document.getElementById('s-biz');
-  var douleur=document.getElementById('s-douleur');
-  var warn=document.getElementById('s-douleur-warn');
-  if(biz&&douleur&&warn){
-    biz.addEventListener('blur',function(){
-      if(biz.value.trim()&&!douleur.value.trim()){
-        warn.style.display='block';
-      }
-    });
-    douleur.addEventListener('input',function(){
-      if(douleur.value.trim()) warn.style.display='none';
-    });
-  }
-});
-
-// ─── POST UN À LA FOIS ───
-var _stIdx=0;
-var _calMode='libre'; // 'libre' ou 'sequence'
-
-// Ordre psychologique 6 étapes Moment Troc pour mode séquence
-var SEQUENCE_JOURS=[2,5,8,12,16,20,24,28]; // Masque→Déclencheur→Fissure→Reconstruction→Invitation
-
-function stRenderPosts(posts){
-  _stIdx=0;
-  S._stPosts=posts;
-  stShowPost(0);
-  stRenderDots(posts.length);
-  stRenderCal(posts);
-}
-
-function stRenderDots(total){
-  var dots=document.getElementById('st-dots');
-  dots.innerHTML='';
-  for(var i=0;i<total;i++){
-    var d=document.createElement('div');
-    d.className='post-dot'+(i===0?' active':'');
-    d.setAttribute('data-i',i);
-    (function(idx){d.onclick=function(){stGoTo(idx);};})(i);
-    dots.appendChild(d);
-  }
-}
-
-function stShowPost(idx){
-  var posts=S._stPosts;
-  if(!posts||!posts.length)return;
-  var p=posts[idx];
-  var card=document.getElementById('st-post-card');
-  var intentionClass=p.intention.toLowerCase().includes('valeur')?'ptag-ink':p.intention.toLowerCase().includes('curiosit')?'ptag-rust':'';
-  var illusionTag=p.illusion?'<span class="ptag">'+esc(p.illusion)+'</span>':'';
-  var formatTag=p.format?'<span class="ptag">'+esc(p.format)+'</span>':'';
-  card.innerHTML='<div class="post-item" style="margin-bottom:0;animation:fadeUp 0.3s ease both;"><div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">J'+p.jour+'</span><span class="ptag '+intentionClass+'">'+esc(p.intention)+'</span>'+formatTag+illusionTag+'<span class="ptag">'+esc(p.archetype)+'</span></div></div><div class="post-body">'+esc(p.content)+'</div><div class="post-footer"><span class="post-num">Post '+(idx+1)+' / '+posts.length+'</span><button class="copy-btn" onclick="stCp(this,'+idx+')">Copier</button></div></div>';
-  // counter
-  document.getElementById('st-counter').textContent='Post '+(idx+1)+' / '+posts.length;
-  // dots
-  document.querySelectorAll('#st-dots .post-dot').forEach(function(d,i){
-    d.className='post-dot'+(i<idx?' done':i===idx?' active':'');
-  });
-  // nav buttons
-  document.getElementById('st-prev').disabled=(idx===0);
-  document.getElementById('st-next').disabled=(idx===posts.length-1);
-  // highlight cal
-  document.querySelectorAll('.cal-cell').forEach(function(c){c.classList.remove('active-day');});
-  var dayCell=document.querySelector('.cal-cell[data-post="'+idx+'"]');
-  if(dayCell)dayCell.classList.add('active-day');
-  _stIdx=idx;
-}
-
-window.stNav=function(dir){stGoTo(_stIdx+dir);};
-window.stGoTo=function(idx){
-  var posts=S._stPosts;
-  if(!posts)return;
-  idx=Math.max(0,Math.min(posts.length-1,idx));
-  stShowPost(idx);
-};
-
-function stRenderCal(posts){
-  var cal=document.getElementById('st-cal');
-  cal.innerHTML='';
-  // Calculer les jours selon le mode
-  var jours=stCalJours(posts);
-  for(var d=1;d<=30;d++){
-    var c=document.createElement('div');
-    c.className='cal-cell';
-    var postIdx=jours.indexOf(d);
-    if(postIdx!==-1){
-      var p=posts[postIdx];
-      var cls=p.intention.toLowerCase().includes('valeur')?'valeur':p.intention.toLowerCase().includes('curiosit')?'curiosite':'emotion';
-      c.classList.add('has',cls);
-      c.setAttribute('data-post',postIdx);
-      c.innerHTML='<span>'+d+'</span><div class="cal-pn">P'+(postIdx+1)+'</div>';
-      (function(idx){c.onclick=function(){stGoTo(idx);};})(postIdx);
-    } else {
-      c.innerHTML='<span>'+d+'</span>';
-    }
-    cal.appendChild(c);
-  }
-}
-
-function stCalJours(posts){
-  if(_calMode==='sequence'){
-    // Mode séquence : placement psychologique Moment Troc
-    return posts.map(function(p,i){
-      return SEQUENCE_JOURS[i]||((i+1)*6);
-    });
-  } else {
-    // Mode libre : espacement régulier sur 30 jours
-    return posts.map(function(p,i){
-      return Math.round(1+(i*(29/(posts.length-1||1))));
-    });
-  }
-}
-
-window.calToggleMode=function(){
-  _calMode=(_calMode==='libre')?'sequence':'libre';
-  var btn=document.getElementById('cal-toggle-btn');
-  var label=document.getElementById('cal-toggle-label');
-  if(_calMode==='sequence'){
-    btn.classList.add('on');
-    label.textContent='Séquence stratégique';
-  } else {
-    btn.classList.remove('on');
-    label.textContent='Placement libre';
-  }
-  if(S._stPosts) stRenderCal(S._stPosts);
-};
-
-window.stCp=function(btn,i){cp(S._stPosts[i].content,btn);};
-window.studioBack=function(s){if(s===1){hide('st-step2');show('st-step1');}else{hide('st-step3');show('st-step2');}};
-window.studioNouvelle=function(){S.studio.etape=null;document.querySelectorAll('#st-etapes .sel-item').forEach(function(b){b.classList.remove('on');});document.getElementById('st-btn-gen').disabled=true;hide('st-step3');show('st-step2');};
-
-// ═══════════════════════════════
-// ═══ TROC KIT ══════════════════
-// ═══════════════════════════════
-window.selCanal=function(btn,c){document.querySelectorAll('#tk-step1 .sel-item').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');S.trockit.canal=c;};
-
-window.trocKitGen=async function(){
-  var prospect=document.getElementById('tk-prospect').value.trim();
-  var produit=document.getElementById('tk-produit').value.trim();
-  var objection=document.getElementById('tk-objection').value.trim();
-  if(!prospect||!produit)return;
-  if(!S.trockit.canal){alert('Choisis un canal');return;}
-
-  hide('tk-step1');show('tk-step2');
-  show('tk-load');hide('tk-result');hide('tk-err');hide('tk-actions');hide('tk-eval');
-
-  var t=statTimer('tk-sub',['Détection archétype...','Analyse psychologique...','Construction du script...','Anticipation objections...','Auto-évaluation...']);
-
-  var al=Object.keys(ARCHETYPES).map(function(k){return k+': '+ARCHETYPES[k].trigger;}).join(' | ');
-
-  var main='Tu es expert Moment Troc en psychologie d\'achat.\n\nNote: Le Protecteur est la version peur de tous les autres archétypes.\nArchétypes: '+al+'\n\nPROSPECT: '+prospect+'\nPRODUIT: '+produit+'\nCANAL: '+S.trockit.canal+'\n'+(objection?'OBJECTION: '+objection+'\n':'')+'\nGénère un script de vente complet calibré sur cet archétype.\n\nFORMAT:\nARCHETYPE_DETECTE: [archétype + mode désir/peur + justification courte]\n\nPREMIER_MESSAGE:\n[message naturel calibré pour ce canal — jamais commercial]\n\nRELANCE:\n[message 24h sans réponse]\n\nGESTION_OBJECTION:\n[réponse qui utilise la psychologie du profil — pas d\'argumentation]\n\nCLOSING:\n[phrase exacte pour conclure — courte, sans pression]\n\nERREURS_A_EVITER:\n[3 erreurs qui tuent la vente avec ce profil]\n\nRÈGLES: Registre "tu", naturel, jamais de marketing visible, phrases courtes.';
-
-  var evalP='Tu es évaluateur Moment Troc.\nÉvalue ce script:\n1. Le premier message est-il vraiment naturel pour ce canal ?\n2. La gestion objection utilise-t-elle la psychologie du profil ou c\'est générique ?\n3. Y a-t-il des angles morts — des approches plus efficaces ?\n4. Le closing crée-t-il une tension sans pression ?\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée même format]';
-
-  try{
-    var res=await callWithEval(main,evalP,2000);
-    clearInterval(t);
-    hide('tk-load');show('tk-result');
-    if(res.improved)show('tk-eval');
-    tkRender(res.content);show('tk-actions');
-  }catch(e){clearInterval(t);hide('tk-load');err('tk-err',e.message);show('tk-err');show('tk-actions');}
-};
-
-function tkRender(raw){
-  var am=raw.match(/ARCHETYPE_DETECTE:\s*(.+)/i);
-  if(am){var t=document.getElementById('tk-arch');t.innerHTML='<span class="profil-tag">'+esc(am[1].trim())+'</span>';}
-  var secs=[{k:'PREMIER_MESSAGE',l:'Premier Message'},{k:'RELANCE',l:'Relance (24h)'},{k:'GESTION_OBJECTION',l:'Gestion Objection'},{k:'CLOSING',l:'Closing'},{k:'ERREURS_A_EVITER',l:'Erreurs à Éviter'}];
-  var c=document.getElementById('tk-scripts');c.innerHTML='';S._tkTexts={};
-  secs.forEach(function(s,i){
-    var rx=new RegExp(s.k+':\\s*([\\s\\S]+?)(?=(?:'+secs.map(function(x){return x.k;}).join('|')+'):|$)','i');
-    var m=raw.match(rx);
-    if(m){
-      S._tkTexts[i]=m[1].trim();
-      var d=document.createElement('div');d.className='script-block';
-      d.innerHTML='<div class="script-label">'+s.l+'</div><div class="script-body">'+esc(m[1].trim())+'<button class="script-copy" onclick="tkCp(this,'+i+')">Copier</button></div>';
-      c.appendChild(d);
-    }
-  });
-}
-window.tkCp=function(btn,i){cp(S._tkTexts[i],btn);};
-window.trocKitBack=function(){hide('tk-step2');show('tk-step1');};
-
-// ═══════════════════════════════
-// ═══ CONTENT SPRINT ════════════
-// ═══════════════════════════════
-window.selSprint=function(btn,o){document.querySelectorAll('#sp-step1 .sel-item').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');S.sprint.objectif=o;};
-
-window.sprintGen=async function(){
-  var biz=document.getElementById('sp-biz').value.trim();
-  var arch=document.getElementById('sp-arch').value.trim();
-  if(!biz)return;if(!S.sprint.objectif){alert('Choisis un objectif');return;}
-
-  hide('sp-step1');show('sp-step2');
-  show('sp-load');hide('sp-result');hide('sp-err');hide('sp-actions');hide('sp-eval');
-
-  var t=statTimer('sp-sub',['Planification du mois...','Semaine 1 — Notoriété...','Semaine 2 — Valeur...','Semaine 3 — Tension...','Semaine 4 — Closing...','Auto-évaluation...'],1800);
-
-  var main='Tu es le Studio Moment Troc — agent Content Sprint.\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\nBUSINESS: '+biz+'\nOBJECTIF: '+S.sprint.objectif+'\n'+(arch?'ARCHÉTYPE: '+arch+'\n':'')+'\nGénère un plan éditorial de 30 jours avec 15 posts complets (1 tous les 2 jours).\n\nPROGRESSION:\n- Semaine 1 (J1-J8): Notoriété + accroche — posts Curiosité/Suspense dominants\n- Semaine 2 (J9-J15): Valeur + preuve — posts Valeur Brute dominants\n- Semaine 3 (J16-J22): Tension + désir — posts Émotion/Miroir dominants\n- Semaine 4 (J23-J30): Closing + réassurance — mix des 3 intentions\n\nMix d\'intentions: respecte les 3 intentions (Valeur Brute / Émotion Miroir / Curiosité Suspense). Ne jamais mélanger dans un même post.\n\nFORMAT pour chaque post:\nPOST [n] — JOUR [j]\nINTENTION: [intention]\nTYPE: [Concept/Histoire/Trigger/Preuve]\nARCHETYPE: [archétype]\n---\n[contenu complet]\n===\n\nRÈGLES: Phrases courtes, miroir brutal, jamais de marketing visible.';
-
-  var evalP='Évalue ce plan 30 jours:\n1. La progression semaine par semaine est-elle cohérente ?\n2. Y a-t-il un bon mix des 3 intentions ?\n3. Les posts construisent-ils vraiment vers la vente ?\n4. Angles morts — semaines trop faibles ?\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[plan corrigé même format]';
-
-  try{
-    var res=await callWithEval(main,evalP,4000);
-    clearInterval(t);
-    var posts=spParse(res.content);
-    if(!posts.length)throw new Error('Aucun post généré.');
-    S._spPosts=posts;
-    hide('sp-load');show('sp-result');
-    if(res.improved)show('sp-eval');
-    spRender(posts);spCal(posts);show('sp-actions');
-  }catch(e){clearInterval(t);hide('sp-load');err('sp-err',e.message);show('sp-err');show('sp-actions');}
-};
-
-function spParse(raw){
-  var posts=[];
-  var blocks=raw.split(/POST\s*\d+/i).filter(function(b){return b.trim();});
-  blocks.forEach(function(block,i){
-    var jm=block.match(/JOUR\s*(\d+)/i);
-    var im=block.match(/INTENTION:\s*(.+)/i);
-    var tm=block.match(/TYPE:\s*(.+)/i);
-    var am=block.match(/ARCHETYPE:\s*(.+)/i);
-    var cm=block.match(/---\s*([\s\S]+?)(?:===|$)/);
-    posts.push({jour:jm?parseInt(jm[1]):i*2+1,intention:im?im[1].trim():'',type:tm?tm[1].trim():'',archetype:am?am[1].trim():'',content:cm?cm[1].trim():block.replace(/JOUR.*\n|INTENTION:.*\n|TYPE:.*\n|ARCHETYPE:.*\n|---/g,'').trim()});
-  });
-  return posts;
-}
-
-function spRender(posts){
-  var list=document.getElementById('sp-posts');list.innerHTML='';
-  posts.forEach(function(p,i){
-    var d=document.createElement('div');d.className='post-item';d.style.animationDelay=(i*0.05)+'s';
-    d.innerHTML='<div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">J'+p.jour+'</span><span class="ptag">'+esc(p.intention)+'</span><span class="ptag">'+esc(p.archetype)+'</span></div></div><div class="post-body">'+esc(p.content)+'</div><div class="post-footer"><span class="post-num">Post '+(i+1)+' / 15</span><button class="copy-btn" onclick="spCp(this,'+i+')">Copier</button></div>';
-    list.appendChild(d);
-  });
-}
-
-function spCal(posts){
-  var cal=document.getElementById('sp-cal');cal.innerHTML='';
-  var days=posts.map(function(p){return p.jour;});
-  for(var d=1;d<=30;d++){
-    var c=document.createElement('div');c.className='cal-cell';
-    var idx=days.indexOf(d);
-    if(idx!==-1){c.classList.add('has');c.innerHTML='<span>'+d+'</span><div class="cal-pn">P'+(idx+1)+'</div>';}
-    else c.innerHTML='<span>'+d+'</span>';
-    cal.appendChild(c);
-  }
-}
-window.spCp=function(btn,i){cp(S._spPosts[i].content,btn);};
-window.sprintBack=function(){hide('sp-step2');show('sp-step1');};
-
-// ═══════════════════════════════
-// ═══ DIAGNOSTIC ════════════════
-// ═══════════════════════════════
-window.diagGen=async function(){
-  var activite=document.getElementById('d-activite').value.trim();
-  var resultats=document.getElementById('d-resultats').value.trim();
-  var concurrents=document.getElementById('d-concurrents').value.trim();
-  var force=document.getElementById('d-force').value.trim();
-  var frustration=document.getElementById('d-frustration').value.trim();
-  if(!activite||!resultats||!concurrents)return;
-
-  hide('d-step1');show('d-step2');
-  show('d-load');hide('d-result');hide('d-err');hide('d-actions');hide('d-eval');
-
-  var t=statTimer('d-sub',['Analyse du positionnement...','Détection angles morts...','Analyse concurrentielle...','Forge de l\'avantage...','Auto-évaluation...']);
-
-  var al=Object.keys(ARCHETYPES).map(function(k){return k+': '+ARCHETYPES[k].trigger;}).join(' | ');
-
-  var main='Tu es consultant stratégique expert Moment Troc.\n\nPhilosophie: "Vendre c\'est pas convaincre. C\'est reconnaître."\nArchétypes: '+al+'\nNote: Le Protecteur est la version peur de tous les autres.\n\nACTIVITÉ: '+activite+'\nRÉSULTATS: '+resultats+'\nCONCURRENTS: '+concurrents+'\n'+(force?'FORCE PERÇUE: '+force+'\n':'')+(frustration?'FRUSTRATION: '+frustration+'\n':'')+'\nGénère un diagnostic stratégique complet et précis — pas générique.\n\nFORMAT:\nARCHETYPE_PRINCIPAL: [archétype dominant + mode désir/peur + justification]\n\nPOSITIONNEMENT_ACTUEL: [comment il se positionne vraiment vs comment il pense se positionner — sois brutal]\n\nANGLES_MORTS: [3-5 angles morts SPÉCIFIQUES à sa situation — pas génériques]\n\nAVANTAGE_COMPARATIF: [son vrai avantage unique révélé par l\'analyse — pas ce qu\'il croit]\n\nSTRATEGIE_IMMEDIATE: [3 actions concrètes et spécifiques à faire cette semaine]\n\nMESSAGE_CLE: [la phrase courte et forte qui résume son positionnement réel]';
-
-  var evalP='Tu es évaluateur stratégique.\nÉvalue ce diagnostic:\n1. Les angles morts sont-ils spécifiques ou génériques ?\n2. L\'avantage comparatif est-il vraiment différenciant ?\n3. Les actions sont-elles réellement faisables cette semaine ?\n4. Y a-t-il des contradictions ?\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[diagnostic corrigé même format]';
-
-  try{
-    var res=await callWithEval(main,evalP,2500);
-    clearInterval(t);
-    hide('d-load');show('d-result');
-    if(res.improved)show('d-eval');
-    dRender(res.content);show('d-actions');
-  }catch(e){clearInterval(t);hide('d-load');err('d-err',e.message);show('d-err');show('d-actions');}
-};
-
-function dRender(raw){
-  var secs=[
-    {k:'ARCHETYPE_PRINCIPAL',l:'Archétype Principal',rust:true},
-    {k:'POSITIONNEMENT_ACTUEL',l:'Positionnement Actuel'},
-    {k:'ANGLES_MORTS',l:'Angles Morts',danger:true},
-    {k:'AVANTAGE_COMPARATIF',l:'Avantage Comparatif',rust:true},
-    {k:'STRATEGIE_IMMEDIATE',l:'Stratégie Immédiate'},
-    {k:'MESSAGE_CLE',l:'Message Clé',rust:true}
-  ];
-  var c=document.getElementById('d-sections');c.innerHTML='';
-  secs.forEach(function(s,i){
-    var rx=new RegExp(s.k+':\\s*([\\s\\S]+?)(?=(?:'+secs.map(function(x){return x.k;}).join('|')+'):|$)','i');
-    var m=raw.match(rx);
-    if(m){
-      var text=m[1].trim();
-      var d=document.createElement('div');d.className='diag-block';
-      var color=s.rust?'color:var(--rust)':'';
-      if(s.danger){
-        d.innerHTML='<div class="diag-title" style="'+color+'">'+s.l+'</div><div class="angle-bloc"><div class="angle-label">Zones non vues</div><div class="angle-body">'+esc(text)+'</div></div>';
-      } else {
-        d.innerHTML='<div class="diag-title" style="'+color+'">'+s.l+'</div><div class="diag-body">'+esc(text)+'</div>';
-      }
-      c.appendChild(d);
-      if(i<secs.length-1){var sep=document.createElement('div');sep.className='section-break';sep.innerHTML='<span></span>';c.appendChild(sep);}
-    }
-  });
-}
-window.diagBack=function(){hide('d-step2');show('d-step1');};
+<!-- CONVERSION BAR -->
+<div class="conv-bar">
+  <div class="cs" id="cs-1"><div class="cs-dot"></div>S1 · Masque</div>
+  <div class="cs" id="cs-2"><div class="cs-dot"></div>S2 · Déclencheur</div>
+  <div class="cs" id="cs-3"><div class="cs-dot"></div>S3 · Fissure</div>
+  <div class="cs" id="cs-4"><div class="cs-dot"></div>S4 · Conversion</div>
+</div>
+<div class="conv-hint" id="conv-hint"></div>
 
-// ═══════════════════════════════
-// MODE DÉCONSTRUIRE
-// ═══════════════════════════════
-window.deconstruireGen=async function(){
-  var post=document.getElementById('dc-post').value.trim();
-  var contexte=document.getElementById('dc-contexte').value.trim();
-  if(!post){document.getElementById('dc-post').focus();return;}
+<!-- MODE TABS -->
+<nav class="mode-nav">
+  <button class="mtab active" onclick="goMode('studio')">Studio</button>
+  <button class="mtab" onclick="goMode('trockit')">Troc Kit</button>
+  <button class="mtab" onclick="goMode('deconstruire')">Déconstruire</button>
+  <button class="mtab" onclick="goMode('arsenal')">Arsenal</button>
+</nav>
 
-  hide('dc-step1');show('dc-step2');
-  show('dc-load');hide('dc-result');hide('dc-err');hide('dc-actions');
+<main>
 
-  var al=Object.keys(ARCHETYPES).map(function(k){
-    var a=ARCHETYPES[k];
-    return k+' ('+a.organe+') — Rupture: "'+a.rupture+'" — Illusions: '+a.illusions.join(', ');
-  }).join('\n');
+<!-- ═══════════════════════════════
+     STUDIO
+═══════════════════════════════ -->
+<section id="mode-studio">
+  <div class="s-eye">Agent terrain · Profil · 5 posts calibrés</div>
+  <div class="s-title">L'agent qui lit<br><em>ton marché.</em></div>
+  <div class="s-deck">3 questions. L'agent détecte le profil de ta cible et génère 5 posts calibrés sur sa psychologie.</div>
 
-  var t=statTimer('dc-sub',['Identification du profil ciblé...','Détection de la mécanique...','Analyse des silences...','Génération du contre-angle...']);
+  <div class="field">
+    <div class="flabel">Business sauvegardé <span class="opt">3 profils max</span></div>
+    <div class="slots" id="slots">
+      <div class="slot active" data-sl="0" onclick="pickSlot(0)"><div class="slot-dot"></div><span id="sl0">Profil 1</span></div>
+      <div class="slot" data-sl="1" onclick="pickSlot(1)"><div class="slot-dot"></div><span id="sl1">Profil 2</span></div>
+      <div class="slot" data-sl="2" onclick="pickSlot(2)"><div class="slot-dot"></div><span id="sl2">Profil 3</span></div>
+    </div>
+  </div>
 
-  var prompt='Tu es un agent expert en déconstruction de posts Facebook — Modèle Moment Troc.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\n\nPROFILS ET MÉCANIQUES:\n'+al+'\n\nMODE PEUR (Amygdale): état transversal — activer quand le profil est dominé par la peur de perdre. Illusions: Le Post-Contrat / Le Post-Test Rassurant / La Cicatrice / La Preuve par le Vide / Le Serment. Rupture: "Ce post est la preuve."\n\nPOST À DÉCONSTRUIRE:\n'+post+'\n'+(contexte?'CONTEXTE: '+contexte+'\n':'')+'\nANALYSE COMPLÈTE:\n\n1. PROFIL_CIBLE: [quel profil est visé, mode désir ou peur, justification précise]\n\n2. ORGANE_ACTIVE: [quel organe, comment il est activé dans ce post]\n\n3. MECANIQUE_UTILISEE: [T1/T2/T3 — quelle illusion, quelle rupture, quel CTA — ce qui est bien fait]\n\n4. CE_QUI_MANQUE: [les silences laissés — ce que l\'auteur n\'a pas osé dire — les angles morts — ce qui aurait rendu le post 3x plus fort]\n\n5. VERDICT: [le post est-il calibré ou générique ? Pourquoi ?]\n\n6. CONTRE_ANGLE:\n[Un post complet et inédit sur le même sujet — angle que personne n\'a pris — utilise une mécanique différente du post original — format adapté au profil — TON DIVIN si Valeur Brute, WIL AIME si Émotion/Miroir — JAMAIS "peace" en signature]';
+  <div id="studio-form">
+    <div class="field">
+      <div class="flabel">Ce que tu vends</div>
+      <div class="fhint">Nomme le produit ou service. Simple et précis.</div>
+      <textarea id="f1" rows="2" maxlength="300" placeholder="Ex: Formation en ligne sur la gestion financière pour entrepreneurs…" oninput="cc(this,'cc1',300)"></textarea>
+      <div class="cc" id="cc1">0 / 300</div>
+    </div>
+    <div class="field">
+      <div class="flabel">À qui exactement</div>
+      <div class="fhint">Qui est cette personne, ce qu'elle vit, où elle en est.</div>
+      <textarea id="f2" rows="2" maxlength="300" placeholder="Ex: Entrepreneurs africains 25-40 ans qui peinent à gérer leur trésorerie…" oninput="cc(this,'cc2',300)"></textarea>
+      <div class="cc" id="cc2">0 / 300</div>
+    </div>
+    <div class="field">
+      <div class="flabel">Le problème exact que tu règles</div>
+      <div class="fhint">Leur douleur — ce qu'ils vivent avant de te rencontrer.</div>
+      <textarea id="f3" rows="2" maxlength="300" placeholder="Ex: Ils génèrent des revenus mais ne savent pas où l'argent disparaît chaque mois…" oninput="cc(this,'cc3',300)"></textarea>
+      <div class="cc" id="cc3">0 / 300</div>
+    </div>
+    <div class="field">
+      <div class="flabel">Matière brute <span class="opt">optionnel</span></div>
+      <div class="fhint">Une phrase, une scène, une tension que tu veux voir dans les posts.</div>
+      <textarea id="f4" rows="2" maxlength="400" placeholder="Ex: L'image du vendeur de Poteau qui a lu ma morphologie avant de parler…" oninput="cc(this,'cc4',400)"></textarea>
+      <div class="cc" id="cc4">0 / 400</div>
+    </div>
+    <div class="field">
+      <div class="flabel">Format</div>
+      <div class="sgrid">
+        <div class="sitem on" data-f="court" onclick="s1(this,'f')"><div class="sname">Court</div><div class="sdesc">80–130 mots. Impact direct.</div></div>
+        <div class="sitem" data-f="long" onclick="s1(this,'f')"><div class="sname">Long</div><div class="sdesc">200–300 mots. Narration.</div></div>
+        <div class="sitem" data-f="thread" onclick="s1(this,'f')"><div class="sname">Thread</div><div class="sdesc">4–6 parties. Révélation.</div></div>
+        <div class="sitem" data-f="mixte" onclick="s1(this,'f')"><div class="sname">Mixte</div><div class="sdesc">L'agent adapte selon l'intention.</div></div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="flabel">Intentions <span class="opt">plusieurs possibles</span></div>
+      <div class="sgrid">
+        <div class="sitem on" data-i="valeur" onclick="sN(this)"><div class="sname">Valeur Brute</div><div class="sdesc">Autorité. Le lecteur apprend.</div></div>
+        <div class="sitem on" data-i="emotion" onclick="sN(this)"><div class="sname">Émotion Miroir</div><div class="sdesc">Reconnaissance. Il se voit.</div></div>
+        <div class="sitem on" data-i="curiosite" onclick="sN(this)"><div class="sname">Curiosité</div><div class="sdesc">Suspense. Il doit finir.</div></div>
+        <div class="sitem on" data-i="miroir" onclick="sN(this)"><div class="sname">Miroir Brutal</div><div class="sdesc">Vérité. Il se reconnaît.</div></div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="flabel">Langue</div>
+      <div class="sgrid c3">
+        <div class="sitem on" data-l="standard" onclick="s1(this,'l')"><div class="sname">Français</div><div class="sdesc">Autorité.</div></div>
+        <div class="sitem" data-l="local" onclick="s1(this,'l')"><div class="sname">Local</div><div class="sdesc">Terrain africain.</div></div>
+        <div class="sitem" data-l="mixte" onclick="s1(this,'l')"><div class="sname">Mixte</div><div class="sdesc">Adapté par intention.</div></div>
+      </div>
+    </div>
+    <button class="btn-p" id="btn-gen" onclick="runStudio()">Lancer l'agent → 5 posts</button>
+    <button class="btn-stop" id="btn-stop" onclick="stopGen()">⬛ Arrêter</button>
+  </div>
 
-  try{
-    var res=await callGemini(prompt,2500,false);
-    clearInterval(t);
-    hide('dc-load');show('dc-result');
-    dcRender(res);
-    show('dc-actions');
-  }catch(e){
-    clearInterval(t);
-    hide('dc-load');
-    err('dc-err',e.message);
-    show('dc-err');
-    show('dc-actions');
+  <div id="studio-prog" style="display:none;">
+    <div class="prog-wrap">
+      <div class="prog-title" id="prog-title">L'agent travaille…</div>
+      <div class="psteps" id="psteps"></div>
+    </div>
+  </div>
+
+  <div id="studio-res" style="display:none;">
+    <div id="scan-res"></div>
+    <div id="profil-res"></div>
+
+    <div class="s-eye" style="margin-top:28px;" id="posts-anchor">Posts générés</div>
+    <div class="post-nav-bar">
+      <button class="btn-nav" id="btn-prev" onclick="navP(-1)" disabled>← Préc.</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div class="pcounter" id="pcounter">Post 1 / 5</div>
+        <div class="pdots" id="pdots"></div>
+      </div>
+      <button class="btn-nav" id="btn-next" onclick="navP(1)">Suiv. →</button>
+    </div>
+    <div id="post-display"></div>
+
+    <div id="tk-bridge" style="display:none;margin-top:16px;"></div>
+
+    <div class="cal-wrap" id="cal-wrap">
+      <div class="s-eye">Calendrier 30 jours</div>
+      <div class="cal-head">
+        <div class="s-title" style="font-size:20px;">Programme</div>
+        <div class="tog-wrap" id="cal-tog" onclick="togCal()">
+          <span id="cal-lbl">Simple</span>
+          <div class="tog-pill"></div>
+          <span>Séquence</span>
+        </div>
+      </div>
+      <div class="cal-week-row">
+        <div class="cal-week-lbl">Semaine de départ</div>
+        <div class="cal-week-btns">
+          <button class="cwbtn on" data-w="1" onclick="setW(1,this)">S1</button>
+          <button class="cwbtn" data-w="2" onclick="setW(2,this)">S2</button>
+          <button class="cwbtn" data-w="3" onclick="setW(3,this)">S3</button>
+          <button class="cwbtn" data-w="4" onclick="setW(4,this)">S4</button>
+        </div>
+      </div>
+      <div class="cal-day-lbls">
+        <div class="cdl">Lun</div><div class="cdl">Mar</div><div class="cdl">Mer</div>
+        <div class="cdl">Jeu</div><div class="cdl">Ven</div><div class="cdl">Sam</div><div class="cdl">Dim</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <div class="div-line"></div>
+    <div class="s-eye">Historique mécaniques</div>
+    <div id="hist-list" style="margin-top:8px;"></div>
+
+    <div class="brow" style="margin-top:28px;">
+      <button class="btn-g" onclick="resetStudio()">← Nouveau brief</button>
+      <button class="btn-g" onclick="runStudio()">Tout régénérer</button>
+    </div>
+  </div>
+  <div id="studio-err" style="display:none;"></div>
+</section>
+
+<!-- ═══════════════════════════════
+     TROC KIT
+═══════════════════════════════ -->
+<section id="mode-trockit" style="display:none;">
+  <div class="s-eye">Messages de prospection calibrés</div>
+  <div class="s-title">Troc Kit —<br><em>chirurgical par profil.</em></div>
+  <div class="s-deck">Messages d'approche, de valeur, de relance et de réponse aux objections. Chaque message suit la logique de conversion Moment Troc.</div>
+
+  <div id="tk-auto" style="display:none;" class="info-box" style="margin-bottom:16px;"></div>
+
+  <div class="field">
+    <div class="flabel">Ton offre</div>
+    <div class="fhint">Ce que tu proposes, à quel prix, ce que ça change pour l'acheteur.</div>
+    <textarea id="tk-offre" rows="3" maxlength="400" placeholder="Ex: Formation 3 mois, 497€ — l'entrepreneur sort avec un système financier qui tourne seul…" oninput="cc(this,'cc-tko',400)"></textarea>
+    <div class="cc" id="cc-tko">0 / 400</div>
+  </div>
+  <div class="field">
+    <div class="flabel">Profil du prospect</div>
+    <div class="sgrid">
+      <div class="sitem on" data-p="automatiseur" onclick="s1(this,'p')"><div class="sname">Automatiseur</div><div class="sdesc">Veut que ça tourne sans lui.</div></div>
+      <div class="sitem" data-p="optimiseur" onclick="s1(this,'p')"><div class="sname">Optimiseur</div><div class="sdesc">Veut les meilleurs résultats.</div></div>
+      <div class="sitem" data-p="elevateur" onclick="s1(this,'p')"><div class="sname">Élévateur</div><div class="sdesc">Veut monter en niveau.</div></div>
+      <div class="sitem" data-p="liberateur" onclick="s1(this,'p')"><div class="sname">Libérateur</div><div class="sdesc">Veut se libérer d'un fardeau.</div></div>
+    </div>
+  </div>
+  <div class="field">
+    <div class="flabel">Niveau de méfiance</div>
+    <div class="sgrid c3">
+      <div class="sitem on" data-m="faible" onclick="s1(this,'m')"><div class="sname">Faible</div><div class="sdesc">Déjà chaud.</div></div>
+      <div class="sitem" data-m="moderee" onclick="s1(this,'m')"><div class="sname">Modérée</div><div class="sdesc">Prudent.</div></div>
+      <div class="sitem" data-m="elevee" onclick="s1(this,'m')"><div class="sname">Élevée</div><div class="sdesc">Mur fort.</div></div>
+    </div>
+  </div>
+  <div class="field">
+    <div class="flabel">Ce que tu sais de lui <span class="opt">optionnel</span></div>
+    <textarea id="tk-ctx" rows="2" maxlength="300" placeholder="Ce qu'il a dit, comment vous vous êtes rencontrés…" oninput="cc(this,'cc-tkc',300)"></textarea>
+    <div class="cc" id="cc-tkc">0 / 300</div>
+  </div>
+  <button class="btn-p" onclick="runTrocKit()">Générer les messages</button>
+  <div id="tk-prog" style="display:none;"><div class="prog-wrap"><div class="prog-title">Calibration en cours…</div></div></div>
+  <div id="tk-res" style="display:none;"></div>
+  <div id="tk-err" style="display:none;"></div>
+</section>
+
+<!-- ═══════════════════════════════
+     DÉCONSTRUIRE
+═══════════════════════════════ -->
+<section id="mode-deconstruire" style="display:none;">
+  <div class="s-eye">Autopsie de contenu</div>
+  <div class="s-title">Déconstruire —<br><em>ce qui marche. Pourquoi.</em></div>
+  <div class="s-deck">Colle un post concurrent. L'agent révèle la mécanique cachée et génère une version améliorée directement exploitable.</div>
+
+  <div class="field">
+    <div class="flabel">Le post à déconstruire</div>
+    <textarea id="dc-post" rows="7" maxlength="2000" placeholder="Colle le post ici…" oninput="cc(this,'cc-dc',2000)"></textarea>
+    <div class="cc" id="cc-dc">0 / 2000</div>
+  </div>
+  <div class="field">
+    <div class="flabel">Ton secteur / cible <span class="opt">optionnel</span></div>
+    <textarea id="dc-ctx" rows="2" maxlength="300" placeholder="Pour calibrer l'analyse sur ton marché…" oninput="cc(this,'cc-dcc',300)"></textarea>
+    <div class="cc" id="cc-dcc">0 / 300</div>
+  </div>
+  <button class="btn-p" onclick="runDC()">Déconstruire + améliorer</button>
+  <div id="dc-prog" style="display:none;"><div class="prog-wrap"><div class="prog-title">Autopsie en cours…</div></div></div>
+  <div id="dc-res" style="display:none;"></div>
+  <div id="dc-err" style="display:none;"></div>
+</section>
+
+<!-- ═══════════════════════════════
+     ARSENAL
+═══════════════════════════════ -->
+<section id="mode-arsenal" style="display:none;">
+  <div class="s-eye">Bibliothèque personnelle</div>
+  <div class="s-title">Arsenal —<br><em>tes meilleurs posts.</em></div>
+  <div class="s-deck">Posts validés depuis le Studio. Recycle-les comme base de variante ou utilise-les comme matière pour de nouveaux posts.</div>
+  <div id="ar-list"></div>
+</section>
+
+</main>
+
+<script>
+// ════════════════════════════════════════
+// ÉTAT GLOBAL
+// ════════════════════════════════════════
+let GK = '';
+let stopped = false;
+let isGen = false;
+
+let scanData = '';
+let profilData = null;
+let posts = [];
+let postIdx = 0;
+
+let calSeq = false;
+let calWeek = 1;
+
+let slots = JSON.parse(localStorage.getItem('mt4_slots') || '[{},{},{}]');
+let activeSlot = 0;
+
+let mechHist = JSON.parse(localStorage.getItem('mt4_mech') || '[]');
+let arsenal = JSON.parse(localStorage.getItem('mt4_arsenal') || '[]');
+
+let confirmCb = null;
+
+const CONV_HINTS = {
+  1: 'S1 · Masque — Publie des posts qui créent la reconnaissance. Ton lecteur doit se voir dans ce que tu écris.',
+  2: 'S2 · Déclencheur — Active le signal qui fissure. Ton lecteur commence à douter de sa situation actuelle.',
+  3: 'S3 · Fissure — Touche l\'émotion enfouie. Ton lecteur ressent quelque chose qu\'il n\'avait jamais nommé.',
+  4: 'S4 · Conversion — Propose la sortie. Ton lecteur passe à l\'action.'
+};
+
+const INT = {
+  valeur: {
+    label: 'Valeur Brute', tag: 'ptag-r',
+    rules: `VALEUR BRUTE :
+- Ton d'autorité directe. Affirmation forte, pas de question rhétorique.
+- Structure : Affirmation → Démonstration concrète → Vérité finale
+- Le lecteur apprend quelque chose de précis en 30 secondes.
+- Jamais de langage local. Pas d'émotion excessive.`
+  },
+  emotion: {
+    label: 'Émotion Miroir', tag: 'ptag-g',
+    rules: `ÉMOTION MIROIR — T1→T2→T3→T4 :
+- T1 MASQUE : Ce que le prospect montre au monde (sa façade)
+- T2 DÉCLENCHEUR : L'événement qui fissure ce masque
+- T3 FISSURE : L'émotion vraie, jamais dite, enfouie
+- T4 RECONSTRUCTION : La sortie — ce qui change
+- Narration à la 2ème personne (tu). Langage local si demandé.`
+  },
+  curiosite: {
+    label: 'Curiosité Suspense', tag: 'ptag-i',
+    rules: `CURIOSITÉ SUSPENSE :
+- Ouvre une boucle cognitive dès les 2 premières lignes. Ne la ferme pas.
+- Chaque paragraphe crée une tension vers le suivant.
+- Révélation progressive. Le lecteur doit scroller pour la réponse.
+- Clôture sur une vérité surprenante ou contre-intuitive.`
+  },
+  miroir: {
+    label: 'Miroir Brutal', tag: 'ptag-r',
+    rules: `MIROIR BRUTAL :
+- Tu dis la vérité quand tout le monde applaudit.
+- Pas d'accusation directe — la vérité arrive par le miroir.
+- Le lecteur se reconnaît AVANT de se défendre.
+- Registre émotionnel OU autoritaire — un seul, pas les deux.`
   }
 };
 
-function dcRender(raw){
-  var secs=[
-    {k:'PROFIL_CIBLE',l:'Profil Ciblé',rust:true},
-    {k:'ORGANE_ACTIVE',l:'Organe Activé'},
-    {k:'MECANIQUE_UTILISEE',l:'Mécanique Utilisée'},
-    {k:'CE_QUI_MANQUE',l:'Ce Qui Manque',danger:true},
-    {k:'VERDICT',l:'Verdict',rust:true},
-    {k:'CONTRE_ANGLE',l:'Contre-Angle Inédit',highlight:true}
-  ];
-  var c=document.getElementById('dc-sections');c.innerHTML='';
-  secs.forEach(function(s,i){
-    var re=new RegExp(s.k+':\\s*([\\s\\S]+?)(?=\\n\\n\\d+\\.|$)');
-    var m=raw.match(re);
-    if(m){
-      var text=m[1].trim();
-      var d=document.createElement('div');
-      d.className='diag-item'+(s.highlight?' post-item':'');
-      var color=s.rust?'color:var(--rust);':s.danger?'color:var(--rust);opacity:0.8;':'';
-      if(s.highlight){
-        d.innerHTML='<div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">CONTRE-ANGLE</span></div></div><div class="post-body">'+esc(text)+'</div><div class="post-footer"><button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest(\'.post-item\').querySelector(\'.post-body\').innerText)">Copier</button></div>';
-      } else {
-        d.innerHTML='<div class="diag-title" style="'+color+'">'+s.l+'</div><div class="diag-body">'+esc(text)+'</div>';
+const SEQ_INT = { 1:['valeur','valeur'], 2:['emotion','curiosite'], 3:['emotion','miroir'], 4:['valeur','miroir'] };
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+window.onload = () => {
+  const saved = localStorage.getItem('mt4_key');
+  if (saved) {
+    GK = saved;
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('key-status').innerHTML = '<span class="m-ok">✓ clé active</span>';
+  }
+  loadSlot(0);
+  updateConv(1);
+  renderArsenal();
+  renderHist();
+};
+
+document.getElementById('key-inp').addEventListener('keydown', e => { if (e.key === 'Enter') validateKey(); });
+
+// ════════════════════════════════════════
+// GATE
+// ════════════════════════════════════════
+async function validateKey() {
+  const k = document.getElementById('key-inp').value.trim();
+  const errEl = document.getElementById('gate-err');
+  errEl.textContent = '';
+  if (!k.startsWith('AIza') || k.length < 30) {
+    errEl.textContent = 'Clé invalide. Elle commence par AIza...';
+    return;
+  }
+  const btn = document.getElementById('gate-btn');
+  const txt = document.getElementById('gate-btn-txt');
+  btn.disabled = true;
+  txt.textContent = 'Vérification…';
+  try {
+    const ok = await testKey(k);
+    if (!ok) throw new Error('Clé rejetée par Gemini. Vérifie sur aistudio.google.com');
+    GK = k;
+    localStorage.setItem('mt4_key', k);
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('key-status').innerHTML = '<span class="m-ok">✓ clé active</span>';
+  } catch (e) {
+    errEl.textContent = e.message;
+    btn.disabled = false;
+    txt.textContent = 'Entrer dans le Studio';
+  }
+}
+
+async function testKey(k) {
+  const r = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,
+    { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{parts:[{text:'OK'}]}], generationConfig:{maxOutputTokens:3} }) }
+  );
+  return r.ok;
+}
+
+// ════════════════════════════════════════
+// MODE SWITCH
+// ════════════════════════════════════════
+function goMode(m) {
+  ['studio','trockit','deconstruire','arsenal'].forEach(id => {
+    document.getElementById('mode-' + id).style.display = id === m ? '' : 'none';
+  });
+  document.querySelectorAll('.mtab').forEach((t, i) => {
+    t.classList.toggle('active', ['studio','trockit','deconstruire','arsenal'][i] === m);
+  });
+  if (m === 'trockit') prefillTK();
+  if (m === 'arsenal') renderArsenal();
+}
+
+// ════════════════════════════════════════
+// SELECTORS
+// ════════════════════════════════════════
+function s1(el, attr) {
+  document.querySelectorAll(`[data-${attr}]`).forEach(e => e.classList.remove('on'));
+  el.classList.add('on');
+}
+function sN(el) { el.classList.toggle('on'); }
+function gv(attr) { const e = document.querySelector(`[data-${attr}].on`); return e ? e.getAttribute('data-' + attr) : ''; }
+function gvs(attr) { return [...document.querySelectorAll(`[data-${attr}].on`)].map(e => e.getAttribute('data-' + attr)); }
+
+// ════════════════════════════════════════
+// CHAR COUNT
+// ════════════════════════════════════════
+function cc(el, id, max) {
+  const n = el.value.length;
+  const c = document.getElementById(id);
+  if (!c) return;
+  c.textContent = `${n} / ${max}`;
+  c.classList.toggle('warn', n > max * 0.9);
+}
+
+// ════════════════════════════════════════
+// SLOTS
+// ════════════════════════════════════════
+function pickSlot(i) {
+  saveSlot(activeSlot);
+  activeSlot = i;
+  document.querySelectorAll('.slot').forEach((s, j) => s.classList.toggle('active', j === i));
+  loadSlot(i);
+}
+function saveSlot(i) {
+  const v1 = document.getElementById('f1')?.value || '';
+  const v2 = document.getElementById('f2')?.value || '';
+  const v3 = document.getElementById('f3')?.value || '';
+  if (v1 || v2 || v3) {
+    slots[i] = { v1, v2, v3, label: v1.slice(0, 18) || `Profil ${i+1}` };
+    localStorage.setItem('mt4_slots', JSON.stringify(slots));
+    updateSlotLabels();
+  }
+}
+function loadSlot(i) {
+  const s = slots[i] || {};
+  const f1 = document.getElementById('f1'); if (f1) { f1.value = s.v1 || ''; cc(f1,'cc1',300); }
+  const f2 = document.getElementById('f2'); if (f2) { f2.value = s.v2 || ''; cc(f2,'cc2',300); }
+  const f3 = document.getElementById('f3'); if (f3) { f3.value = s.v3 || ''; cc(f3,'cc3',300); }
+  updateSlotLabels();
+}
+function updateSlotLabels() {
+  slots.forEach((s, i) => {
+    const lbl = document.getElementById(`sl${i}`);
+    const el = document.querySelector(`[data-sl="${i}"]`);
+    if (lbl) lbl.textContent = s.label || `Profil ${i+1}`;
+    if (el) el.classList.toggle('filled', !!(s.v1 || s.v2));
+  });
+}
+
+// ════════════════════════════════════════
+// CONVERSION BAR
+// ════════════════════════════════════════
+function updateConv(w) {
+  [1,2,3,4].forEach(n => {
+    const el = document.getElementById('cs-' + n);
+    el.classList.remove('active','done');
+    if (n === w) el.classList.add('active');
+    else if (n < w) el.classList.add('done');
+  });
+  const hint = document.getElementById('conv-hint');
+  hint.textContent = CONV_HINTS[w] || '';
+  hint.classList.toggle('show', !!CONV_HINTS[w]);
+}
+
+// ════════════════════════════════════════
+// GEMINI CALL
+// ════════════════════════════════════════
+async function callG(prompt, temp = 0.85, maxTok = 1200) {
+  if (stopped) throw new Error('Génération arrêtée.');
+  const r = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GK}`,
+    { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:temp, maxOutputTokens:maxTok} }) }
+  );
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    const code = e?.error?.code || r.status;
+    if (code === 429) throw new Error('Limite API atteinte. Attends 1 minute et relance.');
+    if (code === 401 || code === 403) throw new Error('Clé API invalide ou expirée. Vérifie sur aistudio.google.com');
+    throw new Error(e?.error?.message || `Erreur Gemini (${code})`);
+  }
+  const d = await r.json();
+  const txt = d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  // Nettoyer markdown de Gemini
+  return txt
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/`{1,3}/g, '')
+    .trim();
+}
+
+// ════════════════════════════════════════
+// STOP
+// ════════════════════════════════════════
+function stopGen() {
+  stopped = true; isGen = false;
+  document.getElementById('btn-stop').classList.remove('show');
+  document.getElementById('studio-prog').style.display = 'none';
+  document.getElementById('studio-form').style.display = '';
+  showErr('studio-err', 'Génération arrêtée. Tu peux relancer.');
+}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ════════════════════════════════════════
+// PROGRESS
+// ════════════════════════════════════════
+function buildSteps(steps) {
+  document.getElementById('psteps').innerHTML = steps.map((s, i) =>
+    `<div class="pstep" id="ps${i}"><div class="pstep-dot"></div><span>${s}</span></div>`
+  ).join('');
+}
+function setPS(i, state) {
+  const el = document.getElementById('ps' + i);
+  if (!el) return;
+  el.classList.remove('active','done');
+  if (state) el.classList.add(state);
+}
+function actPS(i) {
+  for (let j = 0; j < i; j++) setPS(j, 'done');
+  setPS(i, 'active');
+}
+
+// ════════════════════════════════════════
+// VALIDATION BRIEF
+// ════════════════════════════════════════
+function validBrief() {
+  const v1 = document.getElementById('f1').value.trim();
+  const v2 = document.getElementById('f2').value.trim();
+  const v3 = document.getElementById('f3').value.trim();
+  if (!v1 || v1.length < 8) return 'Décris ce que tu vends — champ 1 (min. 8 caractères).';
+  if (!v2 || v2.length < 8) return 'Décris à qui tu vends — champ 2 (min. 8 caractères).';
+  if (!v3 || v3.length < 8) return 'Décris le problème que tu règles — champ 3 (min. 8 caractères).';
+  return null;
+}
+
+// ════════════════════════════════════════
+// STUDIO — ORCHESTRATION
+// ════════════════════════════════════════
+async function runStudio() {
+  const err = validBrief();
+  if (err) { showErr('studio-err', err); return; }
+  if (!GK) { document.getElementById('gate').style.display = 'flex'; return; }
+  if (isGen) return;
+
+  isGen = true; stopped = false;
+
+  const v1 = document.getElementById('f1').value.trim();
+  const v2 = document.getElementById('f2').value.trim();
+  const v3 = document.getElementById('f3').value.trim();
+  const v4 = document.getElementById('f4').value.trim();
+  const fmt = gv('f') || 'court';
+  const lng = gv('l') || 'standard';
+  const ints = gvs('i');
+  const five = ints.length ? Array.from({length:5}, (_,i) => ints[i % ints.length]) : ['valeur','emotion','curiosite','miroir','emotion'];
+
+  saveSlot(activeSlot);
+
+  document.getElementById('studio-form').style.display = 'none';
+  document.getElementById('studio-err').style.display = 'none';
+  document.getElementById('studio-res').style.display = 'none';
+  document.getElementById('studio-prog').style.display = '';
+  document.getElementById('btn-stop').classList.add('show');
+
+  buildSteps([
+    'Analyse du terrain et du marché…',
+    'Détection du profil dominant…',
+    'Génération Post 1 / 5…',
+    'Génération Post 2 / 5…',
+    'Génération Post 3 / 5…',
+    'Génération Post 4 / 5…',
+    'Génération Post 5 / 5…',
+    'Construction du calendrier…'
+  ]);
+
+  posts = []; postIdx = 0;
+
+  try {
+    actPS(0);
+    scanData = await doScan(v1, v2, v3);
+
+    actPS(1);
+    profilData = await doProfil(v1, v2, v3, scanData);
+
+    for (let i = 0; i < 5; i++) {
+      if (stopped) break;
+      actPS(2 + i);
+      const int = five[i];
+      const f = fmt === 'mixte' ? fmtFor(int) : fmt;
+      let post = null;
+      let tries = 0;
+      while (tries < 2 && !post) {
+        try {
+          post = await doPost(profilData, scanData, int, f, lng, v4, i);
+        } catch (e) {
+          tries++;
+          if (tries >= 2) throw e;
+          await delay(1500);
+        }
       }
-      c.appendChild(d);
-      if(i<secs.length-1){var sep=document.createElement('div');sep.className='section-break';sep.innerHTML='<span></span>';c.appendChild(sep);}
+      if (post) { posts.push(post); addMech(post); }
+    }
+
+    actPS(7);
+    await delay(300);
+
+    document.getElementById('btn-stop').classList.remove('show');
+    document.getElementById('studio-prog').style.display = 'none';
+    document.getElementById('studio-res').style.display = '';
+    isGen = false;
+
+    renderScan(scanData);
+    renderProfil(profilData);
+    renderPosts();
+    renderCal();
+    renderHist();
+
+    // Bridge Troc Kit
+    const bridge = document.getElementById('tk-bridge');
+    if (bridge && profilData) {
+      bridge.style.display = '';
+      bridge.innerHTML = `<div class="ok-box">Profil détecté → <strong>${esc(profilData.profil)}</strong> · Mode ${esc(profilData.mode)}</div>
+        <button class="btn-g" style="margin-top:8px;" onclick="goMode('trockit')">Ouvrir le Troc Kit avec ce profil →</button>`;
+    }
+    updateConv(calWeek);
+
+  } catch (e) {
+    isGen = false;
+    document.getElementById('btn-stop').classList.remove('show');
+    document.getElementById('studio-prog').style.display = 'none';
+    document.getElementById('studio-form').style.display = '';
+    showErr('studio-err', e.message);
+  }
+}
+
+function fmtFor(int) {
+  if (int === 'emotion') return 'long';
+  if (int === 'curiosite') return 'thread';
+  return 'court';
+}
+
+// ════════════════════════════════════════
+// BLOC 1 — SCAN
+// ════════════════════════════════════════
+async function doScan(v1, v2, v3) {
+  const p = `Tu es un analyste de contenu marketing pour les marchés africains francophones.
+
+Business :
+- Ce qui est vendu : "${v1}"
+- La cible : "${v2}"
+- Le problème réglé : "${v3}"
+
+Analyse en 4 axes (150 mots max, dense, directement exploitable) :
+
+1. CE QUI ENGAGE SUR CE MARCHÉ : types de contenus qui fonctionnent, formats, tonalités performantes
+2. STRUCTURES NARRATIVES : micro-scène, chiffre choc, question miroir — lesquelles reviennent
+3. SILENCES ET ANGLES INEXPLOITÉS : ce que personne ne dit sur cette thématique
+4. LANGAGE LOCAL : mots, expressions, références culturelles qui circulent
+
+Commence directement par l'analyse. Pas de titre. Pas d'introduction.`;
+  return await callG(p, 0.7, 700);
+}
+
+// ════════════════════════════════════════
+// BLOC 2 — PROFIL
+// ════════════════════════════════════════
+async function doProfil(v1, v2, v3, scan) {
+  const p = `Tu es un expert du framework Moment Troc — lecture comportementale des acheteurs.
+
+Business :
+- Ce qui est vendu : "${v1}"
+- La cible : "${v2}"
+- Le problème réglé : "${v3}"
+- Analyse terrain : "${scan.slice(0, 350)}"
+
+4 profils Moment Troc :
+- AUTOMATISEUR : veut que ça tourne sans lui, fuit la charge mentale
+- OPTIMISEUR : veut les meilleurs résultats, compare, rationnel
+- ÉLÉVATEUR : veut progresser, apprendre, monter en niveau
+- LIBÉRATEUR : veut se libérer d'un fardeau, sortir d'une prison
+
+Retourne UNIQUEMENT ce JSON exact (rien d'autre, zéro markdown) :
+{"profil":"AUTOMATISEUR","mode":"désir","organe":"image mentale précise qui fait basculer","tension":"phrase intérieure que ce prospect se dit","simple":"ce que ça veut dire en clair sans jargon"}`;
+
+  const raw = await callG(p, 0.7, 500);
+  const m = raw.match(/\{[\s\S]*?\}/);
+  if (!m) throw new Error('Profil non détecté. Relance l\'agent.');
+  try { return JSON.parse(m[0]); }
+  catch { throw new Error('Profil invalide. Relance l\'agent.'); }
+}
+
+// ════════════════════════════════════════
+// BLOC 3 — POST
+// ════════════════════════════════════════
+async function doPost(profil, scan, int, fmt, lng, matiere, idx) {
+  const cfg = INT[int] || INT.valeur;
+  const hist = mechHist.slice(0, 5).map((h, i) => `${i+1}. [${h.int}] Ouverture: "${h.ouv}"`).join('\n');
+  const histSec = hist ? `\nSTRUCTURES DÉJÀ UTILISÉES — NE PAS RÉPÉTER :\n${hist}\n` : '';
+
+  const langRule = lng === 'local' && (int === 'emotion' || int === 'miroir')
+    ? 'Langage de terrain africain francophone intégré naturellement. Expressions locales authentiques.'
+    : lng === 'mixte' && int === 'emotion'
+    ? 'Langage de terrain si pertinent pour créer la proximité.'
+    : 'Français standard. Pas de langage local.';
+
+  const fmtRule = fmt === 'thread'
+    ? 'Format THREAD : 4 à 6 parties numérotées (1/, 2/, etc.). Chaque partie = une révélation. Hook fort en ouverture.'
+    : fmt === 'long'
+    ? 'Format LONG : 220 à 320 mots. Narration développée, rythme, respiration entre les paragraphes.'
+    : 'Format COURT : 80 à 130 mots. Chaque mot compte. Impact immédiat. Zéro remplissage.';
+
+  const matSec = matiere ? `\nMATIÈRE BRUTE — pars de là en priorité, construis depuis cette matière :\n"${matiere}"\n` : '';
+
+  const p = `Tu es un ghostwriter expert en marketing comportemental pour entrepreneurs africains francophones.
+
+PROFIL DE LA CIBLE :
+- Archétype : ${profil.profil}
+- Mode : ${profil.mode}
+- Ce qui fait basculer : ${profil.organe}
+- Ce qu'il se dit intérieurement : "${profil.tension}"
+
+DONNÉES TERRAIN :
+${scan.slice(0, 450)}
+${matSec}
+INTENTION : ${cfg.label}
+${cfg.rules}
+
+FORMAT : ${fmtRule}
+LANGUE : ${langRule}
+${histSec}
+RÈGLES ABSOLUES :
+- Commence directement par le contenu du post. Zéro titre, zéro label, zéro "Voici le post".
+- Écris comme un humain expert, pas comme une IA
+- Pas de bullet points sauf format thread
+- Pas de conclusion moralisatrice type "alors n'attends plus" ou "passe à l'action"
+- Pas de call to action commercial explicite
+- Sauts de ligne pour le rythme
+- Respecte strictement la longueur du format demandé`;
+
+  const text = await callG(p, 0.88, 1400);
+  if (!text || text.length < 40) throw new Error(`Post ${idx+1} vide.`);
+
+  return {
+    text, int, fmt, lng,
+    label: cfg.label, tag: cfg.tag,
+    ouv: text.slice(0, 70),
+    signal: `${profil.profil} · ${cfg.label} · mode ${profil.mode}`
+  };
+}
+
+// ════════════════════════════════════════
+// RENDER SCAN
+// ════════════════════════════════════════
+function renderScan(data) {
+  document.getElementById('scan-res').innerHTML = `
+    <div class="result-card gold">
+      <div class="s-eye">Bloc 1 — Rapport terrain</div>
+      <div style="font-size:11px;color:var(--ink-mid);line-height:1.9;white-space:pre-wrap;">${esc(data)}</div>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// RENDER PROFIL
+// ════════════════════════════════════════
+function renderProfil(p) {
+  document.getElementById('profil-res').innerHTML = `
+    <div class="result-card">
+      <div class="s-eye">Bloc 2 — Profil détecté</div>
+      <div class="ptags">
+        <span class="ptag ptag-r">${esc(p.profil)}</span>
+        <span class="ptag ptag-g">${esc(p.mode)}</span>
+        <span class="ptag ptag-l">${esc(p.organe)}</span>
+      </div>
+      <div style="font-family:'Playfair Display','Georgia',serif;font-size:14px;font-style:italic;color:var(--ink-mid);line-height:1.9;border-left:2px solid var(--rust);padding-left:14px;margin-bottom:10px;">
+        "${esc(p.tension)}"
+      </div>
+      <div style="font-size:11px;color:var(--ink-dim);line-height:1.7;">${esc(p.simple || '')}</div>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// RENDER POSTS
+// ════════════════════════════════════════
+function renderPosts() {
+  document.getElementById('pdots').innerHTML = posts.map((_, i) =>
+    `<div class="pdot${i===0?' active':''}" onclick="goP(${i})"></div>`
+  ).join('');
+  showP(0);
+}
+
+function showP(i) {
+  postIdx = i;
+  const p = posts[i];
+  if (!p) return;
+  document.getElementById('pcounter').textContent = `Post ${i+1} / ${posts.length}`;
+  document.querySelectorAll('.pdot').forEach((d, j) => {
+    d.classList.toggle('active', j === i);
+    d.classList.toggle('done', j < i);
+  });
+  document.getElementById('btn-prev').disabled = i === 0;
+  document.getElementById('btn-next').disabled = i === posts.length - 1;
+  document.getElementById('post-display').innerHTML = buildCard(p, i);
+}
+
+function buildCard(p, i) {
+  return `<div class="post-card">
+    <div class="pcard-head">
+      <div class="ptags">
+        <span class="ptag ${p.tag}">${esc(p.label)}</span>
+        <span class="ptag ptag-l">${esc(p.fmt)}</span>
+      </div>
+      <div class="post-signal">${esc(p.signal)}</div>
+    </div>
+    <div class="post-body">${esc(p.text)}</div>
+    <div class="post-actions">
+      <div class="ag">
+        <button class="abtn" onclick="copyP(${i},this)">Copier</button>
+        <button class="abtn" onclick="regenP(${i})">Régénérer</button>
+        <button class="abtn" onclick="changeAngle(${i})">Autre angle</button>
+        <button class="abtn" onclick="togDir(${i})">Ma direction</button>
+      </div>
+      <button class="abtn accent" onclick="saveAr(${i},this)">+ Arsenal</button>
+    </div>
+    <div class="dir-panel" id="dir${i}">
+      <div class="flabel" style="margin-bottom:8px;">Ta phrase, ta scène, ta tension de départ</div>
+      <textarea class="dir-ta" id="dirin${i}" rows="2" placeholder="Je veux que ce post parte de…"></textarea>
+      <button class="dir-submit" onclick="runDir(${i})">Reconstruire depuis ma matière →</button>
+    </div>
+  </div>`;
+}
+
+function navP(d) { const n = postIdx + d; if (n >= 0 && n < posts.length) showP(n); }
+function goP(i) { showP(i); }
+
+// ════════════════════════════════════════
+// POST ACTIONS
+// ════════════════════════════════════════
+function copyP(i, btn) {
+  navigator.clipboard.writeText(posts[i]?.text || '').then(() => {
+    btn.textContent = 'Copié ✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+async function regenP(i) {
+  if (!profilData) return;
+  const p = posts[i];
+  loadingP(i, 'Régénération…');
+  try {
+    const tempHist = [{ int:p.int, ouv:p.ouv }, ...mechHist];
+    const orig = mechHist;
+    mechHist = tempHist;
+    const np = await doPost(profilData, scanData, p.int, p.fmt, p.lng || 'standard', '', i);
+    mechHist = orig;
+    posts[i] = np; addMech(np); showP(i);
+  } catch (e) { showP(i); showErr('studio-err', e.message); }
+}
+
+async function changeAngle(i) {
+  if (!profilData) return;
+  const p = posts[i];
+  const order = ['valeur','emotion','curiosite','miroir'];
+  const ci = order.indexOf(p.int);
+  const ni = order[(ci + 1) % order.length];
+  loadingP(i, `Changement d'angle → ${INT[ni].label}…`);
+  try {
+    const np = await doPost(profilData, scanData, ni, fmtFor(ni), p.lng || 'standard', '', i);
+    posts[i] = np; addMech(np); showP(i);
+  } catch (e) { showP(i); showErr('studio-err', e.message); }
+}
+
+function togDir(i) {
+  const el = document.getElementById('dir' + i);
+  if (el) el.classList.toggle('open');
+}
+
+async function runDir(i) {
+  const mat = document.getElementById('dirin' + i)?.value.trim();
+  if (!mat || !profilData) return;
+  const p = posts[i];
+  loadingP(i, 'Reconstruction depuis ta matière…');
+  try {
+    const np = await doPost(profilData, scanData, p.int, p.fmt, p.lng || 'standard', mat, i);
+    posts[i] = np; addMech(np);
+    const inp = document.getElementById('dirin' + i);
+    if (inp) inp.value = '';
+    showP(i);
+  } catch (e) { showP(i); showErr('studio-err', e.message); }
+}
+
+function loadingP(i, msg) {
+  document.getElementById('post-display').innerHTML = `
+    <div class="post-card">
+      <div class="post-loading">
+        <span>${esc(msg)}</span>
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--rust);animation:blink 1s infinite;display:inline-block;flex-shrink:0;"></span>
+      </div>
+    </div>`;
+}
+
+function saveAr(i, btn) {
+  const p = posts[i];
+  if (!p) return;
+  arsenal.unshift({ ...p, savedAt: Date.now(), id: Date.now() });
+  if (arsenal.length > 50) arsenal.pop();
+  localStorage.setItem('mt4_arsenal', JSON.stringify(arsenal));
+  btn.textContent = 'Sauvegardé ✓'; btn.classList.add('saved');
+  setTimeout(() => { btn.textContent = '+ Arsenal'; btn.classList.remove('saved'); }, 2000);
+}
+
+// ════════════════════════════════════════
+// HISTORIQUE MÉCANIQUES
+// ════════════════════════════════════════
+function addMech(post) {
+  mechHist.unshift({ int:post.int, ouv:post.ouv, savedAt:Date.now() });
+  if (mechHist.length > 10) mechHist.pop();
+  localStorage.setItem('mt4_mech', JSON.stringify(mechHist));
+}
+
+function renderHist() {
+  const el = document.getElementById('hist-list');
+  if (!el) return;
+  if (!mechHist.length) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--ink-dim);">Aucun post généré encore.</div>';
+    return;
+  }
+  el.innerHTML = mechHist.map((h, i) => `
+    <div class="hist-item">
+      <div class="hist-n">${i+1}</div>
+      <div>
+        <div class="hist-int">${esc(h.int)}</div>
+        <div class="hist-prev">${esc(h.ouv)}…</div>
+      </div>
+    </div>`).join('');
+}
+
+function resetStudio() {
+  document.getElementById('studio-form').style.display = '';
+  document.getElementById('studio-res').style.display = 'none';
+  document.getElementById('studio-err').style.display = 'none';
+  document.getElementById('studio-prog').style.display = 'none';
+  document.getElementById('tk-bridge').style.display = 'none';
+  posts = []; postIdx = 0; profilData = null; scanData = '';
+}
+
+// ════════════════════════════════════════
+// CALENDRIER
+// ════════════════════════════════════════
+function togCal() {
+  calSeq = !calSeq;
+  document.getElementById('cal-tog').classList.toggle('on', calSeq);
+  document.getElementById('cal-lbl').textContent = calSeq ? 'Séquence' : 'Simple';
+  renderCal();
+}
+
+function setW(w, btn) {
+  calWeek = w;
+  document.querySelectorAll('.cwbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  updateConv(w);
+  renderCal();
+}
+
+function renderCal() {
+  const grid = document.getElementById('cal-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (calSeq) renderSeqCal(grid);
+  else renderSimCal(grid);
+}
+
+function renderSimCal(grid) {
+  const pdays = [0,2,4,5];
+  let pc = 0;
+  for (let day = 1; day <= 30; day++) {
+    const wd = (day - 1) % 7;
+    const hasP = pdays.includes(wd) && posts.length > 0;
+    const pi = hasP ? pc % posts.length : -1;
+    const post = pi >= 0 ? posts[pi] : null;
+    if (hasP) pc++;
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell' + (post ? ' has ' + post.int : '');
+    cell.innerHTML = `<span>${day}</span>${post ? `<span class="cptype">${post.int.slice(0,2).toUpperCase()}</span>` : ''}`;
+    if (post) {
+      const fi = pi;
+      cell.onclick = () => { goP(fi); document.getElementById('posts-anchor').scrollIntoView({behavior:'smooth'}); };
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function renderSeqCal(grid) {
+  const labels = { 1:'S1 · Masque · Reconnaissance', 2:'S2 · Déclencheur · Activation', 3:'S3 · Fissure · Émotion', 4:'S4 · Conversion' };
+  const weeks = [calWeek, calWeek%4+1, (calWeek+1)%4+1, (calWeek+2)%4+1];
+  let day = 1;
+  weeks.forEach(w => {
+    const lbl = document.createElement('div');
+    lbl.className = 'cal-seq-lbl';
+    lbl.textContent = labels[w] || `S${w}`;
+    grid.appendChild(lbl);
+    const ints = SEQ_INT[w] || ['valeur','emotion'];
+    const pdays = [0,2,4,5];
+    let wi = 0;
+    for (let wd = 0; wd < 7; wd++) {
+      const hasP = pdays.includes(wd) && wi < ints.length && posts.length > 0;
+      const int = hasP ? ints[wi] : null;
+      if (hasP) wi++;
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell' + (hasP ? ' has ' + int : '');
+      cell.innerHTML = `<span>${day}</span>${hasP ? `<span class="cptype">${(int||'').slice(0,2).toUpperCase()}</span>` : ''}`;
+      grid.appendChild(cell);
+      day++;
     }
   });
 }
 
-window.dcBack=function(){hide('dc-step2');show('dc-step1');};
-
-
-// ═══════════════════════════════
-// INIT
-// ═══════════════════════════════
-window.addEventListener('DOMContentLoaded',function(){
-  var saved=localStorage.getItem('mt_k');
-  var geminiSaved=localStorage.getItem('mt_gemini_key');
-  setTimeout(function(){
-    document.getElementById('loader').style.display='none';
-    if(!saved||(saved!==MASTER&&KEYS.indexOf(saved)===-1)){
-      document.getElementById('keygate').style.display='flex';
-    } else if(!geminiSaved){
-      showGeminiGate();
-    }
-  },1800);
-});
-
-})();
-</script>
-</body>
-</html>
+// ════════════════════════════════════════
+// TROC KIT
+// ════════════════════════════════════════
+function prefillTK() {
+  if (!profilData) return;
+  const notice = document.getElementById('tk-auto');
+  if (notice) {
+    notice.style.display = '';
+    notice.textContent = `Profil détecté dans le Studio : ${profilData.profil} · Mode ${profilData.mode}. Sélectionné automatiquement.`;
+  }
+  const map = { AUTOMATISEUR:'automatiseur', OPTIMISEUR:'optimiseur', ÉLÉVATEUR:'elevateur', LIBÉRATEUR:'liberateur' };
+  const key = map[profilData.profil] || 'automatiseur';
+  document.querySelectorAll('[data-p]').forEach(e => e.classList.toggle('on', e.getAttribute('data-p') === key));
+}
+
+async function runTrocKit() {
+  const offre = document.getElementById('tk-offre').value.trim();
+  if (!offre) { showErr('tk-err', 'Décris ton offre.'); return; }
+  if (!GK) { document.getElementById('gate').style.display = 'flex'; return; }
+
+  const profil = gv('p') || 'automatiseur';
+  const mef = gv('m') || 'faible';
+  const ctx = document.getElementById('tk-ctx').value.trim();
+
+  document.getElementById('tk-prog').style.display = '';
+  document.getElementById('tk-res').style.display = 'none';
+  document.getElementById('tk-err').style.display = 'none';
+
+  const mefDesc = {
+    faible: 'Déjà chaud. Approche directe possible.',
+    moderee: 'Prudent. Crée la confiance avant de proposer.',
+    elevee: 'Mur fort. Commence par reconnaître sa situation, ne propose rien tout de suite.'
+  };
+
+  const seqNote = profilData ? `Ce prospect a été exposé à des contenus de séquence Moment Troc et se rapproche de la décision.` : '';
+
+  const p = `Tu es un expert en vente comportementale Moment Troc pour entrepreneurs africains francophones.
+
+OFFRE : "${offre}"
+PROFIL DU PROSPECT : ${profil}
+MÉFIANCE : ${mef} — ${mefDesc[mef] || ''}
+${ctx ? `CE QU'ON SAIT DE LUI : "${ctx}"` : ''}
+${seqNote ? `\nCONTEXTE : ${seqNote}` : ''}
+
+Profils Moment Troc :
+- AUTOMATISEUR : active la vision "pendant que tu dors", fuit la charge mentale
+- OPTIMISEUR : active la comparaison et la performance, veut les meilleurs résultats
+- ÉLÉVATEUR : active la transformation et la montée en niveau
+- LIBÉRATEUR : active la sortie de prison, le soulagement d'un fardeau
+
+Génère 4 messages séparés par "---SEP---" :
+
+MESSAGE 1 : APPROCHE INITIALE
+QUAND : [quand utiliser]
+[le message]
+
+---SEP---
+
+MESSAGE 2 : VALEUR SANS VENTE
+QUAND : [quand utiliser]
+[le message]
+
+---SEP---
+
+MESSAGE 3 : RELANCE
+QUAND : [quand utiliser — après 48h sans réponse]
+[le message]
+
+---SEP---
+
+MESSAGE 4 : RÉPONSE À OBJECTION
+QUAND : [quand utiliser — "je vais réfléchir" ou "pas le budget"]
+[le message]
+
+Règles : messages humains, calibrés sur ${profil} et méfiance ${mef}. Pas de templates génériques. Pas de "bonjour cher ami". Naturel et chirurgical.`;
+
+  try {
+    const raw = await callG(p, 0.85, 1600);
+    document.getElementById('tk-prog').style.display = 'none';
+    document.getElementById('tk-res').style.display = '';
+    renderTK(raw);
+  } catch (e) {
+    document.getElementById('tk-prog').style.display = 'none';
+    showErr('tk-err', e.message);
+  }
+}
+
+function renderTK(raw) {
+  const parts = raw.split('---SEP---').map(s => s.trim()).filter(Boolean);
+  const labels = ['Approche initiale','Valeur sans vente','Relance 48h','Réponse à objection'];
+  let html = '<div style="margin-top:24px;">';
+  parts.forEach((part, i) => {
+    const ctxM = part.match(/QUAND\s*:\s*(.+?)(?:\n|$)/i);
+    const ctx = ctxM ? ctxM[1].trim() : '';
+    const msg = part.replace(/^MESSAGE\s*\d+\s*:.*\n?/im,'').replace(/QUAND\s*:.*\n?/im,'').trim();
+    const safeMsg = JSON.stringify(msg);
+    html += `<div class="tk-msg">
+      <div class="tk-label">${labels[i] || `Message ${i+1}`}</div>
+      ${ctx ? `<div class="tk-ctx">${esc(ctx)}</div>` : ''}
+      <div class="tk-body">${esc(msg)}</div>
+      <div class="tk-foot"><button class="abtn" onclick="copyTxt(${safeMsg},this)">Copier</button></div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('tk-res').innerHTML = html;
+}
+
+// ════════════════════════════════════════
+// DÉCONSTRUIRE
+// ════════════════════════════════════════
+async function runDC() {
+  const post = document.getElementById('dc-post').value.trim();
+  if (!post) { showErr('dc-err', 'Colle un post à déconstruire.'); return; }
+  if (!GK) { document.getElementById('gate').style.display = 'flex'; return; }
+
+  const ctx = document.getElementById('dc-ctx').value.trim();
+  document.getElementById('dc-prog').style.display = '';
+  document.getElementById('dc-res').style.display = 'none';
+  document.getElementById('dc-err').style.display = 'none';
+
+  const p1 = `Tu es un analyste expert du framework Moment Troc.
+
+POST À ANALYSER :
+"${post}"
+${ctx ? `\nCONTEXTE : "${ctx}"` : ''}
+
+Analyse ce post en 6 points. Sépare chaque point par "---S---" :
+
+T1 — MASQUE : Quelle façade ce post attaque-t-il ? Quel persona le lecteur protège ?
+---S---
+T2 — DÉCLENCHEUR : Quel signal ce post active-t-il ? Ce qui fait basculer le lecteur.
+---S---
+T3 — FISSURE : Quelle émotion enfouie ce post touche-t-il ? Ce que le lecteur ne nomme jamais à voix haute.
+---S---
+T4 — RECONSTRUCTION : Quelle sortie ce post propose-t-il ? Vers quoi il attire ?
+---S---
+PROFIL CIBLÉ + MÉCANIQUE : Quel archétype Moment Troc est visé et quelle est la mécanique principale en 5 mots max.
+---S---
+CE QUI MANQUE + ANGLE INEXPLOITÉ : Qu'est-ce qui n'est pas exploité ? Propose une phrase d'ouverture alternative plus puissante.`;
+
+  const p2Labels = ['T1 · Masque','T2 · Déclencheur','T3 · Fissure','T4 · Reconstruction','Profil · Mécanique','Ce qui manque · Angle inexploité'];
+
+  try {
+    const analysis = await callG(p1, 0.75, 900);
+
+    // Version améliorée
+    const p2 = `Tu es un ghostwriter expert Moment Troc.
+
+POST ORIGINAL :
+"${post}"
+
+ANALYSE :
+${analysis.slice(0, 500)}
+
+Génère une version améliorée de ce post qui exploite l'angle inexploité identifié.
+Conserve le sujet. Change la structure d'entrée. Amplifie l'impact émotionnel.
+Commence directement par le post. Zéro commentaire avant ou après.`;
+
+    const improved = await callG(p2, 0.88, 1200);
+
+    document.getElementById('dc-prog').style.display = 'none';
+    document.getElementById('dc-res').style.display = '';
+
+    const sections = analysis.split('---S---').map(s => s.trim()).filter(Boolean);
+    const safeImproved = JSON.stringify(improved);
+    const safeImpText = JSON.stringify(improved);
+
+    let html = `<div style="margin-top:24px;">
+      <div class="dc-block">
+        <div class="s-eye">Analyse T1 → T4</div>`;
+    sections.forEach((s, i) => {
+      html += `<div class="dc-sec">
+        <div class="dc-sec-lbl">${p2Labels[i] || ''}</div>
+        <div class="dc-sec-body">${esc(s)}</div>
+      </div>`;
+    });
+    html += `</div>
+      <div class="dc-block" style="border-top-color:var(--rust);">
+        <div class="s-eye">Version améliorée</div>
+        <div style="font-family:'Playfair Display','Georgia',serif;font-size:15px;line-height:2;white-space:pre-wrap;color:var(--ink);word-break:break-word;margin-bottom:16px;">${esc(improved)}</div>
+        <div class="ag">
+          <button class="abtn" onclick="copyTxt(${safeImproved},this)">Copier</button>
+          <button class="abtn" onclick="injectAngle(${safeImpText})">→ Exploiter dans le Studio</button>
+        </div>
+      </div>
+    </div>`;
+    document.getElementById('dc-res').innerHTML = html;
+
+  } catch (e) {
+    document.getElementById('dc-prog').style.display = 'none';
+    showErr('dc-err', e.message);
+  }
+}
+
+function injectAngle(text) {
+  const el = document.getElementById('f4');
+  if (el) { el.value = text.slice(0, 400); cc(el,'cc4',400); }
+  goMode('studio');
+  setTimeout(() => el?.scrollIntoView({behavior:'smooth'}), 300);
+}
+
+// ════════════════════════════════════════
+// ARSENAL
+// ════════════════════════════════════════
+function renderArsenal() {
+  const el = document.getElementById('ar-list');
+  if (!el) return;
+  if (!arsenal.length) {
+    el.innerHTML = `<div class="ar-empty">
+      Ton Arsenal est vide.<br><br>
+      Génère des posts dans le Studio, puis appuie sur <strong>+ Arsenal</strong> pour garder les meilleurs ici.<br><br>
+      Depuis l'Arsenal : recycle un post comme base de variante, ou injecte-le dans le Studio comme matière brute.
+    </div>`;
+    return;
+  }
+  el.innerHTML = arsenal.map((p, i) => {
+    const safeText = JSON.stringify(p.text);
+    return `<div class="ar-item">
+      <div class="ar-head">
+        <div class="ptags">
+          <span class="ptag ${p.tag || 'ptag-l'}">${esc(p.label || p.int || '')}</span>
+          <span class="ptag ptag-l">${esc(p.fmt || '')}</span>
+        </div>
+        <button class="abtn" onclick="confirmDel(${i})">Supprimer</button>
+      </div>
+      <div class="ar-body">${esc(p.text)}</div>
+      <div class="ar-foot">
+        <button class="abtn" onclick="copyTxt(${safeText},this)">Copier</button>
+        <button class="abtn" onclick="recycleAr(${i})">Recycler → variante</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function recycleAr(i) {
+  const p = arsenal[i];
+  if (!p) return;
+  const el = document.getElementById('f4');
+  if (el) { el.value = p.text.slice(0, 400); cc(el,'cc4',400); }
+  goMode('studio');
+  setTimeout(() => el?.scrollIntoView({behavior:'smooth'}), 300);
+}
+
+function confirmDel(i) {
+  showConfirm('Supprimer ce post de l\'Arsenal ? Action irréversible.', () => {
+    arsenal.splice(i, 1);
+    localStorage.setItem('mt4_arsenal', JSON.stringify(arsenal));
+    renderArsenal();
+  });
+}
+
+// ════════════════════════════════════════
+// CONFIRM
+// ════════════════════════════════════════
+function showConfirm(msg, cb) {
+  confirmCb = cb;
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-ov').classList.add('show');
+  document.getElementById('confirm-yes').onclick = () => { closeConfirm(); if (confirmCb) confirmCb(); };
+}
+function closeConfirm() {
+  document.getElementById('confirm-ov').classList.remove('show');
+  confirmCb = null;
+}
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+function esc(s) {
+  return String(s || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function copyTxt(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copié ✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // Fallback pour navigateurs sans clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copié ✓';
+    setTimeout(() => { btn.textContent = 'Copier'; }, 2000);
+  });
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = '';
+  el.innerHTML = `<div class="err-box">⚠ ${esc(msg)}</div>`;
+}
+</script>
+</body>
+</html>
