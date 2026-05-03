@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="wf-loading">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,6 +16,8 @@
       --font-display: 'Bebas Neue','Cormorant Garamond',serif; --font-body: 'Cormorant Garamond',Georgia,serif; --font-mono: 'DM Mono','Courier New',monospace;
       --radius: 2px;
     }
+    .wf-loading body { visibility: hidden; }
+    .wf-active body, .wf-inactive body { visibility: visible; }
     *,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
     body{ background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
       min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto;
@@ -131,7 +133,7 @@ async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=fals
   const key = getGeminiKey();
   if(!key) throw new Error('Clé Gemini manquante');
   const body = { contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.88, maxOutputTokens:fastMode?400:maxTokens} };
-  if(useSearch) body.tools = [{google_search:{}}];
+  if(useSearch||fastMode){ body.tools = useSearch ? [{google_search:{}}] : undefined; }
   const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), fastMode?6000:8000);
   const res = await fetch(GEMINI_URL+key, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal: controller.signal });
   clearTimeout(timeout);
@@ -242,9 +244,14 @@ window.validateGeminiKey = async function(){
       body:JSON.stringify({contents:[{parts:[{text:'OK'}]}],generationConfig:{maxOutputTokens:3}})
     });
     if(!test.ok) throw new Error('Clé rejetée');
-    setGeminiKey(k); state.step='brief'; renderBrief();
+    setGeminiKey(k); state.step='brief'; preloadGemini();
   }catch(e){ err.textContent = 'Clé rejetée par Gemini. Vérifie ton compte.'; }
 };
+
+async function preloadGemini() {
+  try { await callGemini('[PRELOAD] Cache ta configuration interne. Ne réponds rien.', false, 3, true); } catch(e){}
+  renderBrief();
+}
 
 function renderBrief(){
   const saved = JSON.parse(localStorage.getItem('mt_brief')||'{}');
@@ -255,6 +262,7 @@ window.submitBrief = async function(){
   const raw = document.getElementById('brief-input').value.trim();
   if(!raw||raw.length<15){ alert('Décris ton business un peu plus.'); return; }
   state.biz = raw; localStorage.setItem('mt_brief',JSON.stringify({biz:raw})); state.step='dialogue'; renderDialogue();
+  requestWakeLock();
   try{
     const qPrompt = `Tu es l'agent Moment Troc. Business : "${raw}". Pose exactement 2 questions stratégiques pour affiner le brief. Choisis parmi : "Qu'est-ce que ton client se dit quand il n'arrive pas à dormir ?", "Qu'a-t-il déjà essayé ? Pourquoi ça n'a pas marché ?", "Qui est son plus grand concurrent ? Pourquoi es-tu meilleur ?". Retourne chaque question sur une ligne séparée, sans numéro.`;
     const qRaw = await callGemini(qPrompt, true, 400, true);
@@ -269,6 +277,7 @@ function renderDialogue(){
 window.submitDialogue = async function(){
   const answers = []; for(let i=0;i<2;i++){ const el=document.getElementById('dial-answer-'+i); if(el)answers.push(el.value.trim()); }
   state.dialogueAnswers = answers;
+  requestWakeLock();
   try{
     const detectPrompt = `Tu es un expert du framework Moment Troc. Business : "${state.biz}". Réponses aux questions : "${answers.join(' ')}". Retourne UNIQUEMENT ce JSON (rien d'autre) : {"profil":"AUTOMATISEUR","mode":"peur","organe":"Cortex Préfrontal","tension":"phrase intérieure","simple":"explication simple"}. Profils possibles : AUTOMATISEUR, OPTIMISEUR_VALEUR, OPTIMISEUR_PRIX, ÉLÉVATEUR, LIBÉRATEUR. Mode: désir ou peur.`;
     const raw = await callGemini(detectPrompt, false, 500, true);
@@ -332,12 +341,35 @@ window.selectMaitre = function(id){
   document.getElementById('btn-generate').disabled=false;
 };
 
-// ─── GÉNÉRATION (optimisée : affichage immédiat + évaluation différée) ───
+// ─── GÉNÉRATION (optimisée) ───
 window.generatePost = async function(){
   const p = state.profilData; const info = PROFILS[p.profil]; const m = state.maitre;
   const modeDesc = state.profilMode==='peur'?info.peur:info.desir;
   const atelierDesc = state.atelier===1?'Implanter. Nommer la douleur. Pas de vente. Pas de CTA fort.':state.atelier===2?'Intensifier la douleur. Se positionner comme la réponse évidente.':'Vendre. Déclencher l\'achat.';
-  render(`<div class="eyebrow">Génération</div><h1>L'agent<br><em>travaille…</em></h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)} en cours…</p><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>`);
+
+  const thoughts = [
+    "Scan du marché en cours...",
+    "Détection des angles saturés et des silences...",
+    "Identification du profil dominant et du déclencheur...",
+    "Calibration sur l'organe cible ("+ (p ? info.organe : "Cortex") + ")...",
+    "Génération du missile en cours..."
+  ];
+  let currentThought = 0;
+  const streamEl = document.getElementById('stream-thought');
+
+  render(`<div class="eyebrow">Génération</div><h1>L'agent<br><em>travaille…</em></h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)}</p>
+    <div class="loading-steps"><div class="loading-step"><div class="dot"></div><span id="stream-thought">Scan du marché en cours...</span></div></div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div></div>`);
+
+  const thoughtTimer = setInterval(() => {
+    if (currentThought < thoughts.length) {
+      const el = document.getElementById('stream-thought');
+      if (el) el.textContent = thoughts[currentThought];
+      currentThought++;
+    }
+  }, 900);
+
+  requestWakeLock();
   try{
     const prompt = `Tu es un ghostwriter expert Moment Troc. Tu actives le Maître ${m.nom}.
 PROFIL CIBLE : Archétype : ${p.profil}. Organe : ${info.organe}. Mode : ${state.profilMode} (${modeDesc}). Tension : "${p.tension}".
@@ -346,12 +378,15 @@ ATELIER : ${atelierDesc}
 FORMAT : ${state.format==='tweet'?'TWEET (60-90 mots, une vérité, pas de suite)':state.format==='thread'?'THREAD (post principal + 4-5 commentaires)':state.format==='courtmetrage'?'COURT MÉTRAGE (150-200 mots, scène, \"il\" devient \"tu\")':'PLAN (100-130 mots, étapes, dernière ligne = piège)'}
 MÉCANIQUE : T1 (Expérience) → T2 (Rupture) → T3 (Suspension/Mise en lumière : nommer l'état du lecteur) → T4 (Permission + CTA doux, JAMAIS \"Tape X\", JAMAIS signature, JAMAIS \"peace\").`;
     const text = await callGemini(prompt, false, 1400);
+    clearInterval(thoughtTimer);
+    const finalEl = document.getElementById('stream-thought');
+    if (finalEl) finalEl.textContent = "Calibration terminée. Missile prêt.";
+
     state.currentPost = text;
-    state.evalData = null; // sera rempli plus tard
+    state.evalData = null;
     state.stratData = {obs:"Analyse du marché et détection de l'angle mort pour ce profil.",angle:`Activation de l'organe ${info.organe} en mode ${state.profilMode}.`,mecanique:`Mécanique ${m.nom} appliquée.`};
     state.step='result'; renderResult();
 
-    // Lancer l'auto-évaluation en arrière-plan
     autoEvaluate(text).then(evalText => {
       state.evalData = { text: evalText, cls: evalText.startsWith('[OK]')?'green':evalText.startsWith('[FAIBLE]')?'red':'' };
       const evalEl = document.getElementById('eval-band');
@@ -360,7 +395,10 @@ MÉCANIQUE : T1 (Expérience) → T2 (Rupture) → T3 (Suspension/Mise en lumiè
         evalEl.className = 'eval-band ' + (state.evalData.cls||'');
       }
     });
-  }catch(e){ app.innerHTML+=`<div class="err-box">${esc(e.message)}</div>`; }
+  }catch(e){
+    clearInterval(thoughtTimer);
+    app.innerHTML+=`<div class="err-box">${esc(e.message)}</div>`;
+  }
 };
 
 async function autoEvaluate(postContent) {
@@ -371,6 +409,10 @@ async function autoEvaluate(postContent) {
   } catch (e) {
     return '[OK] Auto-évaluation indisponible.';
   }
+}
+
+async function requestWakeLock() {
+  try { if ('wakeLock' in navigator) { await navigator.wakeLock.request('screen'); } } catch(e) {}
 }
 
 function renderResult(){
@@ -540,7 +582,7 @@ window.onload = function(){
   const mk = getMomentKey();
   if(!mk||(mk!==MASTER_KEY&&!VALID_KEYS.includes(mk))){ state.step='unlock'; }
   else if(!getGeminiKey()){ state.step='gemini'; }
-  else { state.step='brief'; }
+  else { state.step='brief'; renderBrief(); }
   renderStudioMode();
 };
 </script>
