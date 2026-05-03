@@ -17,21 +17,19 @@
       --radius: 2px;
     }
     *,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
-    body{
-      background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
+    body{ background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
       min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto;
       background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
     }
     @keyframes fadeUp{ from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
-    @keyframes goldPulse{ 0%,100%{box-shadow:0 0 8px var(--gold-glow);} 50%{box-shadow:0 0 22px rgba(201,168,76,0.28);} }
+    @keyframes goldPulse{ 0%,100%{box-shadow:0 0 4px var(--gold-glow);} 50%{box-shadow:0 0 12px rgba(201,168,76,0.18);} }
     @keyframes borderShimmer{ 0%,100%{border-color:var(--gold-line);} 50%{border-color:var(--gold);} }
     .hidden{ display:none!important; } .center{ text-align:center; }
-    h1{ font-family:var(--font-display); font-size:clamp(2.8rem,8vw,4.2rem); font-weight:400; line-height:0.95; letter-spacing:0.02em; text-transform:uppercase; color:var(--ink); }
+    h1{ font-family:var(--font-display); font-size:clamp(2.6rem,8vw,3.6rem); font-weight:400; line-height:0.95; letter-spacing:0.02em; text-transform:uppercase; color:var(--ink); }
     h1 em{ font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600; color:var(--gold); text-transform:none; font-size:0.85em; display:block; letter-spacing:0; }
     .eyebrow{ font-family:var(--font-mono); font-size:0.65rem; letter-spacing:5px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; opacity:0.85; }
     .sub{ font-family:var(--font-body); font-size:1rem; color:var(--ink-mid); line-height:1.65; margin:14px 0 24px; font-style:italic; }
-    textarea,input[type="text"],input[type="password"]{
-      width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
+    textarea,input[type="text"],input[type="password"]{ width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
       color:var(--ink); padding:16px 18px; font-family:var(--font-body); font-size:1rem; line-height:1.7;
       resize:vertical; outline:none; border-radius:var(--radius); transition:border-color 0.3s ease,box-shadow 0.3s ease;
     }
@@ -64,9 +62,15 @@
     .strat-block{ background:var(--gold-glow); border-left:2px solid var(--gold); padding:14px 18px; margin-bottom:20px; font-family:var(--font-mono); font-size:0.78rem; line-height:1.65; color:var(--ink-mid); border-radius:0 var(--radius) var(--radius) 0; animation:goldPulse 4s ease-in-out infinite; }
     .err-box{ background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:var(--font-mono); font-size:0.8rem; color:var(--red); border-radius:0 var(--radius) var(--radius) 0; }
     .ok-box{ background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:var(--font-mono); font-size:0.8rem; color:var(--green); border-radius:0 var(--radius) var(--radius) 0; }
-    .eval-band{ padding:10px 14px; margin-bottom:14px; font-family:var(--font-mono); font-size:0.75rem; border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 var(--radius) var(--radius) 0; letter-spacing:1px; }
+    .eval-band{ padding:10px 14px; margin-bottom:14px; font-family:var(--font-mono); font-size:0.75rem; border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 var(--radius) var(--radius) 0; letter-spacing:1px; transition:all 0.3s ease; }
     .eval-band.green{ border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
     .eval-band.red{ border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
+
+    /* Barre de progression */
+    .loading-bar{ width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
+    .loading-bar-fill{ width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
+    @keyframes loadBar{ 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
+
     .cal-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
     .cal-cell{ aspect-ratio:1; background:var(--card2); border:1px solid var(--line); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.25s ease; position:relative; user-select:none; border-radius:var(--radius); font-family:var(--font-mono); }
     .cal-cell .day-num{ font-family:var(--font-mono); font-size:1rem; color:var(--ink-dim); line-height:1; }
@@ -96,7 +100,7 @@
     .nav-item:hover{ color:var(--ink); }
     a{ color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); transition:border-color 0.2s ease; }
     a:hover{ border-bottom-color:var(--gold); }
-    @media(max-width:500px){ .grid-2{ grid-template-columns:1fr; } .grid-4{ grid-template-columns:1fr 1fr; } .cal-grid{ gap:6px; } h1{ font-size:2.6rem; } }
+    @media(max-width:500px){ .grid-2{ grid-template-columns:1fr; } .grid-4{ grid-template-columns:1fr 1fr; } h1{ font-size:2.4rem; } }
   </style>
 </head>
 <body>
@@ -110,7 +114,7 @@
 
 <script>
 // ═══════════════════════════════════════
-// MOMENT TROC · STUDIO — Final Design Intégré
+// MOMENT TROC · STUDIO — Final Optimisé
 // ═══════════════════════════════════════
 
 // ─── Clés ───
@@ -123,12 +127,12 @@ function setGeminiKey(k){ localStorage.setItem('mt_gemini_key', k); }
 
 // ─── API Gemini ───
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
-async function callGemini(prompt, useSearch=false, maxTokens=1400){
+async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=false){
   const key = getGeminiKey();
   if(!key) throw new Error('Clé Gemini manquante');
-  const body = { contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.88, maxOutputTokens:maxTokens} };
+  const body = { contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.88, maxOutputTokens:fastMode?400:maxTokens} };
   if(useSearch) body.tools = [{google_search:{}}];
-  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 12000);
+  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), fastMode?6000:8000);
   const res = await fetch(GEMINI_URL+key, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal: controller.signal });
   clearTimeout(timeout);
   if(!res.ok){ const e = await res.json().catch(()=>({})); if(res.status===429) throw new Error('Limite API atteinte. Reviens dans 1 minute.'); throw new Error(e?.error?.message||'Erreur API'); }
@@ -141,6 +145,13 @@ const app = document.getElementById('app');
 function render(html){ app.innerHTML = html; }
 function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function copyTxt(text, btn){ navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copié'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='Copier'; btn.classList.remove('copied'); },2000); }); }
+function startWorker(targetId, messages) {
+  const el = document.getElementById(targetId);
+  if (!el) return null;
+  let i = 0;
+  const timer = setInterval(() => { el.textContent = messages[i % messages.length]; i++; }, 1200);
+  return timer;
+}
 
 // ─── Profils ───
 const PROFILS = {
@@ -154,7 +165,7 @@ const PROFILS = {
 // ─── Maîtres ───
 const MAITRES = [
   {id:'bismarck',nom:'Otto von Bismarck',categorie:'Stratège Silencieux',ton:'La force tranquille, le pragmatisme froid.'},
-  {id:'will',nom:'Will Aime',categorie:'Miroir Vivant',ton:'Un "il" qui devient "tu". Fin sans résolution.'},
+  {id:'will',nom:'Will Aime',categorie:'Miroir Vivant',ton:'Un \"il\" qui devient \"tu\". Fin sans résolution.'},
   {id:'itachi',nom:'Itachi Uchiha',categorie:'Briseur de Réalité',ton:'Projection noire puis réveil brutal.'},
   {id:'scofield',nom:'Michael Scofield',categorie:'Architecte de l\'Ombre',ton:'Plan froid, imparable, chirurgical.'},
   {id:'tyrion',nom:'Tyrion Lannister',categorie:'Miroir Vivant',ton:'La faiblesse retournée en pouvoir suprême.'},
@@ -176,7 +187,6 @@ const CATEGORIES = ['Architecte de l\'Ombre','Briseur de Réalité','Miroir Viva
 const state = {
   step:'unlock', mode:'studio', biz:'', dialogueAnswers:[], profilData:null, profilMode:'désir',
   atelier:null, format:null, maitre:null, currentPost:null, evalData:null, stratData:null,
-  arsenal:JSON.parse(localStorage.getItem('mt_arsenal')||'[]'),
   arsenalPosts: JSON.parse(localStorage.getItem('mt_arsenal_posts')||'{}')
 };
 const dcState = { step:'input', post:'', contexte:'', analyse:null, contreAngle:null };
@@ -247,7 +257,7 @@ window.submitBrief = async function(){
   state.biz = raw; localStorage.setItem('mt_brief',JSON.stringify({biz:raw})); state.step='dialogue'; renderDialogue();
   try{
     const qPrompt = `Tu es l'agent Moment Troc. Business : "${raw}". Pose exactement 2 questions stratégiques pour affiner le brief. Choisis parmi : "Qu'est-ce que ton client se dit quand il n'arrive pas à dormir ?", "Qu'a-t-il déjà essayé ? Pourquoi ça n'a pas marché ?", "Qui est son plus grand concurrent ? Pourquoi es-tu meilleur ?". Retourne chaque question sur une ligne séparée, sans numéro.`;
-    const qRaw = await callGemini(qPrompt, true, 400);
+    const qRaw = await callGemini(qPrompt, true, 400, true);
     const questions = qRaw.split('\n').filter(l=>l.trim().length>10).slice(0,2);
     document.getElementById('dialogue-questions').innerHTML = questions.map((q,i)=>`<div class="chat-bubble"><strong>Agent</strong> : ${esc(q)}</div><textarea id="dial-answer-${i}" rows="2" placeholder="Ta réponse..."></textarea>`).join('');
     document.getElementById('dialogue-box').classList.remove('hidden');
@@ -261,7 +271,7 @@ window.submitDialogue = async function(){
   state.dialogueAnswers = answers;
   try{
     const detectPrompt = `Tu es un expert du framework Moment Troc. Business : "${state.biz}". Réponses aux questions : "${answers.join(' ')}". Retourne UNIQUEMENT ce JSON (rien d'autre) : {"profil":"AUTOMATISEUR","mode":"peur","organe":"Cortex Préfrontal","tension":"phrase intérieure","simple":"explication simple"}. Profils possibles : AUTOMATISEUR, OPTIMISEUR_VALEUR, OPTIMISEUR_PRIX, ÉLÉVATEUR, LIBÉRATEUR. Mode: désir ou peur.`;
-    const raw = await callGemini(detectPrompt, false, 500);
+    const raw = await callGemini(detectPrompt, false, 500, true);
     const match = raw.match(/\{[\s\S]*?\}/); if(!match) throw new Error('Profil non détecté');
     state.profilData = JSON.parse(match[0]); state.step='profil'; renderProfil();
   }catch(e){ document.getElementById('dialogue-err').innerHTML = `<div class="err-box">⚠ ${esc(e.message)}</div>`; }
@@ -322,33 +332,52 @@ window.selectMaitre = function(id){
   document.getElementById('btn-generate').disabled=false;
 };
 
+// ─── GÉNÉRATION (optimisée : affichage immédiat + évaluation différée) ───
 window.generatePost = async function(){
   const p = state.profilData; const info = PROFILS[p.profil]; const m = state.maitre;
   const modeDesc = state.profilMode==='peur'?info.peur:info.desir;
   const atelierDesc = state.atelier===1?'Implanter. Nommer la douleur. Pas de vente. Pas de CTA fort.':state.atelier===2?'Intensifier la douleur. Se positionner comme la réponse évidente.':'Vendre. Déclencher l\'achat.';
-  render(`<div class="eyebrow">Génération</div><h1>L'agent<br><em>travaille…</em></h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)} en cours…</p></div>`);
+  render(`<div class="eyebrow">Génération</div><h1>L'agent<br><em>travaille…</em></h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)} en cours…</p><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>`);
   try{
     const prompt = `Tu es un ghostwriter expert Moment Troc. Tu actives le Maître ${m.nom}.
 PROFIL CIBLE : Archétype : ${p.profil}. Organe : ${info.organe}. Mode : ${state.profilMode} (${modeDesc}). Tension : "${p.tension}".
 BUSINESS : ${state.biz}.
 ATELIER : ${atelierDesc}
-FORMAT : ${state.format==='tweet'?'TWEET (60-90 mots, une vérité, pas de suite)':state.format==='thread'?'THREAD (post principal + 4-5 commentaires)':state.format==='courtmetrage'?'COURT MÉTRAGE (150-200 mots, scène, "il" devient "tu")':'PLAN (100-130 mots, étapes, dernière ligne = piège)'}
-MÉCANIQUE : T1 (Expérience) → T2 (Rupture) → T3 (Suspension/Mise en lumière : nommer l'état du lecteur) → T4 (Permission + CTA doux, JAMAIS "Tape X", JAMAIS signature, JAMAIS "peace").`;
+FORMAT : ${state.format==='tweet'?'TWEET (60-90 mots, une vérité, pas de suite)':state.format==='thread'?'THREAD (post principal + 4-5 commentaires)':state.format==='courtmetrage'?'COURT MÉTRAGE (150-200 mots, scène, \"il\" devient \"tu\")':'PLAN (100-130 mots, étapes, dernière ligne = piège)'}
+MÉCANIQUE : T1 (Expérience) → T2 (Rupture) → T3 (Suspension/Mise en lumière : nommer l'état du lecteur) → T4 (Permission + CTA doux, JAMAIS \"Tape X\", JAMAIS signature, JAMAIS \"peace\").`;
     const text = await callGemini(prompt, false, 1400);
-    const evalMatch = text.match(/AUTOEVAL:\s*(.*)/i);
-    let evalText = evalMatch?evalMatch[1].trim():'Auto-évaluation non disponible.';
-    state.currentPost = text.replace(/AUTOEVAL:.*/i,'').trim();
-    state.evalData = {text:evalText, cls:evalText.startsWith('[OK]')?'green':evalText.startsWith('[FAIBLE]')?'red':''};
+    state.currentPost = text;
+    state.evalData = null; // sera rempli plus tard
     state.stratData = {obs:"Analyse du marché et détection de l'angle mort pour ce profil.",angle:`Activation de l'organe ${info.organe} en mode ${state.profilMode}.`,mecanique:`Mécanique ${m.nom} appliquée.`};
     state.step='result'; renderResult();
+
+    // Lancer l'auto-évaluation en arrière-plan
+    autoEvaluate(text).then(evalText => {
+      state.evalData = { text: evalText, cls: evalText.startsWith('[OK]')?'green':evalText.startsWith('[FAIBLE]')?'red':'' };
+      const evalEl = document.getElementById('eval-band');
+      if (evalEl) {
+        evalEl.textContent = 'Auto-évaluation : ' + evalText;
+        evalEl.className = 'eval-band ' + (state.evalData.cls||'');
+      }
+    });
   }catch(e){ app.innerHTML+=`<div class="err-box">${esc(e.message)}</div>`; }
 };
+
+async function autoEvaluate(postContent) {
+  try {
+    const prompt = `Évalue ce post Moment Troc en une phrase (commence par [OK], [MOYEN] ou [FAIBLE]). Post : "${postContent}"`;
+    const raw = await callGemini(prompt, false, 200);
+    return raw.trim();
+  } catch (e) {
+    return '[OK] Auto-évaluation indisponible.';
+  }
+}
 
 function renderResult(){
   const ev = state.evalData; const st = state.stratData;
   render(`<div class="eyebrow">Post généré</div><h1>Ton<br><em>missile.</em></h1>
     ${st?`<div class="strat-block">🧠 <strong>Observation :</strong> ${esc(st.obs)}<br>🎯 <strong>Angle mort :</strong> ${esc(st.angle)}<br>⚙️ <strong>Mécanique :</strong> ${esc(st.mecanique)}</div>`:''}
-    ${ev?`<div class="eval-band ${ev.cls}"><strong>Auto-évaluation :</strong> ${esc(ev.text)}</div>`:''}
+    <div id="eval-band" class="eval-band ${ev?ev.cls:''}">${ev?esc(ev.text):'Auto-évaluation en cours…'}</div>
     <div class="card" style="border-top-color:var(--gold);">
       <div class="card-header"><div><span class="tag gold">${esc(state.profilData.profil)}</span><span class="tag gold">Atelier ${state.atelier}</span></div></div>
       <div class="post-body">${esc(state.currentPost)}</div>
@@ -376,7 +405,7 @@ function renderDeconstruction() {
       </div>
     </div>
     <button class="btn btn-main" onclick="runDeconstruction()">Lancer l'autopsie →</button>
-    <div id="dc-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Dissection en cours...</div></div>
+    <div id="dc-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Dissection en cours...</div><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>
     <div id="dc-error" style="display:none;"></div>
     <div id="dc-result" style="display:none;"></div>`);
 }
@@ -425,7 +454,7 @@ function renderTrocKit() {
         <div class="sitem ${tkState.mode==='peur'?'on':''}" onclick="tkState.mode='peur';renderTrocKit();"><div class="sname">🔴 Peur</div></div>
       </div></div>
     <button class="btn btn-main" onclick="runTrocKit()">Générer les 4 scripts →</button>
-    <div id="tk-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Calibration en cours...</div></div>
+    <div id="tk-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Calibration en cours...</div><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>
     <div id="tk-error" style="display:none;"></div><div id="tk-result" style="display:none;"></div>`);
 }
 
