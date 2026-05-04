@@ -1,108 +1,148 @@
 <!DOCTYPE html>
-<html lang="fr" class="wf-loading">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Moment Troc · Studio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Bebas+Neue&display=swap"
+        media="print" onload="this.media='all'">
   <style>
     :root {
-      --paper: #080808; --card: #0F0F0F; --card2: #141414; --card3: #1A1A1A;
+      --paper: #080808; --card: #0F0F0F; --card2: #141414;
       --gold: #C9A84C; --gold-dim: rgba(201,168,76,0.18); --gold-line: rgba(201,168,76,0.35); --gold-glow: rgba(201,168,76,0.12);
       --ink: #F0EAD6; --ink-mid: rgba(240,234,214,0.60); --ink-dim: rgba(240,234,214,0.28); --ink-ghost: rgba(240,234,214,0.10);
       --line: rgba(201,168,76,0.10); --line-hard: rgba(201,168,76,0.22); --green: #4a9e6a; --red: #9e4a4a;
       --font-display: 'Bebas Neue','Cormorant Garamond',serif; --font-body: 'Cormorant Garamond',Georgia,serif; --font-mono: 'DM Mono','Courier New',monospace;
-      --radius: 2px;
     }
-    .wf-loading body { visibility: hidden; }
-    .wf-active body, .wf-inactive body { visibility: visible; }
-    *,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
-    body{ background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
       min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto;
       background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
     }
-    @keyframes fadeUp{ from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
-    @keyframes goldPulse{ 0%,100%{box-shadow:0 0 4px var(--gold-glow);} 50%{box-shadow:0 0 12px rgba(201,168,76,0.18);} }
-    @keyframes borderShimmer{ 0%,100%{border-color:var(--gold-line);} 50%{border-color:var(--gold);} }
-    .hidden{ display:none!important; } .center{ text-align:center; }
-    h1{ font-family:var(--font-display); font-size:clamp(2.6rem,8vw,3.6rem); font-weight:400; line-height:0.95; letter-spacing:0.02em; text-transform:uppercase; color:var(--ink); }
-    h1 em{ font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600; color:var(--gold); text-transform:none; font-size:0.85em; display:block; letter-spacing:0; }
-    .eyebrow{ font-family:var(--font-mono); font-size:0.65rem; letter-spacing:5px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; opacity:0.85; }
-    .sub{ font-family:var(--font-body); font-size:1rem; color:var(--ink-mid); line-height:1.65; margin:14px 0 24px; font-style:italic; }
-    textarea,input[type="text"],input[type="password"]{ width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
-      color:var(--ink); padding:16px 18px; font-family:var(--font-body); font-size:1rem; line-height:1.7;
-      resize:vertical; outline:none; border-radius:var(--radius); transition:border-color 0.3s ease,box-shadow 0.3s ease;
+    .hidden { display:none!important; }
+    h1 { font-family:var(--font-display); font-size:clamp(2.4rem,8vw,3.2rem); font-weight:400; line-height:0.95; letter-spacing:0.02em; text-transform:uppercase; color:var(--ink); }
+    h1 em { font-family:'Georgia',serif; font-style:italic; font-weight:600; color:var(--gold); text-transform:none; font-size:0.85em; display:block; letter-spacing:0; }
+    .eyebrow { font-family:var(--font-mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; opacity:0.85; }
+    .sub { font-family:var(--font-body); font-size:1rem; color:var(--ink-mid); line-height:1.65; margin:14px 0 24px; font-style:italic; }
+    textarea, input[type="text"], input[type="password"] {
+      width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
+      color:var(--ink); padding:16px 18px; font-family:'Georgia',serif; font-size:1rem; line-height:1.7;
+      resize:vertical; outline:none; border-radius:2px; transition:border-color 0.2s ease;
     }
-    textarea:focus,input:focus{ border-left-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold-glow); }
-    textarea::placeholder,input::placeholder{ color:var(--ink-dim); font-style:italic; }
-    .btn{ display:block; width:100%; padding:15px 20px; border:none; font-family:var(--font-mono); font-size:0.72rem; letter-spacing:4px; text-transform:uppercase; cursor:pointer; transition:all 0.3s ease; margin-top:12px; border-radius:var(--radius); }
-    .btn-main{ background:transparent; color:var(--gold); border:1px solid var(--gold-line); border-left:3px solid var(--gold); }
-    .btn-main:hover{ background:var(--gold-dim); border-color:var(--gold); box-shadow:0 0 18px var(--gold-glow); letter-spacing:5px; }
-    .btn-ghost{ background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
-    .btn-ghost:hover{ border-color:var(--gold-line); color:var(--ink); }
-    .btn:disabled{ opacity:0.25; cursor:not-allowed; box-shadow:none; letter-spacing:4px; }
-    .card{ background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold-line); padding:22px 20px; margin-bottom:18px; animation:fadeUp 0.4s ease both; border-radius:var(--radius); position:relative; overflow:hidden; }
-    .card::before{ content:''; position:absolute; top:0; left:0; width:40px; height:2px; background:var(--gold); }
-    .card.gold{ border-top-color:var(--gold); animation:fadeUp 0.4s ease both,goldPulse 4s ease-in-out infinite; }
-    .card-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-    .tag{ display:inline-block; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:2.5px; padding:4px 10px; text-transform:uppercase; border-radius:var(--radius); margin-right:6px; }
-    .tag.gold{ background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-line); }
-    .tag.line{ background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
-    .tag.active{ background:var(--gold); color:var(--paper); }
-    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-    .maitre-card{ background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-ghost); padding:16px; cursor:pointer; transition:all 0.3s ease; text-align:center; border-radius:var(--radius); }
-    .maitre-card:hover{ transform:translateY(-2px); border-top-color:var(--gold-line); box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 12px var(--gold-glow); }
-    .maitre-card.selected{ background:var(--gold-dim); border-color:var(--gold-line); border-top-color:var(--gold); }
-    .maitre-name{ font-family:var(--font-body); font-size:0.9rem; font-weight:600; margin-bottom:4px; color:var(--ink); }
-    .maitre-type{ font-family:var(--font-mono); font-size:0.6rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; opacity:0.75; }
-    .chat-bubble{ background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line); padding:14px 18px; margin-bottom:10px; border-radius:var(--radius); animation:fadeUp 0.3s ease both; font-family:var(--font-body); font-size:0.95rem; color:var(--ink-mid); }
-    .chat-bubble strong{ color:var(--gold); font-family:var(--font-mono); font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:6px; }
-    .post-body{ font-family:var(--font-body); font-size:1.15rem; line-height:2; white-space:pre-wrap; color:var(--ink); padding:28px 0; letter-spacing:0.01em; }
-    .strat-block{ background:var(--gold-glow); border-left:2px solid var(--gold); padding:14px 18px; margin-bottom:20px; font-family:var(--font-mono); font-size:0.78rem; line-height:1.65; color:var(--ink-mid); border-radius:0 var(--radius) var(--radius) 0; animation:goldPulse 4s ease-in-out infinite; }
-    .err-box{ background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:var(--font-mono); font-size:0.8rem; color:var(--red); border-radius:0 var(--radius) var(--radius) 0; }
-    .ok-box{ background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:var(--font-mono); font-size:0.8rem; color:var(--green); border-radius:0 var(--radius) var(--radius) 0; }
-    .eval-band{ padding:10px 14px; margin-bottom:14px; font-family:var(--font-mono); font-size:0.75rem; border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 var(--radius) var(--radius) 0; letter-spacing:1px; transition:all 0.3s ease; }
-    .eval-band.green{ border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
-    .eval-band.red{ border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
-
-    /* Barre de progression */
-    .loading-bar{ width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
-    .loading-bar-fill{ width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
-    @keyframes loadBar{ 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
-
-    .cal-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
-    .cal-cell{ aspect-ratio:1; background:var(--card2); border:1px solid var(--line); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.25s ease; position:relative; user-select:none; border-radius:var(--radius); font-family:var(--font-mono); }
-    .cal-cell .day-num{ font-family:var(--font-mono); font-size:1rem; color:var(--ink-dim); line-height:1; }
-    .cal-cell .day-ep{ font-family:var(--font-mono); font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-top:3px; opacity:0.85; }
-    .cal-cell.rest{ opacity:0.22; cursor:default; pointer-events:none; }
-    .cal-cell.rest .day-num{ color:var(--ink-dim); }
-    .cal-cell.has{ background:var(--card); border:1px solid var(--gold-line); border-top:2px solid var(--gold); cursor:pointer; }
-    .cal-cell.has .day-num{ color:var(--ink); font-weight:500; }
-    .cal-cell.has:hover{ background:var(--gold-dim); border-color:var(--gold); box-shadow:0 0 14px var(--gold-glow),inset 0 0 8px var(--gold-glow); transform:translateY(-1px); }
-    .cal-cell.has::before{ content:attr(data-profil); position:absolute; top:4px; right:5px; font-family:var(--font-mono); font-size:0.42rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); opacity:0.7; }
-    .cal-cell.active-day{ border:1px solid var(--gold); box-shadow:0 0 12px var(--gold-glow); animation:borderShimmer 3s ease-in-out infinite; }
-    .cal-cell.placeholder{ cursor:pointer; border-top:2px solid var(--ink-ghost); }
-    .cal-cell.placeholder:hover{ border-top-color:var(--gold-line); background:var(--card); }
-    .cal-cell.placeholder .day-num{ color:var(--ink-dim); }
-    .day-detail{ background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold); padding:22px 20px; margin-top:16px; animation:fadeUp 0.35s ease both; border-radius:var(--radius); position:relative; }
-    .day-detail::before{ content:''; position:absolute; top:0; left:0; width:60px; height:2px; background:var(--gold); }
-    .day-detail .post-preview{ font-family:var(--font-body); font-size:1rem; line-height:1.85; color:var(--ink-mid); white-space:pre-wrap; margin:14px 0; border-left:1px solid var(--gold-line); padding-left:16px; font-style:italic; }
-    .day-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-    .day-actions .btn{ flex:1; min-width:120px; margin-top:0; }
-    .bottom-nav{ position:fixed; bottom:0; left:0; right:0; background:rgba(8,8,8,0.96); border-top:1px solid var(--line-hard); display:flex; justify-content:space-around; padding:6px 0 8px; z-index:1000; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
-    .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 14px; transition:all 0.3s ease; font-family:var(--font-mono); font-size:0.58rem; letter-spacing:1.5px; color:var(--ink-dim); text-transform:uppercase; border:none; background:none; position:relative; }
-    .nav-item::after{ content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:1px; background:var(--gold); transition:width 0.3s ease; }
-    .nav-item.active{ color:var(--gold); }
-    .nav-item.active::after{ width:24px; }
-    .nav-icon{ font-size:1.1rem; opacity:0.75; transition:opacity 0.3s ease; }
-    .nav-item.active .nav-icon{ opacity:1; }
-    .nav-item:hover{ color:var(--ink); }
-    a{ color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); transition:border-color 0.2s ease; }
-    a:hover{ border-bottom-color:var(--gold); }
-    @media(max-width:500px){ .grid-2{ grid-template-columns:1fr; } .grid-4{ grid-template-columns:1fr 1fr; } h1{ font-size:2.4rem; } }
+    textarea:focus, input:focus { border-left-color:var(--gold); }
+    textarea::placeholder, input::placeholder { color:var(--ink-dim); font-style:italic; }
+    .btn {
+      display:block; width:100%; padding:15px 20px; border:none;
+      font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:3px; text-transform:uppercase;
+      cursor:pointer; transition:all 0.2s ease; margin-top:12px; border-radius:2px;
+    }
+    .btn-main { background:transparent; color:var(--gold); border:1px solid var(--gold-line); border-left:3px solid var(--gold); }
+    .btn-main:hover { background:var(--gold-dim); border-color:var(--gold); }
+    .btn-ghost { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+    .btn-ghost:hover { border-color:var(--gold-line); color:var(--ink); }
+    .btn:disabled { opacity:0.25; cursor:not-allowed; }
+    .card {
+      background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold-line);
+      padding:22px 20px; margin-bottom:18px; border-radius:2px; position:relative; overflow:hidden;
+    }
+    .card::before { content:''; position:absolute; top:0; left:0; width:40px; height:2px; background:var(--gold); }
+    .card.gold { border-top-color:var(--gold); }
+    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+    .tag {
+      display:inline-block; font-family:'Courier New',monospace; font-size:0.62rem; letter-spacing:2px;
+      padding:4px 10px; text-transform:uppercase; border-radius:2px; margin-right:6px;
+    }
+    .tag.gold { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-line); }
+    .tag.line { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .maitre-card {
+      background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-ghost);
+      padding:16px; cursor:pointer; transition:all 0.2s ease; text-align:center; border-radius:2px;
+    }
+    .maitre-card:hover { border-top-color:var(--gold-line); }
+    .maitre-card.selected { background:var(--gold-dim); border-color:var(--gold-line); border-top-color:var(--gold); }
+    .maitre-name { font-family:'Georgia',serif; font-size:0.9rem; font-weight:600; margin-bottom:4px; color:var(--ink); }
+    .maitre-type { font-family:'Courier New',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; opacity:0.75; }
+    .chat-bubble {
+      background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
+      padding:14px 18px; margin-bottom:10px; border-radius:2px;
+      font-family:'Georgia',serif; font-size:0.95rem; color:var(--ink-mid);
+    }
+    .chat-bubble strong { color:var(--gold); font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:6px; }
+    .post-body {
+      font-family:'Georgia',serif; font-size:1.15rem; line-height:2; white-space:pre-wrap;
+      color:var(--ink); padding:28px 0;
+    }
+    .strat-block {
+      background:var(--gold-glow); border-left:2px solid var(--gold);
+      padding:14px 18px; margin-bottom:20px; font-family:'Courier New',monospace;
+      font-size:0.78rem; line-height:1.65; color:var(--ink-mid);
+      border-radius:0 2px 2px 0;
+    }
+    .err-box { background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--red); border-radius:0 2px 2px 0; }
+    .ok-box { background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--green); border-radius:0 2px 2px 0; }
+    .eval-band {
+      padding:10px 14px; margin-bottom:14px; font-family:'Courier New',monospace; font-size:0.75rem;
+      border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 2px 2px 0; letter-spacing:1px;
+    }
+    .eval-band.green { border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
+    .eval-band.red { border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
+    .loading-bar { width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
+    .loading-bar-fill { width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
+    @keyframes loadBar { 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
+    .cal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
+    .cal-cell {
+      aspect-ratio:1; background:var(--card2); border:1px solid var(--line);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      cursor:pointer; transition:all 0.2s ease; position:relative; user-select:none; border-radius:2px;
+      font-family:'Courier New',monospace;
+    }
+    .cal-cell .day-num { font-family:'Courier New',monospace; font-size:1rem; color:var(--ink-dim); line-height:1; }
+    .cal-cell .day-ep { font-family:'Courier New',monospace; font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-top:3px; opacity:0.85; }
+    .cal-cell.rest { opacity:0.22; cursor:default; pointer-events:none; }
+    .cal-cell.rest .day-num { color:var(--ink-dim); }
+    .cal-cell.has { background:var(--card); border:1px solid var(--gold-line); border-top:2px solid var(--gold); cursor:pointer; }
+    .cal-cell.has .day-num { color:var(--ink); font-weight:500; }
+    .cal-cell.has:hover { background:var(--gold-dim); border-color:var(--gold); }
+    .cal-cell.has::before { content:attr(data-profil); position:absolute; top:4px; right:5px; font-family:'Courier New',monospace; font-size:0.42rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); opacity:0.7; }
+    .cal-cell.placeholder { cursor:pointer; border-top:2px solid var(--ink-ghost); }
+    .cal-cell.placeholder:hover { border-top-color:var(--gold-line); background:var(--card); }
+    .cal-cell.placeholder .day-num { color:var(--ink-dim); }
+    .day-detail {
+      background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold);
+      padding:22px 20px; margin-top:16px; border-radius:2px; position:relative;
+    }
+    .day-detail::before { content:''; position:absolute; top:0; left:0; width:60px; height:2px; background:var(--gold); }
+    .day-detail .post-preview {
+      font-family:'Georgia',serif; font-size:1rem; line-height:1.85; color:var(--ink-mid);
+      white-space:pre-wrap; margin:14px 0; border-left:1px solid var(--gold-line); padding-left:16px; font-style:italic;
+    }
+    .day-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .day-actions .btn { flex:1; min-width:120px; margin-top:0; }
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:rgba(8,8,8,0.96); border-top:1px solid var(--line-hard);
+      display:flex; justify-content:space-around; padding:6px 0 8px;
+      z-index:1000; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    }
+    .nav-item {
+      display:flex; flex-direction:column; align-items:center; gap:4px;
+      cursor:pointer; padding:8px 14px; transition:all 0.2s ease;
+      font-family:'Courier New',monospace; font-size:0.58rem; letter-spacing:1.5px;
+      color:var(--ink-dim); text-transform:uppercase; border:none; background:none; position:relative;
+    }
+    .nav-item::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:1px; background:var(--gold); transition:width 0.2s ease; }
+    .nav-item.active { color:var(--gold); }
+    .nav-item.active::after { width:24px; }
+    .nav-icon { font-size:1.1rem; opacity:0.75; }
+    .nav-item.active .nav-icon { opacity:1; }
+    .nav-item:hover { color:var(--ink); }
+    a { color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); }
+    a:hover { border-bottom-color:var(--gold); }
+    @media(max-width:500px) { .grid-2,.grid-4{ grid-template-columns:1fr; } h1{ font-size:2rem; } }
   </style>
 </head>
 <body>
@@ -116,10 +156,9 @@
 
 <script>
 // ═══════════════════════════════════════
-// MOMENT TROC · STUDIO — Final Optimisé
+// MOMENT TROC · STUDIO — Final Léger (Sans WebFont Loader)
 // ═══════════════════════════════════════
 
-// ─── Clés ───
 const MASTER_KEY = 'MKB2000-2022A';
 const VALID_KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
 function getMomentKey(){ return localStorage.getItem('mt_moment_key'); }
@@ -127,13 +166,12 @@ function setMomentKey(k){ localStorage.setItem('mt_moment_key', k); }
 function getGeminiKey(){ return localStorage.getItem('mt_gemini_key'); }
 function setGeminiKey(k){ localStorage.setItem('mt_gemini_key', k); }
 
-// ─── API Gemini ───
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
 async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=false){
   const key = getGeminiKey();
   if(!key) throw new Error('Clé Gemini manquante');
   const body = { contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.88, maxOutputTokens:fastMode?400:maxTokens} };
-  if(useSearch||fastMode){ body.tools = useSearch ? [{google_search:{}}] : undefined; }
+  if(useSearch) body.tools = [{google_search:{}}];
   const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), fastMode?6000:8000);
   const res = await fetch(GEMINI_URL+key, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal: controller.signal });
   clearTimeout(timeout);
@@ -142,20 +180,11 @@ async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=fals
   return text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/#{1,6}\s/g,'').trim();
 }
 
-// ─── Helpers ───
 const app = document.getElementById('app');
 function render(html){ app.innerHTML = html; }
 function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function copyTxt(text, btn){ navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copié'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='Copier'; btn.classList.remove('copied'); },2000); }); }
-function startWorker(targetId, messages) {
-  const el = document.getElementById(targetId);
-  if (!el) return null;
-  let i = 0;
-  const timer = setInterval(() => { el.textContent = messages[i % messages.length]; i++; }, 1200);
-  return timer;
-}
 
-// ─── Profils ───
 const PROFILS = {
   AUTOMATISEUR: { organe:'Cortex Préfrontal', desir:'Un rail clair sans options', peur:'Le chaos, la surcharge mentale' },
   OPTIMISEUR_VALEUR: { organe:'Striatum', desir:'Le meilleur retour sur investissement', peur:'Le mauvais investissement' },
@@ -164,7 +193,6 @@ const PROFILS = {
   LIBÉRATEUR: { organe:'Cortex Cingulaire', desir:'La singularité, la liberté', peur:'Les cases, le générique' }
 };
 
-// ─── Maîtres ───
 const MAITRES = [
   {id:'bismarck',nom:'Otto von Bismarck',categorie:'Stratège Silencieux',ton:'La force tranquille, le pragmatisme froid.'},
   {id:'will',nom:'Will Aime',categorie:'Miroir Vivant',ton:'Un \"il\" qui devient \"tu\". Fin sans résolution.'},
@@ -185,7 +213,6 @@ const MAITRES = [
 ];
 const CATEGORIES = ['Architecte de l\'Ombre','Briseur de Réalité','Miroir Vivant','Stratège Silencieux'];
 
-// ─── États globaux ───
 const state = {
   step:'unlock', mode:'studio', biz:'', dialogueAnswers:[], profilData:null, profilMode:'désir',
   atelier:null, format:null, maitre:null, currentPost:null, evalData:null, stratData:null,
@@ -194,7 +221,6 @@ const state = {
 const dcState = { step:'input', post:'', contexte:'', analyse:null, contreAngle:null };
 const tkState = { offre:'', profil:'AUTOMATISEUR', mode:'désir', scripts:null };
 
-// ─── Navigation ───
 window.switchMode = function(m) {
   state.mode = m;
   document.querySelectorAll('.nav-item').forEach((el, i) => {
@@ -207,7 +233,7 @@ window.switchMode = function(m) {
 };
 
 /* ═══════════════════════════════════════
-   MODE STUDIO
+   STUDIO
    ═══════════════════════════════════════ */
 function renderStudioMode() {
   if (state.step === 'unlock') renderUnlock();
@@ -222,7 +248,7 @@ function renderStudioMode() {
 }
 
 function renderUnlock(){
-  render(`<div class="center" style="margin-top:60px;"><div class="eyebrow">Moment Troc · Studio</div><h1>Clé<br>d'Accès</h1><p class="sub">Entre la clé fournie par Kabou Meshak.</p><input id="key-input" type="text" placeholder="MT-2024X..." autocomplete="off" style="text-transform:uppercase;" /><div id="gate-err" style="min-height:20px;color:var(--red);font-size:0.8rem;margin-top:8px;"></div><button class="btn btn-main" onclick="validateMomentKey()">Entrer →</button></div>`);
+  render(`<div class="center" style="margin-top:60px;"><div class="eyebrow">Moment Troc · Studio</div><h1>Clé d'Accès</h1><p class="sub">Entre la clé fournie.</p><input id="key-input" type="text" placeholder="MT-2024X..." autocomplete="off" style="text-transform:uppercase;" /><div id="gate-err" style="min-height:20px;color:var(--red);font-size:0.8rem;margin-top:8px;"></div><button class="btn btn-main" onclick="validateMomentKey()">Entrer →</button></div>`);
 }
 window.validateMomentKey = function(){
   const k = document.getElementById('key-input').value.trim().toUpperCase();
@@ -232,7 +258,7 @@ window.validateMomentKey = function(){
 };
 
 function renderGeminiGate(){
-  render(`<div class="center" style="margin-top:60px;"><div class="eyebrow">Étape 2/2</div><h1>Clé API<br>Gemini</h1><p class="sub">Gratuit sur <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p><input id="gemini-input" type="password" placeholder="AIza..." autocomplete="off" /><div id="gemini-err" style="min-height:20px;color:var(--red);font-size:0.8rem;margin-top:8px;"></div><button class="btn btn-main" onclick="validateGeminiKey()">Activer le moteur →</button></div>`);
+  render(`<div class="center" style="margin-top:60px;"><div class="eyebrow">Étape 2/2</div><h1>Clé API Gemini</h1><p class="sub">Gratuit sur <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p><input id="gemini-input" type="password" placeholder="AIza..." autocomplete="off" /><div id="gemini-err" style="min-height:20px;color:var(--red);font-size:0.8rem;margin-top:8px;"></div><button class="btn btn-main" onclick="validateGeminiKey()">Activer le moteur →</button></div>`);
 }
 window.validateGeminiKey = async function(){
   const k = document.getElementById('gemini-input').value.trim();
@@ -256,7 +282,7 @@ async function preloadGemini() {
 function renderBrief(){
   const saved = JSON.parse(localStorage.getItem('mt_brief')||'{}');
   if(saved.biz){ state.biz = saved.biz; }
-  render(`<div class="eyebrow">Brief</div><h1>Décharge<br><em>ton idée.</em></h1><p class="sub">Décris ton business, ta cible, le problème. Même en vrac.</p><textarea id="brief-input" rows="6" placeholder="Ex: Je vends une formation en ligne aux entrepreneurs africains qui n'arrivent pas à gérer leur trésorerie...">${esc(state.biz)}</textarea><button class="btn btn-main" onclick="submitBrief()">Analyser mon marché →</button>`);
+  render(`<div class="eyebrow">Brief</div><h1>Décharge ton idée</h1><p class="sub">Décris ton business, ta cible, le problème. Même en vrac.</p><textarea id="brief-input" rows="6" placeholder="Ex: Je vends une formation en ligne aux entrepreneurs africains qui n'arrivent pas à gérer leur trésorerie...">${esc(state.biz)}</textarea><button class="btn btn-main" onclick="submitBrief()">Analyser mon marché →</button>`);
 }
 window.submitBrief = async function(){
   const raw = document.getElementById('brief-input').value.trim();
@@ -272,7 +298,7 @@ window.submitBrief = async function(){
   }catch(e){ document.getElementById('dialogue-err').innerHTML = `<div class="err-box">⚠ ${esc(e.message)}</div>`; }
 };
 function renderDialogue(){
-  render(`<div class="eyebrow">Dialogue</div><h1>L'agent<br><em>t'écoute.</em></h1><div id="dialogue-questions"></div><div id="dialogue-box" class="hidden"><button class="btn btn-main" onclick="submitDialogue()">Continuer →</button></div><div id="dialogue-err"></div>`);
+  render(`<div class="eyebrow">Dialogue</div><h1>L'agent t'écoute</h1><div id="dialogue-questions"></div><div id="dialogue-box" class="hidden"><button class="btn btn-main" onclick="submitDialogue()">Continuer →</button></div><div id="dialogue-err"></div>`);
 }
 window.submitDialogue = async function(){
   const answers = []; for(let i=0;i<2;i++){ const el=document.getElementById('dial-answer-'+i); if(el)answers.push(el.value.trim()); }
@@ -288,7 +314,7 @@ window.submitDialogue = async function(){
 
 function renderProfil(){
   const p = state.profilData; const info = PROFILS[p.profil]||PROFILS.AUTOMATISEUR;
-  render(`<div class="eyebrow">Profil détecté</div><h1>${esc(p.profil)}<br><em>mode ${esc(p.mode)}</em></h1>
+  render(`<div class="eyebrow">Profil détecté</div><h1>${esc(p.profil)} <em>mode ${esc(p.mode)}</em></h1>
     <div class="card"><div class="tag gold">${esc(p.organe)}</div><p style="margin-top:12px;font-style:italic;color:var(--ink-mid);">"${esc(p.tension)}"</p><p style="color:var(--ink-dim);margin-top:8px;">${esc(p.simple)}</p></div>
     <div class="grid-2">
       <div class="card ${state.profilMode==='désir'?'':'gold'}" style="cursor:pointer;" onclick="state.profilMode='désir';renderProfil();"><div class="tag gold">🟢 Désir</div><p style="margin-top:8px;color:var(--ink-mid);">Attiré par : ${esc(info.desir)}</p></div>
@@ -298,7 +324,7 @@ function renderProfil(){
 }
 
 function renderAtelier(){
-  render(`<div class="eyebrow">Atelier</div><h1>Choisis<br><em>ta phase.</em></h1>
+  render(`<div class="eyebrow">Atelier</div><h1>Choisis ta phase</h1>
     <div class="grid-2">
       <div class="card" style="cursor:pointer;" onclick="selectAtelier(1)"><div class="tag gold">1</div><h3 style="margin-top:8px;">Le Miroir</h3><p style="color:var(--ink-dim);">Implanter l'expertise. Nommer la douleur. Pas de vente.</p></div>
       <div class="card" style="cursor:pointer;" onclick="selectAtelier(2)"><div class="tag gold">2</div><h3 style="margin-top:8px;">La Forge</h3><p style="color:var(--ink-dim);">Intensifier la douleur. Se positionner comme la réponse.</p></div>
@@ -309,7 +335,7 @@ function renderAtelier(){
 window.selectAtelier = function(id){ state.atelier=id; document.getElementById('btn-atelier-next').disabled=false; };
 
 function renderFormat(){
-  render(`<div class="eyebrow">Format</div><h1>Choisis<br><em>ta forme.</em></h1>
+  render(`<div class="eyebrow">Format</div><h1>Choisis ta forme</h1>
     <div class="grid-2" id="format-grid">
       <div class="card" style="cursor:pointer;" onclick="selectFormat('tweet')"><div class="tag gold">Tweet</div><p style="color:var(--ink-dim);">60-90 mots. Une vérité. Pas de suite.</p></div>
       <div class="card" style="cursor:pointer;" onclick="selectFormat('thread')"><div class="tag gold">Thread</div><p style="color:var(--ink-dim);">Post + 4-5 commentaires. Suite en com.</p></div>
@@ -321,7 +347,7 @@ function renderFormat(){
 window.selectFormat = function(id){ state.format=id; document.getElementById('btn-format-next').disabled=false; };
 
 function renderPantheon(){
-  render(`<div class="eyebrow">Arsenal des Maîtres</div><h1>Choisis<br><em>ton illusion.</em></h1>
+  render(`<div class="eyebrow">Arsenal des Maîtres</div><h1>Choisis ton illusion</h1>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
       <button class="btn btn-ghost" onclick="filterMaitres('Tous')" style="width:auto;padding:8px 14px;font-size:0.7rem;">Tous</button>
       ${CATEGORIES.map(c=>`<button class="btn btn-ghost" onclick="filterMaitres('${c}')" style="width:auto;padding:8px 14px;font-size:0.7rem;">${c}</button>`).join('')}
@@ -341,23 +367,16 @@ window.selectMaitre = function(id){
   document.getElementById('btn-generate').disabled=false;
 };
 
-// ─── GÉNÉRATION (optimisée) ───
+// ─── GÉNÉRATION (Stream de Pensée) ───
 window.generatePost = async function(){
   const p = state.profilData; const info = PROFILS[p.profil]; const m = state.maitre;
   const modeDesc = state.profilMode==='peur'?info.peur:info.desir;
   const atelierDesc = state.atelier===1?'Implanter. Nommer la douleur. Pas de vente. Pas de CTA fort.':state.atelier===2?'Intensifier la douleur. Se positionner comme la réponse évidente.':'Vendre. Déclencher l\'achat.';
 
-  const thoughts = [
-    "Scan du marché en cours...",
-    "Détection des angles saturés et des silences...",
-    "Identification du profil dominant et du déclencheur...",
-    "Calibration sur l'organe cible ("+ (p ? info.organe : "Cortex") + ")...",
-    "Génération du missile en cours..."
-  ];
+  const thoughts = ["Scan du marché en cours...","Détection des angles saturés...","Identification du profil dominant...","Calibration sur l'organe cible...","Génération du missile en cours..."];
   let currentThought = 0;
-  const streamEl = document.getElementById('stream-thought');
 
-  render(`<div class="eyebrow">Génération</div><h1>L'agent<br><em>travaille…</em></h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)}</p>
+  render(`<div class="eyebrow">Génération</div><h1>L'agent travaille…</h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)}</p>
     <div class="loading-steps"><div class="loading-step"><div class="dot"></div><span id="stream-thought">Scan du marché en cours...</span></div></div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div></div>`);
 
@@ -406,9 +425,7 @@ async function autoEvaluate(postContent) {
     const prompt = `Évalue ce post Moment Troc en une phrase (commence par [OK], [MOYEN] ou [FAIBLE]). Post : "${postContent}"`;
     const raw = await callGemini(prompt, false, 200);
     return raw.trim();
-  } catch (e) {
-    return '[OK] Auto-évaluation indisponible.';
-  }
+  } catch (e) { return '[OK] Auto-évaluation indisponible.'; }
 }
 
 async function requestWakeLock() {
@@ -417,7 +434,7 @@ async function requestWakeLock() {
 
 function renderResult(){
   const ev = state.evalData; const st = state.stratData;
-  render(`<div class="eyebrow">Post généré</div><h1>Ton<br><em>missile.</em></h1>
+  render(`<div class="eyebrow">Post généré</div><h1>Ton missile</h1>
     ${st?`<div class="strat-block">🧠 <strong>Observation :</strong> ${esc(st.obs)}<br>🎯 <strong>Angle mort :</strong> ${esc(st.angle)}<br>⚙️ <strong>Mécanique :</strong> ${esc(st.mecanique)}</div>`:''}
     <div id="eval-band" class="eval-band ${ev?ev.cls:''}">${ev?esc(ev.text):'Auto-évaluation en cours…'}</div>
     <div class="card" style="border-top-color:var(--gold);">
@@ -436,7 +453,7 @@ function renderResult(){
    MODE DÉCONSTRUCTION
    ═══════════════════════════════════════ */
 function renderDeconstruction() {
-  render(`<div class="eyebrow">Mode Déconstruction</div><h1>L'agent<br><em>dissèque.</em></h1><p class="sub">Colle un post. L'agent révèle la mécanique cachée, les angles morts, et génère un contre-angle calibré.</p>
+  render(`<div class="eyebrow">Mode Déconstruction</div><h1>L'agent dissèque</h1><p class="sub">Colle un post. L'agent révèle la mécanique cachée, les angles morts, et génère un contre-angle calibré.</p>
     <div class="field"><textarea id="dc-post" rows="8" maxlength="2000" placeholder="Colle ici le post complet à analyser..."></textarea></div>
     <div class="field"><textarea id="dc-contexte" rows="2" maxlength="300" placeholder="Qui a écrit ce post ? Dans quel secteur ?"></textarea></div>
     <div class="field"><div class="flabel">Sous-angle d'analyse</div>
@@ -471,7 +488,7 @@ window.runDeconstruction = async function() {
     document.getElementById('dc-prog').style.display='none'; document.getElementById('dc-result').style.display='';
     document.getElementById('dc-result').innerHTML = `
       <div class="dc-block" style="margin-top:24px;"><div class="s-eye">Rapport d'Autopsie</div><div style="font-size:11px;color:var(--ink-mid);line-height:1.9;white-space:pre-wrap;">${esc(raw)}</div></div>
-      <div class="dc-block" style="border-top-color:var(--gold);margin-top:20px;"><div class="s-eye">Contre-Angle Généré</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.9;white-space:pre-wrap;color:var(--ink);padding:16px 0;">${esc(contreAngle)}</div>
+      <div class="dc-block" style="border-top-color:var(--gold);margin-top:20px;"><div class="s-eye">Contre-Angle Généré</div><div style="font-family:'Georgia',serif;font-size:1.1rem;line-height:1.9;white-space:pre-wrap;color:var(--ink);padding:16px 0;">${esc(contreAngle)}</div>
         <div class="ag"><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(contreAngle)},this)">Copier</button><button class="btn btn-ghost" onclick="state.step='brief'; renderBrief();">→ Exploiter dans le Studio</button></div></div>
       <button class="btn btn-ghost" onclick="renderDeconstruction()" style="margin-top:16px;">← Nouvelle autopsie</button>`;
   } catch(e) {
@@ -485,7 +502,7 @@ window.runDeconstruction = async function() {
    ═══════════════════════════════════════ */
 function renderTrocKit() {
   const profils = ['AUTOMATISEUR','OPTIMISEUR_VALEUR','OPTIMISEUR_PRIX','ÉLÉVATEUR','LIBÉRATEUR'];
-  render(`<div class="eyebrow">Troc Kit</div><h1>Le script<br><em>qui vend.</em></h1><p class="sub">Génère 4 messages calibrés sur le cerveau de ton prospect. Approche, valeur, relance, objection. Avec l'urgence dosée à son profil.</p>
+  render(`<div class="eyebrow">Troc Kit</div><h1>Le script qui vend</h1><p class="sub">Génère 4 messages calibrés sur le cerveau de ton prospect. Approche, valeur, relance, objection. Avec l'urgence dosée à son profil.</p>
     ${state.profilData ? `<div class="ok-box" style="margin-bottom:16px;">🧠 Profil détecté dans le Studio : <strong>${esc(state.profilData.profil)}</strong> · Mode ${esc(state.profilData.mode)}. Pré-rempli automatiquement.</div>` : ''}
     <div class="field"><textarea id="tk-offre" rows="3" maxlength="400" placeholder="Ce que tu vends, à quel prix, ce que ça change pour l'acheteur...">${esc(tkState.offre)}</textarea></div>
     <div class="field"><div class="flabel">Profil du prospect</div>
@@ -527,14 +544,14 @@ window.runTrocKit = async function() {
   } catch(e) {
     document.getElementById('tk-prog').style.display='none'; document.getElementById('tk-error').style.display='';
     document.getElementById('tk-error').innerHTML = `<div class="err-box">⚠ ${esc(e.message)} — scripts de secours générés.</div>`;
-    const fallback = [`Salut. Mon post t'a parlé ? DM si tu veux en discuter.`, `Un chiffre : [X] clients en [Y] semaines. DM pour savoir comment.`, `Salut. L'offre est toujours là. DM si tu veux en parler.`, `Je comprends ton hésitation. Prends ton temps. DM si tu as des questions.`];
+    const fallback = [`Salut. DM si tu veux en discuter.`, `Un chiffre : [X] clients en [Y] semaines. DM.`, `Salut. L'offre est toujours là. DM.`, `Je comprends. Prends ton temps. DM si tu as des questions.`];
     document.getElementById('tk-result').style.display='';
     document.getElementById('tk-result').innerHTML = fallback.map(s => `<div class="tk-msg"><div class="tk-body">${esc(s)}</div></div>`).join('');
   }
 };
 
 /* ═══════════════════════════════════════
-   MODE ARSENAL — Calendrier Stratégique
+   MODE ARSENAL
    ═══════════════════════════════════════ */
 window.saveToArsenal = function() {
   if (!state.currentPost) { alert('Aucun post à sauvegarder.'); return; }
@@ -549,7 +566,7 @@ window.saveToArsenal = function() {
 };
 
 window.renderCalendar = function() {
-  let html = '<div class="eyebrow">Arsenal — Calendrier 30 Jours</div><h1>Ton<br><em>plan de tir.</em></h1><p class="sub">Chaque post sauvegardé se place automatiquement sur un jour pair. Clique sur une case pour lire, recycler ou déconstruire.</p>';
+  let html = '<div class="eyebrow">Arsenal — Calendrier 30 Jours</div><h1>Ton plan de tir</h1><p class="sub">Chaque post sauvegardé se place automatiquement sur un jour pair. Clique sur une case pour lire, recycler ou déconstruire.</p>';
   html += '<div class="cal-grid">';
   for (let d = 1; d <= 30; d++) {
     const isEven = d % 2 === 0; const hasPost = state.arsenalPosts[d]; const profil = hasPost ? hasPost.profil?.substring(0, 3).toUpperCase() : '';
