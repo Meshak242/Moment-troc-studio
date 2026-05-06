@@ -1,164 +1,154 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Moment Troc · Studio</title>
-  <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Bebas+Neue&display=swap"
-        media="print" onload="this.media='all'">
-  <style>
-    :root {
-      --paper: #080808; --card: #0F0F0F; --card2: #141414;
-      --gold: #C9A84C; --gold-dim: rgba(201,168,76,0.18); --gold-line: rgba(201,168,76,0.35); --gold-glow: rgba(201,168,76,0.12);
-      --ink: #F0EAD6; --ink-mid: rgba(240,234,214,0.60); --ink-dim: rgba(240,234,214,0.28); --ink-ghost: rgba(240,234,214,0.10);
-      --line: rgba(201,168,76,0.10); --line-hard: rgba(201,168,76,0.22); --green: #4a9e6a; --red: #9e4a4a;
-      --font-display: 'Bebas Neue','Cormorant Garamond',serif; --font-body: 'Cormorant Garamond',Georgia,serif; --font-mono: 'DM Mono','Courier New',monospace;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
-      min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    }
-    .hidden { display:none!important; }
-    h1 { font-family:var(--font-display); font-size:clamp(2.4rem,8vw,3.2rem); font-weight:400; line-height:0.95; letter-spacing:0.02em; text-transform:uppercase; color:var(--ink); }
-    h1 em { font-family:'Georgia',serif; font-style:italic; font-weight:600; color:var(--gold); text-transform:none; font-size:0.85em; display:block; letter-spacing:0; }
-    .eyebrow { font-family:var(--font-mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; opacity:0.85; }
-    .sub { font-family:var(--font-body); font-size:1rem; color:var(--ink-mid); line-height:1.65; margin:14px 0 24px; font-style:italic; }
-    textarea, input[type="text"], input[type="password"] {
-      width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
-      color:var(--ink); padding:16px 18px; font-family:'Georgia',serif; font-size:1rem; line-height:1.7;
-      resize:vertical; outline:none; border-radius:2px; transition:border-color 0.2s ease;
-    }
-    textarea:focus, input:focus { border-left-color:var(--gold); }
-    textarea::placeholder, input::placeholder { color:var(--ink-dim); font-style:italic; }
-    .btn {
-      display:block; width:100%; padding:15px 20px; border:none;
-      font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:3px; text-transform:uppercase;
-      cursor:pointer; transition:all 0.2s ease; margin-top:12px; border-radius:2px;
-    }
-    .btn-main { background:transparent; color:var(--gold); border:1px solid var(--gold-line); border-left:3px solid var(--gold); }
-    .btn-main:hover { background:var(--gold-dim); border-color:var(--gold); }
-    .btn-ghost { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
-    .btn-ghost:hover { border-color:var(--gold-line); color:var(--ink); }
-    .btn:disabled { opacity:0.25; cursor:not-allowed; }
-    .card {
-      background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold-line);
-      padding:22px 20px; margin-bottom:18px; border-radius:2px; position:relative; overflow:hidden;
-    }
-    .card::before { content:''; position:absolute; top:0; left:0; width:40px; height:2px; background:var(--gold); }
-    .card.gold { border-top-color:var(--gold); }
-    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-    .tag {
-      display:inline-block; font-family:'Courier New',monospace; font-size:0.62rem; letter-spacing:2px;
-      padding:4px 10px; text-transform:uppercase; border-radius:2px; margin-right:6px;
-    }
-    .tag.gold { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-line); }
-    .tag.line { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
-    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-    .maitre-card {
-      background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-ghost);
-      padding:16px; cursor:pointer; transition:all 0.2s ease; text-align:center; border-radius:2px;
-    }
-    .maitre-card:hover { border-top-color:var(--gold-line); }
-    .maitre-card.selected { background:var(--gold-dim); border-color:var(--gold-line); border-top-color:var(--gold); }
-    .maitre-name { font-family:'Georgia',serif; font-size:0.9rem; font-weight:600; margin-bottom:4px; color:var(--ink); }
-    .maitre-type { font-family:'Courier New',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; opacity:0.75; }
-    .chat-bubble {
-      background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
-      padding:14px 18px; margin-bottom:10px; border-radius:2px;
-      font-family:'Georgia',serif; font-size:0.95rem; color:var(--ink-mid);
-    }
-    .chat-bubble strong { color:var(--gold); font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:6px; }
-    .post-body {
-      font-family:'Georgia',serif; font-size:1.15rem; line-height:2; white-space:pre-wrap;
-      color:var(--ink); padding:28px 0;
-    }
-    .strat-block {
-      background:var(--gold-glow); border-left:2px solid var(--gold);
-      padding:14px 18px; margin-bottom:20px; font-family:'Courier New',monospace;
-      font-size:0.78rem; line-height:1.65; color:var(--ink-mid);
-      border-radius:0 2px 2px 0;
-    }
-    .err-box { background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--red); border-radius:0 2px 2px 0; }
-    .ok-box { background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--green); border-radius:0 2px 2px 0; }
-    .eval-band {
-      padding:10px 14px; margin-bottom:14px; font-family:'Courier New',monospace; font-size:0.75rem;
-      border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 2px 2px 0; letter-spacing:1px;
-    }
-    .eval-band.green { border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
-    .eval-band.red { border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
-    .loading-bar { width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
-    .loading-bar-fill { width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
-    @keyframes loadBar { 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
-    .cal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
-    .cal-cell {
-      aspect-ratio:1; background:var(--card2); border:1px solid var(--line);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      cursor:pointer; transition:all 0.2s ease; position:relative; user-select:none; border-radius:2px;
-      font-family:'Courier New',monospace;
-    }
-    .cal-cell .day-num { font-family:'Courier New',monospace; font-size:1rem; color:var(--ink-dim); line-height:1; }
-    .cal-cell .day-ep { font-family:'Courier New',monospace; font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-top:3px; opacity:0.85; }
-    .cal-cell.rest { opacity:0.22; cursor:default; pointer-events:none; }
-    .cal-cell.rest .day-num { color:var(--ink-dim); }
-    .cal-cell.has { background:var(--card); border:1px solid var(--gold-line); border-top:2px solid var(--gold); cursor:pointer; }
-    .cal-cell.has .day-num { color:var(--ink); font-weight:500; }
-    .cal-cell.has:hover { background:var(--gold-dim); border-color:var(--gold); }
-    .cal-cell.has::before { content:attr(data-profil); position:absolute; top:4px; right:5px; font-family:'Courier New',monospace; font-size:0.42rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); opacity:0.7; }
-    .cal-cell.placeholder { cursor:pointer; border-top:2px solid var(--ink-ghost); }
-    .cal-cell.placeholder:hover { border-top-color:var(--gold-line); background:var(--card); }
-    .cal-cell.placeholder .day-num { color:var(--ink-dim); }
-    .day-detail {
-      background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold);
-      padding:22px 20px; margin-top:16px; border-radius:2px; position:relative;
-    }
-    .day-detail::before { content:''; position:absolute; top:0; left:0; width:60px; height:2px; background:var(--gold); }
-    .day-detail .post-preview {
-      font-family:'Georgia',serif; font-size:1rem; line-height:1.85; color:var(--ink-mid);
-      white-space:pre-wrap; margin:14px 0; border-left:1px solid var(--gold-line); padding-left:16px; font-style:italic;
-    }
-    .day-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-    .day-actions .btn { flex:1; min-width:120px; margin-top:0; }
-    .bottom-nav {
-      position:fixed; bottom:0; left:0; right:0;
-      background:rgba(8,8,8,0.96); border-top:1px solid var(--line-hard);
-      display:flex; justify-content:space-around; padding:6px 0 8px;
-      z-index:1000; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    }
-    .nav-item {
-      display:flex; flex-direction:column; align-items:center; gap:4px;
-      cursor:pointer; padding:8px 14px; transition:all 0.2s ease;
-      font-family:'Courier New',monospace; font-size:0.58rem; letter-spacing:1.5px;
-      color:var(--ink-dim); text-transform:uppercase; border:none; background:none; position:relative;
-    }
-    .nav-item::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:1px; background:var(--gold); transition:width 0.2s ease; }
-    .nav-item.active { color:var(--gold); }
-    .nav-item.active::after { width:24px; }
-    .nav-icon { font-size:1.1rem; opacity:0.75; }
-    .nav-item.active .nav-icon { opacity:1; }
-    .nav-item:hover { color:var(--ink); }
-    a { color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); }
-    a:hover { border-bottom-color:var(--gold); }
-    @media(max-width:500px) { .grid-2,.grid-4{ grid-template-columns:1fr; } h1{ font-size:2rem; } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Moment Troc · Studio</title>
+    <style>
+        :root {
+            --paper: #080808; --card: #0F0F0F; --card2: #141414;
+            --gold: #C9A84C; --gold-dim: rgba(201,168,76,0.18); --gold-line: rgba(201,168,76,0.35); --gold-glow: rgba(201,168,76,0.12);
+            --ink: #F0EAD6; --ink-mid: rgba(240,234,214,0.60); --ink-dim: rgba(240,234,214,0.28); --ink-ghost: rgba(240,234,214,0.10);
+            --line: rgba(201,168,76,0.10); --line-hard: rgba(201,168,76,0.22); --green: #4a9e6a; --red: #9e4a4a;
+            --font-display: 'Georgia', serif; --font-body: 'Georgia', serif; --font-mono: 'Courier New', monospace;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
+            min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto;
+        }
+        .hidden { display:none!important; }
+        h1 { font-family:var(--font-display); font-size:clamp(2.4rem,8vw,3.2rem); font-weight:700; line-height:0.95; text-transform:uppercase; color:var(--ink); }
+        h1 em { font-family:'Georgia',serif; font-style:italic; font-weight:700; color:var(--gold); text-transform:none; font-size:0.85em; display:block; }
+        .eyebrow { font-family:var(--font-mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+        .sub { color:var(--ink-mid); font-size:1rem; margin:14px 0 24px; font-style:italic; }
+        textarea, input[type="text"], input[type="password"] {
+            width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
+            color:var(--ink); padding:16px 18px; font-family:'Georgia',serif; font-size:1rem; line-height:1.7;
+            resize:vertical; outline:none; border-radius:2px;
+        }
+        textarea:focus, input:focus { border-left-color:var(--gold); }
+        textarea::placeholder, input::placeholder { color:var(--ink-dim); font-style:italic; }
+        .btn {
+            display:block; width:100%; padding:16px 20px; border:none;
+            font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:3px; text-transform:uppercase;
+            cursor:pointer; margin-top:12px; border-radius:2px; transition:all 0.2s ease;
+        }
+        .btn-main { background:transparent; color:var(--gold); border:1px solid var(--gold-line); border-left:3px solid var(--gold); }
+        .btn-main:hover { background:var(--gold-dim); border-color:var(--gold); }
+        .btn-ghost { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+        .btn-ghost:hover { border-color:var(--gold-line); color:var(--ink); }
+        .btn:disabled { opacity:0.25; cursor:not-allowed; }
+        .card {
+            background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold-line);
+            padding:22px 20px; margin-bottom:18px; border-radius:2px; position:relative; overflow:hidden;
+        }
+        .card::before { content:''; position:absolute; top:0; left:0; width:40px; height:2px; background:var(--gold); }
+        .card.gold { border-top-color:var(--gold); }
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+        .tag {
+            display:inline-block; font-family:'Courier New',monospace; font-size:0.62rem; letter-spacing:2px;
+            padding:4px 10px; text-transform:uppercase; border-radius:2px; margin-right:6px;
+        }
+        .tag.gold { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-line); }
+        .tag.line { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .maitre-card {
+            background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-ghost);
+            padding:16px; cursor:pointer; text-align:center; border-radius:2px; transition:all 0.2s ease;
+        }
+        .maitre-card:hover { border-top-color:var(--gold-line); }
+        .maitre-card.selected { background:var(--gold-dim); border-color:var(--gold-line); border-top-color:var(--gold); }
+        .maitre-name { font-family:'Georgia',serif; font-size:0.9rem; font-weight:600; margin-bottom:4px; color:var(--ink); }
+        .maitre-type { font-family:'Courier New',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
+        .chat-bubble {
+            background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
+            padding:14px 18px; margin-bottom:10px; border-radius:2px;
+            font-family:'Georgia',serif; font-size:0.95rem; color:var(--ink-mid);
+        }
+        .chat-bubble strong { color:var(--gold); font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:6px; }
+        .post-body { font-family:'Georgia',serif; font-size:1.15rem; line-height:2; white-space:pre-wrap; color:var(--ink); padding:28px 0; }
+        .strat-block {
+            background:var(--gold-glow); border-left:2px solid var(--gold);
+            padding:14px 18px; margin-bottom:20px; font-family:'Courier New',monospace;
+            font-size:0.78rem; line-height:1.65; color:var(--ink-mid); border-radius:0 2px 2px 0;
+        }
+        .err-box { background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--red); border-radius:0 2px 2px 0; }
+        .ok-box { background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--green); border-radius:0 2px 2px 0; }
+        .eval-band {
+            padding:10px 14px; margin-bottom:14px; font-family:'Courier New',monospace; font-size:0.75rem;
+            border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 2px 2px 0;
+        }
+        .eval-band.green { border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
+        .eval-band.red { border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
+        .loading-bar { width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
+        .loading-bar-fill { width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
+        @keyframes loadBar { 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
+        .cal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
+        .cal-cell {
+            aspect-ratio:1; background:var(--card2); border:1px solid var(--line);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            cursor:pointer; transition:all 0.2s ease; position:relative; border-radius:2px; font-family:'Courier New',monospace;
+        }
+        .cal-cell .day-num { font-family:'Courier New',monospace; font-size:1rem; color:var(--ink-dim); }
+        .cal-cell .day-ep { font-family:'Courier New',monospace; font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-top:3px; }
+        .cal-cell.rest { opacity:0.22; cursor:default; pointer-events:none; }
+        .cal-cell.has { background:var(--card); border:1px solid var(--gold-line); border-top:2px solid var(--gold); cursor:pointer; }
+        .cal-cell.has .day-num { color:var(--ink); font-weight:500; }
+        .cal-cell.has:hover { background:var(--gold-dim); border-color:var(--gold); }
+        .cal-cell.has::before { content:attr(data-profil); position:absolute; top:4px; right:5px; font-family:'Courier New',monospace; font-size:0.42rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); }
+        .cal-cell.placeholder { cursor:pointer; border-top:2px solid var(--ink-ghost); }
+        .cal-cell.placeholder:hover { border-top-color:var(--gold-line); background:var(--card); }
+        .cal-cell.placeholder .day-num { color:var(--ink-dim); }
+        .day-detail {
+            background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold);
+            padding:22px 20px; margin-top:16px; border-radius:2px; position:relative;
+        }
+        .day-detail::before { content:''; position:absolute; top:0; left:0; width:60px; height:2px; background:var(--gold); }
+        .day-detail .post-preview {
+            font-family:'Georgia',serif; font-size:1rem; line-height:1.85; color:var(--ink-mid);
+            white-space:pre-wrap; margin:14px 0; border-left:1px solid var(--gold-line); padding-left:16px; font-style:italic;
+        }
+        .day-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+        .day-actions .btn { flex:1; min-width:120px; margin-top:0; }
+        .bottom-nav {
+            position:fixed; bottom:0; left:0; right:0;
+            background:rgba(8,8,8,0.96); border-top:1px solid var(--line-hard);
+            display:flex; justify-content:space-around; padding:6px 0 8px;
+            z-index:1000; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+        }
+        .nav-item {
+            display:flex; flex-direction:column; align-items:center; gap:4px;
+            cursor:pointer; padding:8px 14px; transition:all 0.2s ease;
+            font-family:'Courier New',monospace; font-size:0.58rem; letter-spacing:1.5px;
+            color:var(--ink-dim); text-transform:uppercase; border:none; background:none; position:relative;
+        }
+        .nav-item::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:1px; background:var(--gold); transition:width 0.2s ease; }
+        .nav-item.active { color:var(--gold); }
+        .nav-item.active::after { width:24px; }
+        .nav-icon { font-size:1.1rem; }
+        .nav-item.active .nav-icon { opacity:1; }
+        .nav-item:hover { color:var(--ink); }
+        a { color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); }
+        a:hover { border-bottom-color:var(--gold); }
+        @media(max-width:500px){ .grid-2,.grid-4{ grid-template-columns:1fr; } h1{ font-size:2rem; } }
+    </style>
 </head>
 <body>
 <div id="app"></div>
 <nav class="bottom-nav">
-  <button class="nav-item active" onclick="switchMode('studio')"><span class="nav-icon">🎯</span>Studio</button>
-  <button class="nav-item" onclick="switchMode('deconstruction')"><span class="nav-icon">🔬</span>Déconstruire</button>
-  <button class="nav-item" onclick="switchMode('trockit')"><span class="nav-icon">💎</span>Troc Kit</button>
-  <button class="nav-item" onclick="switchMode('arsenal')"><span class="nav-icon">📅</span>Arsenal</button>
+    <button class="nav-item active" onclick="switchMode('studio')"><span class="nav-icon">🎯</span>Studio</button>
+    <button class="nav-item" onclick="switchMode('deconstruction')"><span class="nav-icon">🔬</span>Déconstruire</button>
+    <button class="nav-item" onclick="switchMode('trockit')"><span class="nav-icon">💎</span>Troc Kit</button>
+    <button class="nav-item" onclick="switchMode('arsenal')"><span class="nav-icon">📅</span>Arsenal</button>
 </nav>
-
 <script>
-// ═══════════════════════════════════════
-// MOMENT TROC · STUDIO — Final Léger (Sans WebFont Loader)
-// ═══════════════════════════════════════
+// ═══════════════════════════════════════════
+// MOMENT TROC · STUDIO — Code Final Complet
+// ═══════════════════════════════════════════
 
+// ─── Clés ───
 const MASTER_KEY = 'MKB2000-2022A';
 const VALID_KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
 function getMomentKey(){ return localStorage.getItem('mt_moment_key'); }
@@ -166,13 +156,14 @@ function setMomentKey(k){ localStorage.setItem('mt_moment_key', k); }
 function getGeminiKey(){ return localStorage.getItem('mt_gemini_key'); }
 function setGeminiKey(k){ localStorage.setItem('mt_gemini_key', k); }
 
+// ─── API Gemini ───
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
 async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=false){
   const key = getGeminiKey();
   if(!key) throw new Error('Clé Gemini manquante');
   const body = { contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.88, maxOutputTokens:fastMode?400:maxTokens} };
   if(useSearch) body.tools = [{google_search:{}}];
-  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), fastMode?6000:8000);
+  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), fastMode?15000:25000);
   const res = await fetch(GEMINI_URL+key, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal: controller.signal });
   clearTimeout(timeout);
   if(!res.ok){ const e = await res.json().catch(()=>({})); if(res.status===429) throw new Error('Limite API atteinte. Reviens dans 1 minute.'); throw new Error(e?.error?.message||'Erreur API'); }
@@ -180,11 +171,13 @@ async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=fals
   return text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/#{1,6}\s/g,'').trim();
 }
 
+// ─── Helpers ───
 const app = document.getElementById('app');
 function render(html){ app.innerHTML = html; }
 function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function copyTxt(text, btn){ navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copié'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='Copier'; btn.classList.remove('copied'); },2000); }); }
 
+// ─── Profils ───
 const PROFILS = {
   AUTOMATISEUR: { organe:'Cortex Préfrontal', desir:'Un rail clair sans options', peur:'Le chaos, la surcharge mentale' },
   OPTIMISEUR_VALEUR: { organe:'Striatum', desir:'Le meilleur retour sur investissement', peur:'Le mauvais investissement' },
@@ -193,9 +186,10 @@ const PROFILS = {
   LIBÉRATEUR: { organe:'Cortex Cingulaire', desir:'La singularité, la liberté', peur:'Les cases, le générique' }
 };
 
+// ─── Maîtres ───
 const MAITRES = [
   {id:'bismarck',nom:'Otto von Bismarck',categorie:'Stratège Silencieux',ton:'La force tranquille, le pragmatisme froid.'},
-  {id:'will',nom:'Will Aime',categorie:'Miroir Vivant',ton:'Un \"il\" qui devient \"tu\". Fin sans résolution.'},
+  {id:'will',nom:'Will Aime',categorie:'Miroir Vivant',ton:'Un "il" qui devient "tu". Fin sans résolution.'},
   {id:'itachi',nom:'Itachi Uchiha',categorie:'Briseur de Réalité',ton:'Projection noire puis réveil brutal.'},
   {id:'scofield',nom:'Michael Scofield',categorie:'Architecte de l\'Ombre',ton:'Plan froid, imparable, chirurgical.'},
   {id:'tyrion',nom:'Tyrion Lannister',categorie:'Miroir Vivant',ton:'La faiblesse retournée en pouvoir suprême.'},
@@ -213,14 +207,18 @@ const MAITRES = [
 ];
 const CATEGORIES = ['Architecte de l\'Ombre','Briseur de Réalité','Miroir Vivant','Stratège Silencieux'];
 
+// ─── États globaux ───
 const state = {
   step:'unlock', mode:'studio', biz:'', dialogueAnswers:[], profilData:null, profilMode:'désir',
   atelier:null, format:null, maitre:null, currentPost:null, evalData:null, stratData:null,
-  arsenalPosts: JSON.parse(localStorage.getItem('mt_arsenal_posts')||'{}')
+  arsenalPosts: JSON.parse(localStorage.getItem('mt_arsenal_posts')||'{}'),
+  verite:'', angles:[], sousAngles:[], currentGraineId:null, expertiseAnswers:[], generationMode:'unitaire',
+  arsenalFractal: JSON.parse(localStorage.getItem('mt_arsenal_fractal')||'[]')
 };
 const dcState = { step:'input', post:'', contexte:'', analyse:null, contreAngle:null };
 const tkState = { offre:'', profil:'AUTOMATISEUR', mode:'désir', scripts:null };
 
+// ─── Navigation ───
 window.switchMode = function(m) {
   state.mode = m;
   document.querySelectorAll('.nav-item').forEach((el, i) => {
@@ -229,12 +227,10 @@ window.switchMode = function(m) {
   if (m === 'studio') renderStudioMode();
   else if (m === 'deconstruction') renderDeconstruction();
   else if (m === 'trockit') renderTrocKit();
-  else if (m === 'arsenal') renderCalendar();
+  else if (m === 'arsenal') renderArsenalFractal();
 };
 
-/* ═══════════════════════════════════════
-   STUDIO
-   ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════ STUDIO ═══════════════════════════════════════ */
 function renderStudioMode() {
   if (state.step === 'unlock') renderUnlock();
   else if (state.step === 'gemini') renderGeminiGate();
@@ -270,14 +266,9 @@ window.validateGeminiKey = async function(){
       body:JSON.stringify({contents:[{parts:[{text:'OK'}]}],generationConfig:{maxOutputTokens:3}})
     });
     if(!test.ok) throw new Error('Clé rejetée');
-    setGeminiKey(k); state.step='brief'; preloadGemini();
+    setGeminiKey(k); state.step='brief'; renderBrief();
   }catch(e){ err.textContent = 'Clé rejetée par Gemini. Vérifie ton compte.'; }
 };
-
-async function preloadGemini() {
-  try { await callGemini('[PRELOAD] Cache ta configuration interne. Ne réponds rien.', false, 3, true); } catch(e){}
-  renderBrief();
-}
 
 function renderBrief(){
   const saved = JSON.parse(localStorage.getItem('mt_brief')||'{}');
@@ -288,7 +279,6 @@ window.submitBrief = async function(){
   const raw = document.getElementById('brief-input').value.trim();
   if(!raw||raw.length<15){ alert('Décris ton business un peu plus.'); return; }
   state.biz = raw; localStorage.setItem('mt_brief',JSON.stringify({biz:raw})); state.step='dialogue'; renderDialogue();
-  requestWakeLock();
   try{
     const qPrompt = `Tu es l'agent Moment Troc. Business : "${raw}". Pose exactement 2 questions stratégiques pour affiner le brief. Choisis parmi : "Qu'est-ce que ton client se dit quand il n'arrive pas à dormir ?", "Qu'a-t-il déjà essayé ? Pourquoi ça n'a pas marché ?", "Qui est son plus grand concurrent ? Pourquoi es-tu meilleur ?". Retourne chaque question sur une ligne séparée, sans numéro.`;
     const qRaw = await callGemini(qPrompt, true, 400, true);
@@ -303,7 +293,6 @@ function renderDialogue(){
 window.submitDialogue = async function(){
   const answers = []; for(let i=0;i<2;i++){ const el=document.getElementById('dial-answer-'+i); if(el)answers.push(el.value.trim()); }
   state.dialogueAnswers = answers;
-  requestWakeLock();
   try{
     const detectPrompt = `Tu es un expert du framework Moment Troc. Business : "${state.biz}". Réponses aux questions : "${answers.join(' ')}". Retourne UNIQUEMENT ce JSON (rien d'autre) : {"profil":"AUTOMATISEUR","mode":"peur","organe":"Cortex Préfrontal","tension":"phrase intérieure","simple":"explication simple"}. Profils possibles : AUTOMATISEUR, OPTIMISEUR_VALEUR, OPTIMISEUR_PRIX, ÉLÉVATEUR, LIBÉRATEUR. Mode: désir ou peur.`;
     const raw = await callGemini(detectPrompt, false, 500, true);
@@ -367,76 +356,26 @@ window.selectMaitre = function(id){
   document.getElementById('btn-generate').disabled=false;
 };
 
-// ─── GÉNÉRATION (Stream de Pensée) ───
+// Génération
 window.generatePost = async function(){
   const p = state.profilData; const info = PROFILS[p.profil]; const m = state.maitre;
   const modeDesc = state.profilMode==='peur'?info.peur:info.desir;
-  const atelierDesc = state.atelier===1?'Implanter. Nommer la douleur. Pas de vente. Pas de CTA fort.':state.atelier===2?'Intensifier la douleur. Se positionner comme la réponse évidente.':'Vendre. Déclencher l\'achat.';
-
-  const thoughts = ["Scan du marché en cours...","Détection des angles saturés...","Identification du profil dominant...","Calibration sur l'organe cible...","Génération du missile en cours..."];
-  let currentThought = 0;
-
-  render(`<div class="eyebrow">Génération</div><h1>L'agent travaille…</h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)}</p>
-    <div class="loading-steps"><div class="loading-step"><div class="dot"></div><span id="stream-thought">Scan du marché en cours...</span></div></div>
-    <div class="loading-bar"><div class="loading-bar-fill"></div></div></div>`);
-
-  const thoughtTimer = setInterval(() => {
-    if (currentThought < thoughts.length) {
-      const el = document.getElementById('stream-thought');
-      if (el) el.textContent = thoughts[currentThought];
-      currentThought++;
-    }
-  }, 900);
-
-  requestWakeLock();
+  const atelierDesc = state.atelier===1?'Implanter. Pas de vente.':state.atelier===2?'Intensifier la douleur.':'Vendre.';
+  const expertise = document.getElementById('expertise-input')?.value.trim() || state.expertiseAnswers.join(' | ');
+  render(`<div class="eyebrow">Génération</div><h1>L'agent travaille…</h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)} en cours…</p><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>`);
   try{
     const prompt = `Tu es un ghostwriter expert Moment Troc. Tu actives le Maître ${m.nom}.
-PROFIL CIBLE : Archétype : ${p.profil}. Organe : ${info.organe}. Mode : ${state.profilMode} (${modeDesc}). Tension : "${p.tension}".
-BUSINESS : ${state.biz}.
-ATELIER : ${atelierDesc}
-FORMAT : ${state.format==='tweet'?'TWEET (60-90 mots, une vérité, pas de suite)':state.format==='thread'?'THREAD (post principal + 4-5 commentaires)':state.format==='courtmetrage'?'COURT MÉTRAGE (150-200 mots, scène, \"il\" devient \"tu\")':'PLAN (100-130 mots, étapes, dernière ligne = piège)'}
-MÉCANIQUE : T1 (Expérience) → T2 (Rupture) → T3 (Suspension/Mise en lumière : nommer l'état du lecteur) → T4 (Permission + CTA doux, JAMAIS \"Tape X\", JAMAIS signature, JAMAIS \"peace\").`;
+PROFIL CIBLE : ${p.profil}. Organe : ${info.organe}. Mode : ${state.profilMode} (${modeDesc}). Tension : "${p.tension}".
+BUSINESS : ${state.biz}. ATELIER : ${atelierDesc}. FORMAT : ${state.format}.
+${expertise ? `\nEXPERTISE ET VÉCU DE L'UTILISATEUR (source obligatoire pour le T1 et la suture. Utilise ses mots exacts.) : "${expertise}"` : ''}
+STRUCTURE OBLIGATOIRE : Hook → T1 (Expérience) → T2 (Rupture) → Suture (1 phrase max, viscérale) → T3 (Mise en lumière) → T4 (Permission douce, jamais "Tape X"). JAMAIS signature. JAMAIS "peace".`;
     const text = await callGemini(prompt, false, 1400);
-    clearInterval(thoughtTimer);
-    const finalEl = document.getElementById('stream-thought');
-    if (finalEl) finalEl.textContent = "Calibration terminée. Missile prêt.";
-
-    state.currentPost = text;
-    state.evalData = null;
-    state.stratData = {obs:"Analyse du marché et détection de l'angle mort pour ce profil.",angle:`Activation de l'organe ${info.organe} en mode ${state.profilMode}.`,mecanique:`Mécanique ${m.nom} appliquée.`};
-    state.step='result'; renderResult();
-
-    autoEvaluate(text).then(evalText => {
-      state.evalData = { text: evalText, cls: evalText.startsWith('[OK]')?'green':evalText.startsWith('[FAIBLE]')?'red':'' };
-      const evalEl = document.getElementById('eval-band');
-      if (evalEl) {
-        evalEl.textContent = 'Auto-évaluation : ' + evalText;
-        evalEl.className = 'eval-band ' + (state.evalData.cls||'');
-      }
-    });
-  }catch(e){
-    clearInterval(thoughtTimer);
-    app.innerHTML+=`<div class="err-box">${esc(e.message)}</div>`;
-  }
+    state.currentPost = text; state.step='result'; renderResult();
+  }catch(e){ app.innerHTML+=`<div class="err-box">${esc(e.message)}</div>`; }
 };
 
-async function autoEvaluate(postContent) {
-  try {
-    const prompt = `Évalue ce post Moment Troc en une phrase (commence par [OK], [MOYEN] ou [FAIBLE]). Post : "${postContent}"`;
-    const raw = await callGemini(prompt, false, 200);
-    return raw.trim();
-  } catch (e) { return '[OK] Auto-évaluation indisponible.'; }
-}
-
-async function requestWakeLock() {
-  try { if ('wakeLock' in navigator) { await navigator.wakeLock.request('screen'); } } catch(e) {}
-}
-
 function renderResult(){
-  const ev = state.evalData; const st = state.stratData;
   render(`<div class="eyebrow">Post généré</div><h1>Ton missile</h1>
-    ${st?`<div class="strat-block">🧠 <strong>Observation :</strong> ${esc(st.obs)}<br>🎯 <strong>Angle mort :</strong> ${esc(st.angle)}<br>⚙️ <strong>Mécanique :</strong> ${esc(st.mecanique)}</div>`:''}
-    <div id="eval-band" class="eval-band ${ev?ev.cls:''}">${ev?esc(ev.text):'Auto-évaluation en cours…'}</div>
     <div class="card" style="border-top-color:var(--gold);">
       <div class="card-header"><div><span class="tag gold">${esc(state.profilData.profil)}</span><span class="tag gold">Atelier ${state.atelier}</span></div></div>
       <div class="post-body">${esc(state.currentPost)}</div>
@@ -449,9 +388,7 @@ function renderResult(){
     <button class="btn btn-ghost" onclick="state.step='brief';renderBrief();">← Nouveau brief</button>`);
 }
 
-/* ═══════════════════════════════════════
-   MODE DÉCONSTRUCTION
-   ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════ DÉCONSTRUCTION ═══════════════════════════ */
 function renderDeconstruction() {
   render(`<div class="eyebrow">Mode Déconstruction</div><h1>L'agent dissèque</h1><p class="sub">Colle un post. L'agent révèle la mécanique cachée, les angles morts, et génère un contre-angle calibré.</p>
     <div class="field"><textarea id="dc-post" rows="8" maxlength="2000" placeholder="Colle ici le post complet à analyser..."></textarea></div>
@@ -459,8 +396,8 @@ function renderDeconstruction() {
     <div class="field"><div class="flabel">Sous-angle d'analyse</div>
       <div class="sgrid">
         <div class="sitem on" data-dcmode="profil" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Profil</div><div class="sdesc">Diagnostic pur. Quel organe est activé.</div></div>
-        <div class="sitem" data-dcmode="marche" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Marché</div><div class="sdesc">Scan stratégique. Positionnement vs concurrence.</div></div>
-        <div class="sitem" data-dcmode="atelier" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Atelier</div><div class="sdesc">Recyclage. Transformer pour un autre stade.</div></div>
+        <div class="sitem" data-dcmode="marche" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Marché</div><div class="sdesc">Scan stratégique.</div></div>
+        <div class="sitem" data-dcmode="atelier" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Atelier</div><div class="sdesc">Recyclage.</div></div>
       </div>
     </div>
     <button class="btn btn-main" onclick="runDeconstruction()">Lancer l'autopsie →</button>
@@ -475,131 +412,83 @@ window.runDeconstruction = async function() {
   const mode = document.querySelector('[data-dcmode].on')?.getAttribute('data-dcmode') || 'profil';
   if (!post || post.length < 30) { document.getElementById('dc-error').style.display=''; document.getElementById('dc-error').innerHTML='<div class="err-box">⚠ Le post doit faire au moins 30 caractères.</div>'; return; }
   document.getElementById('dc-prog').style.display=''; document.getElementById('dc-error').style.display='none'; document.getElementById('dc-result').style.display='none';
-  const prompts = {
-    profil: `Tu es un analyste Moment Troc. Analyse ce post : "${post}". Contexte : "${contexte}". Donne le profil ciblé, l'organe activé, la mécanique, les angles morts et un verdict.`,
-    marche: `Tu es un analyste Moment Troc avec scan web. Analyse ce post : "${post}". Contexte : "${contexte}". Trouve les tendances du marché, les angles saturés et les silences. Donne le profil ciblé, la comparaison marché, les angles morts et un verdict.`,
-    atelier: `Tu es un analyste Moment Troc. Analyse ce post : "${post}". Contexte : "${contexte}". Dis à quel atelier (Miroir, Forge, Closing) il appartient et propose un contre-angle pour un autre atelier. Donne le profil ciblé, la mécanique, les angles morts et le contre-angle.`
-  };
   try {
-    const raw = await callGemini(prompts[mode], mode==='marche', 900);
-    const contrePrompt = `Tu es un ghostwriter Moment Troc. Analyse : "${raw}". Post original : "${post}". Génère un contre-angle calibré. T1-T2-T3-T4. JAMAIS signature.`;
-    const contreAngle = await callGemini(contrePrompt, false, 800);
-    dcState.analyse = raw; dcState.contreAngle = contreAngle;
+    const raw = await callGemini(post.slice(0,1500), mode==='marche', 900);
+    const contreAngle = await callGemini(`Crée un contre-angle pour ce post : "${post.slice(0,800)}". T1-T2-Suture-T3-T4.`, false, 800);
     document.getElementById('dc-prog').style.display='none'; document.getElementById('dc-result').style.display='';
     document.getElementById('dc-result').innerHTML = `
       <div class="dc-block" style="margin-top:24px;"><div class="s-eye">Rapport d'Autopsie</div><div style="font-size:11px;color:var(--ink-mid);line-height:1.9;white-space:pre-wrap;">${esc(raw)}</div></div>
-      <div class="dc-block" style="border-top-color:var(--gold);margin-top:20px;"><div class="s-eye">Contre-Angle Généré</div><div style="font-family:'Georgia',serif;font-size:1.1rem;line-height:1.9;white-space:pre-wrap;color:var(--ink);padding:16px 0;">${esc(contreAngle)}</div>
-        <div class="ag"><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(contreAngle)},this)">Copier</button><button class="btn btn-ghost" onclick="state.step='brief'; renderBrief();">→ Exploiter dans le Studio</button></div></div>
-      <button class="btn btn-ghost" onclick="renderDeconstruction()" style="margin-top:16px;">← Nouvelle autopsie</button>`;
-  } catch(e) {
-    document.getElementById('dc-prog').style.display='none'; document.getElementById('dc-error').style.display='';
-    document.getElementById('dc-error').innerHTML = `<div class="err-box">⚠ ${esc(e.message)} — Analyse de base uniquement.</div>`;
-  }
+      <div class="dc-block" style="border-top-color:var(--gold);"><div class="s-eye">Contre-Angle</div><div class="post-body">${esc(contreAngle)}</div><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(contreAngle)},this)">Copier</button></div>
+      <button class="btn btn-ghost" onclick="renderDeconstruction()">← Nouvelle autopsie</button>`;
+  } catch(e) { document.getElementById('dc-prog').style.display='none'; document.getElementById('dc-error').style.display=''; document.getElementById('dc-error').innerHTML = `<div class="err-box">⚠ ${esc(e.message)}</div>`; }
 };
 
-/* ═══════════════════════════════════════
-   MODE TROC KIT
-   ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════ TROC KIT ═══════════════════════════ */
 function renderTrocKit() {
   const profils = ['AUTOMATISEUR','OPTIMISEUR_VALEUR','OPTIMISEUR_PRIX','ÉLÉVATEUR','LIBÉRATEUR'];
-  render(`<div class="eyebrow">Troc Kit</div><h1>Le script qui vend</h1><p class="sub">Génère 4 messages calibrés sur le cerveau de ton prospect. Approche, valeur, relance, objection. Avec l'urgence dosée à son profil.</p>
-    ${state.profilData ? `<div class="ok-box" style="margin-bottom:16px;">🧠 Profil détecté dans le Studio : <strong>${esc(state.profilData.profil)}</strong> · Mode ${esc(state.profilData.mode)}. Pré-rempli automatiquement.</div>` : ''}
-    <div class="field"><textarea id="tk-offre" rows="3" maxlength="400" placeholder="Ce que tu vends, à quel prix, ce que ça change pour l'acheteur...">${esc(tkState.offre)}</textarea></div>
-    <div class="field"><div class="flabel">Profil du prospect</div>
-      <div class="sgrid">${profils.map(p => `<div class="sitem ${tkState.profil === p ? 'on' : ''}" data-tkp="${p}" onclick="tkState.profil='${p}';renderTrocKit();"><div class="sname">${p.replace('_',' ')}</div></div>`).join('')}</div></div>
-    <div class="field"><div class="flabel">Mode du prospect</div>
-      <div class="sgrid c3">
-        <div class="sitem ${tkState.mode==='désir'?'on':''}" onclick="tkState.mode='désir';renderTrocKit();"><div class="sname">🟢 Désir</div></div>
-        <div class="sitem ${tkState.mode==='peur'?'on':''}" onclick="tkState.mode='peur';renderTrocKit();"><div class="sname">🔴 Peur</div></div>
-      </div></div>
+  render(`<div class="eyebrow">Troc Kit</div><h1>Le script qui vend</h1><p class="sub">Génère 4 messages calibrés sur le cerveau de ton prospect.</p>
+    <div class="field"><textarea id="tk-offre" rows="3" placeholder="Ce que tu vends, à quel prix...">${esc(tkState.offre)}</textarea></div>
+    <div class="field"><div class="flabel">Profil</div><div class="sgrid">${profils.map(p => `<div class="sitem ${tkState.profil === p ? 'on' : ''}" onclick="tkState.profil='${p}';renderTrocKit();"><div class="sname">${p.replace('_',' ')}</div></div>`).join('')}</div></div>
+    <div class="field"><div class="flabel">Mode</div><div class="sgrid c3"><div class="sitem ${tkState.mode==='désir'?'on':''}" onclick="tkState.mode='désir';renderTrocKit();"><div class="sname">🟢 Désir</div></div><div class="sitem ${tkState.mode==='peur'?'on':''}" onclick="tkState.mode='peur';renderTrocKit();"><div class="sname">🔴 Peur</div></div></div></div>
     <button class="btn btn-main" onclick="runTrocKit()">Générer les 4 scripts →</button>
-    <div id="tk-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Calibration en cours...</div><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>
+    <div id="tk-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Calibration...</div></div>
     <div id="tk-error" style="display:none;"></div><div id="tk-result" style="display:none;"></div>`);
 }
 
 window.runTrocKit = async function() {
   const offre = document.getElementById('tk-offre').value.trim();
-  if (!offre || offre.length < 10) { document.getElementById('tk-error').style.display=''; document.getElementById('tk-error').innerHTML='<div class="err-box">⚠ Décris ton offre plus précisément.</div>'; return; }
+  if (!offre) { document.getElementById('tk-error').style.display=''; document.getElementById('tk-error').innerHTML='<div class="err-box">⚠ Décris ton offre.</div>'; return; }
   tkState.offre = offre;
   document.getElementById('tk-prog').style.display=''; document.getElementById('tk-error').style.display='none'; document.getElementById('tk-result').style.display='none';
-  const urg = {
-    AUTOMATISEUR: {style:'organisationnelle', regle:'Urgence de planning. Pas de pression émotionnelle.'},
-    OPTIMISEUR_VALEUR: {style:'mathématique', regle:'Urgence de rentabilité. Chaque jour perdu coûte.'},
-    OPTIMISEUR_PRIX: {style:'transparente', regle:'Le prix est juste, il ne changera pas.'},
-    ÉLÉVATEUR: {style:'sociale', regle:'La porte se ferme. Les autres y sont déjà.'},
-    LIBÉRATEUR: {style:'inexistante', regle:'Aucune deadline. Juste une conversation.'},
-    PEUR: {style:'rassurante', regle:'La pression est interne. La porte est là, sans menace.'}
-  };
-  const key = tkState.mode==='peur'?'PEUR':tkState.profil; const dosage = urg[key] || urg.AUTOMATISEUR;
+  const urg = { AUTOMATISEUR:{style:'organisationnelle',regle:'Urgence de planning.'}, OPTIMISEUR_VALEUR:{style:'mathématique',regle:'Urgence de rentabilité.'}, OPTIMISEUR_PRIX:{style:'transparente',regle:'Le prix est juste.'}, ÉLÉVATEUR:{style:'sociale',regle:'La porte se ferme.'}, LIBÉRATEUR:{style:'inexistante',regle:'Aucune deadline.'}, PEUR:{style:'rassurante',regle:'Aucune pression.'} };
+  const dosage = urg[tkState.mode==='peur'?'PEUR':tkState.profil] || urg.AUTOMATISEUR;
   try {
-    const prompt = `Tu es un expert en vente comportementale Moment Troc. Offre : "${offre}". Profil : ${tkState.profil}. Mode : ${tkState.mode}. Urgence : ${dosage.style} — ${dosage.regle}. Génère 4 messages séparés par "---SEP---" : 1) Approche 2) Valeur 3) Relance 48h 4) Objection. Chaque message = Mise en Lumière + Permission + CTA doux. JAMAIS "Tape X", JAMAIS signature.`;
-    const raw = await callGemini(prompt, false, 1200);
+    const raw = await callGemini(`Offre : "${offre}". Profil : ${tkState.profil}. Mode : ${tkState.mode}. Urgence : ${dosage.style}. Génère 4 scripts (séparés par "---SEP---") : Approche, Valeur, Relance, Objection. Mise en Lumière + Permission + CTA doux. JAMAIS "Tape X".`, false, 1200);
     const scripts = raw.split('---SEP---').map(s=>s.trim()).filter(Boolean);
     tkState.scripts = scripts;
     document.getElementById('tk-prog').style.display='none'; document.getElementById('tk-result').style.display='';
-    document.getElementById('tk-result').innerHTML = `
-      <div class="ok-box" style="margin-bottom:16px;">⚡ Urgence calibrée : <strong>${dosage.style}</strong> — ${dosage.regle}</div>
-      ${scripts.map(s => `<div class="tk-msg"><div class="tk-body">${esc(s)}</div><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(s)},this)">Copier</button></div>`).join('')}
-      <button class="btn btn-ghost" onclick="renderTrocKit()" style="margin-top:16px;">← Modifier</button>`;
-  } catch(e) {
-    document.getElementById('tk-prog').style.display='none'; document.getElementById('tk-error').style.display='';
-    document.getElementById('tk-error').innerHTML = `<div class="err-box">⚠ ${esc(e.message)} — scripts de secours générés.</div>`;
-    const fallback = [`Salut. DM si tu veux en discuter.`, `Un chiffre : [X] clients en [Y] semaines. DM.`, `Salut. L'offre est toujours là. DM.`, `Je comprends. Prends ton temps. DM si tu as des questions.`];
-    document.getElementById('tk-result').style.display='';
-    document.getElementById('tk-result').innerHTML = fallback.map(s => `<div class="tk-msg"><div class="tk-body">${esc(s)}</div></div>`).join('');
-  }
+    document.getElementById('tk-result').innerHTML = `<div class="ok-box">⚡ ${dosage.style} — ${dosage.regle}</div>${scripts.map(s => `<div class="tk-msg"><div class="tk-body">${esc(s)}</div><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(s)},this)">Copier</button></div>`).join('')}<button class="btn btn-ghost" onclick="renderTrocKit()">← Modifier</button>`;
+  } catch(e) { document.getElementById('tk-prog').style.display='none'; document.getElementById('tk-error').style.display=''; document.getElementById('tk-error').innerHTML=`<div class="err-box">⚠ ${esc(e.message)}</div>`; }
 };
 
-/* ═══════════════════════════════════════
-   MODE ARSENAL
-   ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════ ARSENAL FRACTAL ═══════════════════════════ */
 window.saveToArsenal = function() {
-  if (!state.currentPost) { alert('Aucun post à sauvegarder.'); return; }
+  if (!state.currentPost) return;
   let nextDay = null;
   for (let d = 2; d <= 30; d += 2) { if (!state.arsenalPosts[d]) { nextDay = d; break; } }
-  if (!nextDay) { alert('Tous les jours pairs sont remplis pour ce mois. Supprime un post pour libérer une case.'); return; }
-  const postData = { text: state.currentPost, profil: state.profilData?.profil || 'Inconnu', atelier: state.atelier || 1, maitre: state.maitre?.nom || 'Inconnu', format: state.format || 'Inconnu', savedAt: Date.now(), jour: nextDay };
+  if (!nextDay) { alert('Mois plein.'); return; }
+  const postData = { text:state.currentPost, profil:state.profilData?.profil||'Inconnu', atelier:state.atelier||1, maitre:state.maitre?.nom||'Inconnu', savedAt:Date.now(), jour:nextDay };
   state.arsenalPosts[nextDay] = postData;
   localStorage.setItem('mt_arsenal_posts', JSON.stringify(state.arsenalPosts));
-  const saveBtn = document.getElementById('btn-save-arsenal');
-  if (saveBtn) { saveBtn.textContent = '✓ Sauvegardé (Jour ' + nextDay + ')'; saveBtn.classList.add('saved'); setTimeout(() => { saveBtn.textContent = 'Sauvegarder dans l\'Arsenal'; saveBtn.classList.remove('saved'); }, 2000); }
+  const btn = document.getElementById('btn-save-arsenal'); if(btn){ btn.textContent='✓ Sauvegardé (Jour '+nextDay+')'; btn.classList.add('saved'); setTimeout(()=>{ btn.textContent='Sauvegarder dans l\'Arsenal'; btn.classList.remove('saved'); },2000); }
 };
 
-window.renderCalendar = function() {
-  let html = '<div class="eyebrow">Arsenal — Calendrier 30 Jours</div><h1>Ton plan de tir</h1><p class="sub">Chaque post sauvegardé se place automatiquement sur un jour pair. Clique sur une case pour lire, recycler ou déconstruire.</p>';
-  html += '<div class="cal-grid">';
+function renderArsenalFractal(){
+  let html = '<div class="eyebrow">Arsenal</div><h1>Ton plan<br><em>de tir.</em></h1><div class="cal-grid">';
   for (let d = 1; d <= 30; d++) {
-    const isEven = d % 2 === 0; const hasPost = state.arsenalPosts[d]; const profil = hasPost ? hasPost.profil?.substring(0, 3).toUpperCase() : '';
+    const isEven = d % 2 === 0; const post = state.arsenalPosts[d]; const profil = post ? post.profil?.substring(0, 3).toUpperCase() : '';
     if (isEven) {
-      if (hasPost) { html += `<div class="cal-cell has active" data-profil="${profil}" onclick="viewArsenalPost(${d})"><span class="day-num">J${d}</span><span class="day-ep">EP${Math.floor(d/2)}</span></div>`; }
-      else { html += `<div class="cal-cell placeholder" onclick="viewArsenalPost(${d})"><span class="day-num">+</span></div>`; }
-    } else { html += `<div class="cal-cell rest"><span class="day-num">J${d}</span></div>`; }
+      if (post) html += `<div class="cal-cell has" data-profil="${profil}" onclick="viewArsenalPost(${d})"><span class="day-num">J${d}</span><span class="day-ep">EP${Math.floor(d/2)}</span></div>`;
+      else html += `<div class="cal-cell placeholder" onclick="viewArsenalPost(${d})"><span class="day-num">+</span></div>`;
+    } else html += `<div class="cal-cell rest"><span class="day-num">J${d}</span></div>`;
   }
-  html += '</div><div id="arsenal-detail" class="day-detail hidden"></div>';
+  html += '</div><div id="arsenal-detail" class="day-detail hidden"></div><button class="btn btn-ghost" onclick="switchMode('studio')">← Retour au Studio</button>';
   render(html);
-};
+}
 
 window.viewArsenalPost = function(day) {
-  const post = state.arsenalPosts[day]; const detailEl = document.getElementById('arsenal-detail');
-  if (!post) { detailEl.innerHTML = `<div class="s-eye">Jour ${day} — Vide</div><p style="color:var(--ink-dim);">Aucun post sauvegardé ici. Génère un post dans le Studio et sauvegarde-le pour le placer ici.</p><button class="btn btn-ghost" onclick="switchMode('studio')">→ Aller au Studio</button>`; detailEl.classList.remove('hidden'); return; }
-  detailEl.innerHTML = `<div class="s-eye">Jour ${day} — ${post.profil} · Atelier ${post.atelier}</div><div class="ptags" style="margin-bottom:8px;"><span class="tag gold">${post.profil}</span><span class="tag gold">${post.maitre}</span></div><div class="post-preview">${esc(post.text)}</div><div class="day-actions">
-    <button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(post.text)}, this)">Copier</button>
-    <button class="btn btn-ghost" onclick="recycleArsenalPost(${day})">Recycler</button>
-    <button class="btn btn-ghost" onclick="deconstructArsenalPost(${day})">Déconstruire</button>
-    <button class="btn btn-ghost" onclick="deleteArsenalPost(${day})">Supprimer</button></div>`;
-  detailEl.classList.remove('hidden');
+  const post = state.arsenalPosts[day]; const el = document.getElementById('arsenal-detail');
+  if (!post) { el.innerHTML = `<div class="s-eye">Jour ${day} — Vide</div><button class="btn btn-ghost" onclick="switchMode('studio')">→ Aller au Studio</button>`; el.classList.remove('hidden'); return; }
+  el.innerHTML = `<div class="s-eye">Jour ${day} — ${post.profil}</div><div class="post-preview">${esc(post.text)}</div><div class="day-actions"><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(post.text)},this)">Copier</button><button class="btn btn-ghost" onclick="state.biz=state.arsenalPosts[${day}].text;switchMode('studio');renderBrief();">Recycler</button><button class="btn btn-ghost" onclick="dcState.post=state.arsenalPosts[${day}].text;switchMode('deconstruction');renderDeconstruction();">Déconstruire</button><button class="btn btn-ghost" onclick="delete state.arsenalPosts[${day}];localStorage.setItem('mt_arsenal_posts',JSON.stringify(state.arsenalPosts));renderArsenalFractal();">Supprimer</button></div>`;
+  el.classList.remove('hidden');
 };
-
-window.recycleArsenalPost = function(day) { const post = state.arsenalPosts[day]; if (!post) return; state.biz = post.text; localStorage.setItem('mt_brief', JSON.stringify({ biz: post.text })); state.step = 'brief'; switchMode('studio'); renderBrief(); };
-window.deconstructArsenalPost = function(day) { const post = state.arsenalPosts[day]; if (!post) return; dcState.post = post.text; dcState.contexte = `Post sauvegardé de l'Arsenal (Jour ${day}, Profil ${post.profil}, Maître ${post.maitre})`; switchMode('deconstruction'); renderDeconstruction(); };
-window.deleteArsenalPost = function(day) { if (confirm(`Supprimer le post du Jour ${day} ?`)) { delete state.arsenalPosts[day]; localStorage.setItem('mt_arsenal_posts', JSON.stringify(state.arsenalPosts)); renderCalendar(); } };
 
 // ─── INIT ───
 window.onload = function(){
   const mk = getMomentKey();
   if(!mk||(mk!==MASTER_KEY&&!VALID_KEYS.includes(mk))){ state.step='unlock'; }
   else if(!getGeminiKey()){ state.step='gemini'; }
-  else { state.step='brief'; renderBrief(); }
+  else { state.step='brief'; }
   renderStudioMode();
 };
 </script>
