@@ -1,151 +1,100 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Moment Troc · Studio</title>
-    <style>
-        :root {
-            --paper: #080808; --card: #0F0F0F; --card2: #141414;
-            --gold: #C9A84C; --gold-dim: rgba(201,168,76,0.18); --gold-line: rgba(201,168,76,0.35); --gold-glow: rgba(201,168,76,0.12);
-            --ink: #F0EAD6; --ink-mid: rgba(240,234,214,0.60); --ink-dim: rgba(240,234,214,0.28); --ink-ghost: rgba(240,234,214,0.10);
-            --line: rgba(201,168,76,0.10); --line-hard: rgba(201,168,76,0.22); --green: #4a9e6a; --red: #9e4a4a;
-            --font-display: 'Georgia', serif; --font-body: 'Georgia', serif; --font-mono: 'Courier New', monospace;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
-            min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto;
-        }
-        .hidden { display:none!important; }
-        h1 { font-family:var(--font-display); font-size:clamp(2.4rem,8vw,3.2rem); font-weight:700; line-height:0.95; text-transform:uppercase; color:var(--ink); }
-        h1 em { font-family:'Georgia',serif; font-style:italic; font-weight:700; color:var(--gold); text-transform:none; font-size:0.85em; display:block; }
-        .eyebrow { font-family:var(--font-mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
-        .sub { color:var(--ink-mid); font-size:1rem; margin:14px 0 24px; font-style:italic; }
-        textarea, input[type="text"], input[type="password"] {
-            width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
-            color:var(--ink); padding:16px 18px; font-family:'Georgia',serif; font-size:1rem; line-height:1.7;
-            resize:vertical; outline:none; border-radius:2px;
-        }
-        textarea:focus, input:focus { border-left-color:var(--gold); }
-        textarea::placeholder, input::placeholder { color:var(--ink-dim); font-style:italic; }
-        .btn {
-            display:block; width:100%; padding:16px 20px; border:none;
-            font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:3px; text-transform:uppercase;
-            cursor:pointer; margin-top:12px; border-radius:2px; transition:all 0.2s ease;
-        }
-        .btn-main { background:transparent; color:var(--gold); border:1px solid var(--gold-line); border-left:3px solid var(--gold); }
-        .btn-main:hover { background:var(--gold-dim); border-color:var(--gold); }
-        .btn-ghost { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
-        .btn-ghost:hover { border-color:var(--gold-line); color:var(--ink); }
-        .btn:disabled { opacity:0.25; cursor:not-allowed; }
-        .card {
-            background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold-line);
-            padding:22px 20px; margin-bottom:18px; border-radius:2px; position:relative; overflow:hidden;
-        }
-        .card::before { content:''; position:absolute; top:0; left:0; width:40px; height:2px; background:var(--gold); }
-        .card.gold { border-top-color:var(--gold); }
-        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-        .tag {
-            display:inline-block; font-family:'Courier New',monospace; font-size:0.62rem; letter-spacing:2px;
-            padding:4px 10px; text-transform:uppercase; border-radius:2px; margin-right:6px;
-        }
-        .tag.gold { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-line); }
-        .tag.line { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-        .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-        .maitre-card {
-            background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-ghost);
-            padding:16px; cursor:pointer; text-align:center; border-radius:2px; transition:all 0.2s ease;
-        }
-        .maitre-card:hover { border-top-color:var(--gold-line); }
-        .maitre-card.selected { background:var(--gold-dim); border-color:var(--gold-line); border-top-color:var(--gold); }
-        .maitre-name { font-family:'Georgia',serif; font-size:0.9rem; font-weight:600; margin-bottom:4px; color:var(--ink); }
-        .maitre-type { font-family:'Courier New',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
-        .chat-bubble {
-            background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
-            padding:14px 18px; margin-bottom:10px; border-radius:2px;
-            font-family:'Georgia',serif; font-size:0.95rem; color:var(--ink-mid);
-        }
-        .chat-bubble strong { color:var(--gold); font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:6px; }
-        .post-body { font-family:'Georgia',serif; font-size:1.15rem; line-height:2; white-space:pre-wrap; color:var(--ink); padding:28px 0; }
-        .strat-block {
-            background:var(--gold-glow); border-left:2px solid var(--gold);
-            padding:14px 18px; margin-bottom:20px; font-family:'Courier New',monospace;
-            font-size:0.78rem; line-height:1.65; color:var(--ink-mid); border-radius:0 2px 2px 0;
-        }
-        .err-box { background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--red); border-radius:0 2px 2px 0; }
-        .ok-box { background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--green); border-radius:0 2px 2px 0; }
-        .eval-band {
-            padding:10px 14px; margin-bottom:14px; font-family:'Courier New',monospace; font-size:0.75rem;
-            border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 2px 2px 0;
-        }
-        .eval-band.green { border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
-        .eval-band.red { border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
-        .loading-bar { width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
-        .loading-bar-fill { width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
-        @keyframes loadBar { 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
-        .cal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
-        .cal-cell {
-            aspect-ratio:1; background:var(--card2); border:1px solid var(--line);
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
-            cursor:pointer; transition:all 0.2s ease; position:relative; border-radius:2px; font-family:'Courier New',monospace;
-        }
-        .cal-cell .day-num { font-family:'Courier New',monospace; font-size:1rem; color:var(--ink-dim); }
-        .cal-cell .day-ep { font-family:'Courier New',monospace; font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-top:3px; }
-        .cal-cell.rest { opacity:0.22; cursor:default; pointer-events:none; }
-        .cal-cell.has { background:var(--card); border:1px solid var(--gold-line); border-top:2px solid var(--gold); cursor:pointer; }
-        .cal-cell.has .day-num { color:var(--ink); font-weight:500; }
-        .cal-cell.has:hover { background:var(--gold-dim); border-color:var(--gold); }
-        .cal-cell.has::before { content:attr(data-profil); position:absolute; top:4px; right:5px; font-family:'Courier New',monospace; font-size:0.42rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); }
-        .cal-cell.placeholder { cursor:pointer; border-top:2px solid var(--ink-ghost); }
-        .cal-cell.placeholder:hover { border-top-color:var(--gold-line); background:var(--card); }
-        .cal-cell.placeholder .day-num { color:var(--ink-dim); }
-        .day-detail {
-            background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold);
-            padding:22px 20px; margin-top:16px; border-radius:2px; position:relative;
-        }
-        .day-detail::before { content:''; position:absolute; top:0; left:0; width:60px; height:2px; background:var(--gold); }
-        .day-detail .post-preview {
-            font-family:'Georgia',serif; font-size:1rem; line-height:1.85; color:var(--ink-mid);
-            white-space:pre-wrap; margin:14px 0; border-left:1px solid var(--gold-line); padding-left:16px; font-style:italic;
-        }
-        .day-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-        .day-actions .btn { flex:1; min-width:120px; margin-top:0; }
-        .bottom-nav {
-            position:fixed; bottom:0; left:0; right:0;
-            background:rgba(8,8,8,0.96); border-top:1px solid var(--line-hard);
-            display:flex; justify-content:space-around; padding:6px 0 8px;
-            z-index:1000; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-        }
-        .nav-item {
-            display:flex; flex-direction:column; align-items:center; gap:4px;
-            cursor:pointer; padding:8px 14px; transition:all 0.2s ease;
-            font-family:'Courier New',monospace; font-size:0.58rem; letter-spacing:1.5px;
-            color:var(--ink-dim); text-transform:uppercase; border:none; background:none; position:relative;
-        }
-        .nav-item::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:1px; background:var(--gold); transition:width 0.2s ease; }
-        .nav-item.active { color:var(--gold); }
-        .nav-item.active::after { width:24px; }
-        .nav-icon { font-size:1.1rem; }
-        .nav-item.active .nav-icon { opacity:1; }
-        .nav-item:hover { color:var(--ink); }
-        a { color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); }
-        a:hover { border-bottom-color:var(--gold); }
-        @media(max-width:500px){ .grid-2,.grid-4{ grid-template-columns:1fr; } h1{ font-size:2rem; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Moment Troc · Studio</title>
+  <style>
+    :root {
+      --paper: #080808; --card: #0F0F0F; --card2: #141414;
+      --gold: #C9A84C; --gold-dim: rgba(201,168,76,0.18); --gold-line: rgba(201,168,76,0.35); --gold-glow: rgba(201,168,76,0.12);
+      --ink: #F0EAD6; --ink-mid: rgba(240,234,214,0.60); --ink-dim: rgba(240,234,214,0.28); --ink-ghost: rgba(240,234,214,0.10);
+      --line: rgba(201,168,76,0.10); --line-hard: rgba(201,168,76,0.22); --green: #4a9e6a; --red: #9e4a4a;
+      --font-display: 'Georgia', serif; --font-body: 'Georgia', serif; --font-mono: 'Courier New', monospace;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7; min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto; }
+    .hidden { display:none!important; }
+    h1 { font-family:var(--font-display); font-size:clamp(2.4rem,8vw,3.2rem); font-weight:700; line-height:0.95; text-transform:uppercase; color:var(--ink); }
+    h1 em { font-family:'Georgia',serif; font-style:italic; font-weight:700; color:var(--gold); text-transform:none; font-size:0.85em; display:block; }
+    .eyebrow { font-family:var(--font-mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+    .sub { color:var(--ink-mid); font-size:1rem; margin:14px 0 24px; font-style:italic; }
+    textarea, input[type="text"], input[type="password"] { width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line); color:var(--ink); padding:16px 18px; font-family:'Georgia',serif; font-size:1rem; line-height:1.7; resize:vertical; outline:none; border-radius:2px; }
+    textarea:focus, input:focus { border-left-color:var(--gold); }
+    textarea::placeholder, input::placeholder { color:var(--ink-dim); font-style:italic; }
+    .btn { display:block; width:100%; padding:16px 20px; border:none; font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:3px; text-transform:uppercase; cursor:pointer; margin-top:12px; border-radius:2px; transition:all 0.2s ease; }
+    .btn-main { background:transparent; color:var(--gold); border:1px solid var(--gold-line); border-left:3px solid var(--gold); }
+    .btn-main:hover { background:var(--gold-dim); border-color:var(--gold); }
+    .btn-ghost { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+    .btn-ghost:hover { border-color:var(--gold-line); color:var(--ink); }
+    .btn:disabled { opacity:0.25; cursor:not-allowed; }
+    .card { background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold-line); padding:22px 20px; margin-bottom:18px; border-radius:2px; position:relative; overflow:hidden; }
+    .card::before { content:''; position:absolute; top:0; left:0; width:40px; height:2px; background:var(--gold); }
+    .card.gold { border-top-color:var(--gold); }
+    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+    .tag { display:inline-block; font-family:'Courier New',monospace; font-size:0.62rem; letter-spacing:2px; padding:4px 10px; text-transform:uppercase; border-radius:2px; margin-right:6px; }
+    .tag.gold { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-line); }
+    .tag.line { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .maitre-card { background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-ghost); padding:16px; cursor:pointer; text-align:center; border-radius:2px; transition:all 0.2s ease; }
+    .maitre-card:hover { border-top-color:var(--gold-line); }
+    .maitre-card.selected { background:var(--gold-dim); border-color:var(--gold-line); border-top-color:var(--gold); }
+    .maitre-name { font-family:'Georgia',serif; font-size:0.9rem; font-weight:600; margin-bottom:4px; color:var(--ink); }
+    .maitre-type { font-family:'Courier New',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
+    .chat-bubble { background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line); padding:14px 18px; margin-bottom:10px; border-radius:2px; font-family:'Georgia',serif; font-size:0.95rem; color:var(--ink-mid); }
+    .chat-bubble strong { color:var(--gold); font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:6px; }
+    .post-body { font-family:'Georgia',serif; font-size:1.15rem; line-height:2; white-space:pre-wrap; color:var(--ink); padding:28px 0; }
+    .strat-block { background:var(--gold-glow); border-left:2px solid var(--gold); padding:14px 18px; margin-bottom:20px; font-family:'Courier New',monospace; font-size:0.78rem; line-height:1.65; color:var(--ink-mid); border-radius:0 2px 2px 0; }
+    .err-box { background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--red); border-radius:0 2px 2px 0; }
+    .ok-box { background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--green); border-radius:0 2px 2px 0; }
+    .eval-band { padding:10px 14px; margin-bottom:14px; font-family:'Courier New',monospace; font-size:0.75rem; border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 2px 2px 0; }
+    .eval-band.green { border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
+    .eval-band.red { border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
+    .loading-bar { width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
+    .loading-bar-fill { width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
+    @keyframes loadBar { 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
+    .cal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
+    .cal-cell { aspect-ratio:1; background:var(--card2); border:1px solid var(--line); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s ease; position:relative; border-radius:2px; font-family:'Courier New',monospace; }
+    .cal-cell .day-num { font-family:'Courier New',monospace; font-size:1rem; color:var(--ink-dim); }
+    .cal-cell .day-ep { font-family:'Courier New',monospace; font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-top:3px; }
+    .cal-cell.rest { opacity:0.22; cursor:default; pointer-events:none; }
+    .cal-cell.has { background:var(--card); border:1px solid var(--gold-line); border-top:2px solid var(--gold); cursor:pointer; }
+    .cal-cell.has .day-num { color:var(--ink); font-weight:500; }
+    .cal-cell.has:hover { background:var(--gold-dim); border-color:var(--gold); }
+    .cal-cell.has::before { content:attr(data-profil); position:absolute; top:4px; right:5px; font-family:'Courier New',monospace; font-size:0.42rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); }
+    .cal-cell.placeholder { cursor:pointer; border-top:2px solid var(--ink-ghost); }
+    .cal-cell.placeholder:hover { border-top-color:var(--gold-line); background:var(--card); }
+    .cal-cell.placeholder .day-num { color:var(--ink-dim); }
+    .day-detail { background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold); padding:22px 20px; margin-top:16px; border-radius:2px; position:relative; }
+    .day-detail::before { content:''; position:absolute; top:0; left:0; width:60px; height:2px; background:var(--gold); }
+    .day-detail .post-preview { font-family:'Georgia',serif; font-size:1rem; line-height:1.85; color:var(--ink-mid); white-space:pre-wrap; margin:14px 0; border-left:1px solid var(--gold-line); padding-left:16px; font-style:italic; }
+    .day-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .day-actions .btn { flex:1; min-width:120px; margin-top:0; }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(8,8,8,0.96); border-top:1px solid var(--line-hard); display:flex; justify-content:space-around; padding:6px 0 8px; z-index:1000; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 14px; transition:all 0.2s ease; font-family:'Courier New',monospace; font-size:0.58rem; letter-spacing:1.5px; color:var(--ink-dim); text-transform:uppercase; border:none; background:none; position:relative; }
+    .nav-item::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:1px; background:var(--gold); transition:width 0.2s ease; }
+    .nav-item.active { color:var(--gold); }
+    .nav-item.active::after { width:24px; }
+    .nav-icon { font-size:1.1rem; }
+    .nav-item.active .nav-icon { opacity:1; }
+    .nav-item:hover { color:var(--ink); }
+    a { color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); }
+    a:hover { border-bottom-color:var(--gold); }
+    @media(max-width:500px){ .grid-2,.grid-4{ grid-template-columns:1fr; } h1{ font-size:2rem; } }
+  </style>
 </head>
 <body>
 <div id="app"></div>
 <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchMode('studio')"><span class="nav-icon">🎯</span>Studio</button>
-    <button class="nav-item" onclick="switchMode('deconstruction')"><span class="nav-icon">🔬</span>Déconstruire</button>
-    <button class="nav-item" onclick="switchMode('trockit')"><span class="nav-icon">💎</span>Troc Kit</button>
-    <button class="nav-item" onclick="switchMode('arsenal')"><span class="nav-icon">📅</span>Arsenal</button>
+  <button class="nav-item active" onclick="switchMode('studio')"><span class="nav-icon">🎯</span>Studio</button>
+  <button class="nav-item" onclick="switchMode('deconstruction')"><span class="nav-icon">🔬</span>Déconstruire</button>
+  <button class="nav-item" onclick="switchMode('trockit')"><span class="nav-icon">💎</span>Troc Kit</button>
+  <button class="nav-item" onclick="switchMode('arsenal')"><span class="nav-icon">📅</span>Arsenal</button>
 </nav>
 <script>
 // ═══════════════════════════════════════════
-// MOMENT TROC · STUDIO — Code Final Complet
+// MOMENT TROC · STUDIO — Code Final (Timeouts Africains)
 // ═══════════════════════════════════════════
 
 // ─── Clés ───
@@ -156,14 +105,16 @@ function setMomentKey(k){ localStorage.setItem('mt_moment_key', k); }
 function getGeminiKey(){ return localStorage.getItem('mt_gemini_key'); }
 function setGeminiKey(k){ localStorage.setItem('mt_gemini_key', k); }
 
-// ─── API Gemini ───
+// ─── API Gemini ─── (Timeouts augmentés pour l'Afrique)
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
 async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=false){
   const key = getGeminiKey();
   if(!key) throw new Error('Clé Gemini manquante');
   const body = { contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.88, maxOutputTokens:fastMode?400:maxTokens} };
   if(useSearch) body.tools = [{google_search:{}}];
-  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), fastMode?15000:25000);
+  const controller = new AbortController();
+  // ⚡ Timeout corrigé : 30s rapide, 60s long (adapté à la latence en Afrique)
+  const timeout = setTimeout(() => controller.abort(), fastMode?30000:60000);
   const res = await fetch(GEMINI_URL+key, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal: controller.signal });
   clearTimeout(timeout);
   if(!res.ok){ const e = await res.json().catch(()=>({})); if(res.status===429) throw new Error('Limite API atteinte. Reviens dans 1 minute.'); throw new Error(e?.error?.message||'Erreur API'); }
@@ -485,11 +436,40 @@ window.viewArsenalPost = function(day) {
 
 // ─── INIT ───
 window.onload = function(){
-  const mk = getMomentKey();
-  if(!mk||(mk!==MASTER_KEY&&!VALID_KEYS.includes(mk))){ state.step='unlock'; }
-  else if(!getGeminiKey()){ state.step='gemini'; }
-  else { state.step='brief'; }
+  // 1. Force l'affichage du conteneur principal
+  const app = document.getElementById('app');
+  if (!app) {
+    const newApp = document.createElement('div');
+    newApp.id = 'app';
+    document.body.prepend(newApp);
+  }
+
+  // 2. Initialisation protégée
+  try {
+    const mk = localStorage.getItem('mt_moment_key');
+    const gk = localStorage.getItem('mt_gemini_key');
+    const validKeys = ['MKB2000-2022A', 'MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
+    if (!mk || !validKeys.includes(mk)) {
+      state.step = 'unlock';
+    } else if (!gk || gk.length < 30) {
+      state.step = 'gemini';
+    } else {
+      state.step = 'brief';
+    }
+  } catch (e) {
+    console.error('Init error:', e);
+    state.step = 'unlock';
+  }
+
+  // 3. Rendu forcé du premier écran
   renderStudioMode();
+
+  // 4. Sécurité : si après 600ms l'écran est vide, on réessaye
+  setTimeout(() => {
+    if (!document.getElementById('app')?.innerHTML) {
+      renderStudioMode();
+    }
+  }, 600);
 };
 </script>
 </body>
