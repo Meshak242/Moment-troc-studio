@@ -1,1374 +1,525 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moment Troc · Studio</title>
-<meta property="og:title" content="Moment Troc Studio">
-<meta property="og:description" content="L'agent qui lit le marché. Calibré sur ta cible.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Archivo+Black&display=swap">
-<style>
-:root {
-  --ink:#0A0A0A;
-  --paper:#F2EDE4;
-  --paper2:#E8E2D6;
-  --rust:#C4440A;
-  --rust-dim:rgba(196,68,10,0.15);
-  --rust-line:rgba(196,68,10,0.3);
-  --ink-dim:rgba(10,10,10,0.35);
-  --ink-mid:rgba(10,10,10,0.6);
-  --white:#FDFAF5;
-  --line:rgba(10,10,10,0.12);
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-
-body {
-  background:var(--paper);
-  color:var(--ink);
-  font-family:'Space Mono',monospace;
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
-
-/* GRAIN */
-body::after {
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events:none;
-  z-index:9000;
-}
-
-/* HORIZONTAL RULES DECORATIFS */
-.hr-thick{height:3px;background:var(--ink);margin:0;}
-.hr-thin{height:1px;background:var(--line);margin:0;}
-.hr-rust{height:2px;background:var(--rust);margin:0;}
-
-/* LOADER */
-#loader {
-  position:fixed;inset:0;background:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  z-index:99999;
-}
-.loader-title {
-  font-family:'Archivo Black',sans-serif;
-  font-size:clamp(32px,8vw,64px);
-  letter-spacing:-1px;
-  color:var(--paper);
-  line-height:1;
-  text-align:center;
-}
-.loader-sub {
-  font-family:'Space Mono',monospace;
-  font-size:10px;
-  letter-spacing:4px;
-  color:rgba(242,237,228,0.4);
-  margin-top:16px;
-  text-transform:uppercase;
-}
-.loader-bar {
-  width:200px;height:1px;
-  background:rgba(242,237,228,0.15);
-  margin-top:32px;
-  position:relative;
-  overflow:hidden;
-}
-.loader-bar::after {
-  content:'';
-  position:absolute;
-  left:-100%;top:0;
-  width:100%;height:100%;
-  background:var(--rust);
-  animation:barLoad 1.6s ease forwards;
-}
-@keyframes barLoad{to{left:0;}}
-
-/* KEY GATE */
-#keygate {
-  position:fixed;inset:0;background:var(--ink);
-  display:none;align-items:center;justify-content:center;
-  z-index:9999;padding:24px;
-}
-.gate-inner {
-  max-width:420px;width:100%;
-  border-top:3px solid var(--paper);
-  border-bottom:1px solid rgba(242,237,228,0.2);
-  padding:48px 40px;
-}
-.gate-label {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:4px;
-  color:rgba(242,237,228,0.4);
-  text-transform:uppercase;margin-bottom:12px;
-}
-.gate-title {
-  font-family:'Playfair Display',serif;
-  font-size:48px;font-weight:900;font-style:italic;
-  color:var(--paper);line-height:0.95;margin-bottom:40px;
-}
-.gate-input {
-  width:100%;background:transparent;
-  border:none;border-bottom:1px solid rgba(242,237,228,0.3);
-  color:var(--paper);
-  font-family:'Space Mono',monospace;
-  font-size:18px;letter-spacing:6px;
-  padding:12px 0;outline:none;
-  text-transform:uppercase;
-  transition:border-color 0.3s;
-}
-.gate-input:focus{border-bottom-color:var(--rust);}
-.gate-input::placeholder{color:rgba(242,237,228,0.2);font-size:12px;letter-spacing:3px;}
-#gate-err {
-  font-size:10px;letter-spacing:1px;
-  color:var(--rust);margin-top:8px;
-  min-height:14px;font-family:'Space Mono',monospace;
-}
-.gate-btn {
-  margin-top:24px;width:100%;
-  background:var(--rust);border:none;
-  color:var(--paper);
-  font-family:'Archivo Black',sans-serif;
-  font-size:14px;letter-spacing:3px;
-  padding:16px;cursor:pointer;
-  text-transform:uppercase;
-  transition:opacity 0.2s;
-}
-.gate-btn:hover{opacity:0.85;}
-
-/* MASTHEAD */
-.masthead {
-  border-bottom:3px solid var(--ink);
-  padding:20px 32px 16px;
-  display:flex;align-items:flex-end;justify-content:space-between;
-  flex-wrap:wrap;gap:12px;
-}
-.masthead-title {
-  font-family:'Playfair Display',serif;
-  font-size:clamp(28px,6vw,48px);
-  font-weight:900;line-height:1;
-  letter-spacing:-1px;
-}
-.masthead-title em{font-style:italic;color:var(--rust);}
-.masthead-meta {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;
-  color:var(--ink-dim);
-  text-align:right;
-  text-transform:uppercase;
-  line-height:1.8;
-}
-
-/* MODE NAV — NEWSPAPER SECTION TABS */
-.section-nav {
-  border-bottom:1px solid var(--line);
-  display:flex;overflow-x:auto;
-  padding:0 32px;
-  gap:0;
-}
-.section-tab {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--ink-dim);
-  padding:12px 20px;
-  cursor:pointer;
-  border:none;background:none;
-  border-bottom:2px solid transparent;
-  transition:all 0.25s;white-space:nowrap;
-}
-.section-tab:hover{color:var(--ink);}
-.section-tab.on{color:var(--rust);border-bottom-color:var(--rust);}
-
-/* MAIN */
-main{max-width:860px;margin:0 auto;padding:40px 28px 120px;}
-
-/* COLUMN LAYOUT */
-.col-layout{display:grid;grid-template-columns:1fr 280px;gap:40px;}
-.col-main{}
-.col-aside{border-left:1px solid var(--line);padding-left:32px;}
-
-/* SECTION TITLE */
-.section-eyebrow {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:4px;
-  text-transform:uppercase;
-  color:var(--rust);
-  margin-bottom:6px;
-}
-.section-headline {
-  font-family:'Playfair Display',serif;
-  font-size:clamp(28px,5vw,44px);
-  font-weight:900;line-height:1.05;
-  letter-spacing:-0.5px;
-  margin-bottom:8px;
-}
-.section-headline em{font-style:italic;}
-.section-deck {
-  font-family:'Space Mono',monospace;
-  font-size:11px;color:var(--ink-mid);
-  line-height:1.7;margin-bottom:32px;
-  max-width:520px;
-}
-
-/* FIELDS */
-.field{margin-bottom:24px;}
-.field-label {
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--ink-dim);
-  margin-bottom:8px;
-  display:flex;align-items:center;gap:8px;
-}
-.field-label .opt{
-  font-size:8px;letter-spacing:1px;
-  color:var(--rust);opacity:0.6;
-}
-textarea,input[type=text] {
-  width:100%;
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:2px solid var(--ink);
-  color:var(--ink);
-  font-family:'Space Mono',monospace;
-  font-size:13px;
-  padding:14px 16px;
-  resize:vertical;outline:none;
-  transition:border-color 0.25s;
-  line-height:1.7;
-}
-textarea:focus,input:focus{border-color:var(--rust);border-top-color:var(--rust);}
-textarea::placeholder,input::placeholder{color:var(--ink-dim);font-style:italic;font-size:12px;}
-
-/* SELECTOR GRID */
-.sel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.sel-grid.cols3{grid-template-columns:repeat(3,1fr);}
-.sel-item {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:2px solid var(--ink);
-  padding:14px 16px;
-  cursor:pointer;
-  transition:all 0.2s;
-  text-align:left;
-  position:relative;
-}
-.sel-item:hover{border-top-color:var(--rust);}
-.sel-item.on{
-  background:var(--ink);
-  border-color:var(--ink);
-  border-top-color:var(--rust);
-}
-.sel-item-name {
-  font-family:'Archivo Black',sans-serif;
-  font-size:13px;letter-spacing:1px;
-  color:var(--ink);
-  text-transform:uppercase;
-  transition:color 0.2s;
-}
-.sel-item.on .sel-item-name{color:var(--paper);}
-.sel-item-desc {
-  font-family:'Space Mono',monospace;
-  font-size:9px;color:var(--ink-dim);
-  margin-top:4px;line-height:1.4;
-  transition:color 0.2s;
-}
-.sel-item.on .sel-item-desc{color:rgba(242,237,228,0.5);}
-
-/* BUTTONS */
-.btn-primary {
-  width:100%;
-  background:var(--ink);border:none;
-  color:var(--paper);
-  font-family:'Archivo Black',sans-serif;
-  font-size:13px;letter-spacing:3px;
-  padding:18px 24px;
-  cursor:pointer;text-transform:uppercase;
-  position:relative;overflow:hidden;
-  transition:background 0.25s;
-  margin-top:8px;
-}
-.btn-primary::after {
-  content:'';
-  position:absolute;bottom:0;left:0;
-  width:0;height:2px;
-  background:var(--rust);
-  transition:width 0.3s;
-}
-.btn-primary:hover{background:#1a1a1a;}
-.btn-primary:hover::after{width:100%;}
-.btn-primary:disabled{opacity:0.3;cursor:not-allowed;}
-.btn-primary:disabled::after{display:none;}
-.btn-ghost {
-  background:transparent;
-  border:1px solid var(--line);
-  border-top:2px solid var(--ink);
-  color:var(--ink);
-  font-family:'Space Mono',monospace;
-  font-size:10px;letter-spacing:2px;
-  padding:12px 20px;
-  cursor:pointer;text-transform:uppercase;
-  transition:all 0.2s;
-}
-.btn-ghost:hover{border-top-color:var(--rust);color:var(--rust);}
-.btn-row{display:flex;gap:10px;margin-top:8px;}
-
-/* LOADING */
-.loading{padding:24px 0;}
-.loading-head {
-  font-family:'Playfair Display',serif;
-  font-size:22px;font-style:italic;
-  color:var(--ink-mid);
-  margin-bottom:16px;
-}
-.loading-steps{display:flex;flex-direction:column;gap:6px;}
-.loading-step {
-  font-family:'Space Mono',monospace;
-  font-size:10px;letter-spacing:1px;
-  color:var(--ink-dim);
-  display:flex;align-items:center;gap:10px;
-}
-.loading-step .dot {
-  width:6px;height:6px;
-  border-radius:50%;
-  background:var(--rust);
-  animation:pulse 1.2s infinite;
-}
-.loading-step:nth-child(2) .dot{animation-delay:0.2s;}
-.loading-step:nth-child(3) .dot{animation-delay:0.4s;}
-.loading-status{
-  font-family:'Space Mono',monospace;
-  font-size:10px;color:var(--rust);
-  margin-top:12px;letter-spacing:1px;
-}
-
-/* PROFIL TAGS */
-.profil-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
-.profil-tag {
-  font-family:'Archivo Black',sans-serif;
-  font-size:10px;letter-spacing:2px;
-  text-transform:uppercase;
-  background:var(--ink);
-  color:var(--paper);
-  padding:5px 12px;
-  border-top:2px solid var(--rust);
-}
-.reasoning {
-  font-family:'Playfair Display',serif;
-  font-size:14px;font-style:italic;
-  color:var(--ink-mid);
-  line-height:1.8;
-  padding:16px;
-  border-left:3px solid var(--rust);
-  background:var(--white);
-  margin-top:12px;
-}
-
-/* EVAL BAR */
-.eval-bar {
-  display:flex;align-items:center;gap:10px;
-  padding:10px 16px;
-  background:var(--ink);
-  color:var(--paper);
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:20px;
-  border-top:2px solid var(--rust);
-}
-
-/* POST ITEMS */
-.post-item {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:3px solid var(--ink);
-  margin-bottom:20px;
-  animation:fadeUp 0.4s ease both;
-  position:relative;
-}
-.post-item:hover{border-top-color:var(--rust);}
-.post-header {
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 18px;
-  border-bottom:1px solid var(--line);
-  flex-wrap:wrap;gap:8px;
-}
-.post-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-.ptag {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:2px;
-  text-transform:uppercase;
-  padding:3px 8px;
-  border:1px solid var(--line);
-  color:var(--ink-dim);
-}
-.ptag-rust{border-color:var(--rust-line);color:var(--rust);}
-.ptag-ink{background:var(--ink);color:var(--paper);border-color:var(--ink);}
-.post-body {
-  padding:24px 18px;
-  font-family:'Playfair Display',serif;
-  font-size:15px;font-weight:400;
-  line-height:2;
-  white-space:pre-wrap;
-  color:var(--ink);
-}
-.post-footer {
-  padding:10px 18px;
-  border-top:1px solid var(--line);
-  display:flex;justify-content:space-between;
-  align-items:center;
-}
-.post-num{
-  font-family:'Space Mono',monospace;
-  font-size:9px;color:var(--ink-dim);letter-spacing:1px;
-}
-.copy-btn {
-  background:none;border:none;
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--ink-dim);cursor:pointer;
-  transition:color 0.2s;padding:4px 0;
-}
-.copy-btn:hover,.copy-btn.on{color:var(--rust);}
-
-/* SCRIPT SECTIONS (Troc Kit) */
-.script-block{margin-bottom:20px;}
-.script-label {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:3px;
-  text-transform:uppercase;color:var(--rust);
-  margin-bottom:8px;
-}
-.script-body {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-left:3px solid var(--ink);
-  padding:16px 18px;
-  font-family:'Space Mono',monospace;
-  font-size:12px;line-height:1.8;
-  white-space:pre-wrap;
-  position:relative;
-}
-.script-copy {
-  position:absolute;top:10px;right:10px;
-  background:none;border:none;
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:1px;
-  color:var(--ink-dim);cursor:pointer;
-  text-transform:uppercase;
-  transition:color 0.2s;
-}
-.script-copy:hover{color:var(--rust);}
-
-/* DIAGNOSTIC */
-.diag-block{margin-bottom:28px;}
-.diag-title {
-  font-family:'Archivo Black',sans-serif;
-  font-size:14px;letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:10px;
-  display:flex;align-items:center;gap:10px;
-}
-.diag-title::after{content:'';flex:1;height:1px;background:var(--line);}
-.diag-body {
-  font-family:'Space Mono',monospace;
-  font-size:12px;line-height:1.8;
-  color:var(--ink-mid);
-}
-.angle-bloc {
-  background:var(--ink);
-  padding:16px 18px;
-  border-top:2px solid var(--rust);
-  margin-top:8px;
-}
-.angle-label {
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:3px;
-  text-transform:uppercase;color:var(--rust);
-  margin-bottom:8px;
-}
-.angle-body {
-  font-family:'Space Mono',monospace;
-  font-size:12px;line-height:1.8;
-  color:rgba(242,237,228,0.8);
-}
-
-/* ASIDE WIDGETS */
-.widget{margin-bottom:32px;}
-.widget-title {
-  font-family:'Archivo Black',sans-serif;
-  font-size:10px;letter-spacing:3px;
-  text-transform:uppercase;
-  padding-bottom:8px;
-  border-bottom:2px solid var(--ink);
-  margin-bottom:14px;
-}
-.widget-item {
-  font-family:'Space Mono',monospace;
-  font-size:10px;line-height:1.7;
-  color:var(--ink-mid);
-  padding:8px 0;
-  border-bottom:1px solid var(--line);
-}
-.widget-item strong{color:var(--ink);font-weight:700;}
-
-/* CAL GRID */
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px;}
-.cal-cell {
-  aspect-ratio:1;
-  background:var(--white);
-  border:1px solid var(--line);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  font-family:'Space Mono',monospace;
-  font-size:8px;color:var(--ink-dim);
-}
-.cal-cell.has{
-  background:var(--ink);
-  border-color:var(--ink);
-  color:var(--paper);
-  border-top:2px solid var(--rust);
-}
-.cal-pn{font-size:6px;color:var(--rust);margin-top:1px;}
-
-/* ERROR */
-.error-box {
-  background:var(--white);
-  border:1px solid var(--line);
-  border-top:2px solid var(--rust);
-  padding:16px 18px;
-  font-family:'Space Mono',monospace;
-  font-size:11px;color:var(--rust);
-  line-height:1.6;margin-top:12px;
-}
-
-/* DIVIDER */
-.section-break{
-  display:flex;align-items:center;gap:16px;
-  margin:28px 0;
-}
-.section-break::before,.section-break::after{content:'';flex:1;height:1px;background:var(--line);}
-.section-break span{
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:3px;
-  color:var(--ink-dim);text-transform:uppercase;
-}
-
-.hidden{display:none!important;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
-
-@media(max-width:700px){
-  .col-layout{grid-template-columns:1fr;}
-  .col-aside{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:32px;}
-  .masthead{padding:16px 20px 12px;}
-  main{padding:28px 16px 80px;}
-  .section-nav{padding:0 16px;}
-  .sel-grid.cols3{grid-template-columns:repeat(2,1fr);}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Moment Troc · Studio</title>
+    <style>
+        :root {
+            --paper: #080808; --card: #0F0F0F; --card2: #141414;
+            --gold: #C9A84C; --gold-dim: rgba(201,168,76,0.18); --gold-line: rgba(201,168,76,0.35); --gold-glow: rgba(201,168,76,0.12);
+            --ink: #F0EAD6; --ink-mid: rgba(240,234,214,0.60); --ink-dim: rgba(240,234,214,0.28); --ink-ghost: rgba(240,234,214,0.10);
+            --line: rgba(201,168,76,0.10); --line-hard: rgba(201,168,76,0.22); --green: #4a9e6a; --red: #9e4a4a;
+            --font-display: 'Georgia', serif; --font-body: 'Georgia', serif; --font-mono: 'Courier New', monospace;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:1.05rem; line-height:1.7;
+            min-height:100vh; padding:28px 18px 120px; max-width:720px; margin:0 auto;
+        }
+        .hidden { display:none!important; }
+        h1 { font-family:var(--font-display); font-size:clamp(2.4rem,8vw,3.2rem); font-weight:700; line-height:0.95; text-transform:uppercase; color:var(--ink); }
+        h1 em { font-family:'Georgia',serif; font-style:italic; font-weight:700; color:var(--gold); text-transform:none; font-size:0.85em; display:block; }
+        .eyebrow { font-family:var(--font-mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+        .sub { color:var(--ink-mid); font-size:1rem; margin:14px 0 24px; font-style:italic; }
+        textarea, input[type="text"], input[type="password"] {
+            width:100%; background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
+            color:var(--ink); padding:16px 18px; font-family:'Georgia',serif; font-size:1rem; line-height:1.7;
+            resize:vertical; outline:none; border-radius:2px;
+        }
+        textarea:focus, input:focus { border-left-color:var(--gold); }
+        textarea::placeholder, input::placeholder { color:var(--ink-dim); font-style:italic; }
+        .btn {
+            display:block; width:100%; padding:16px 20px; border:none;
+            font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:3px; text-transform:uppercase;
+            cursor:pointer; margin-top:12px; border-radius:2px; transition:all 0.2s ease;
+        }
+        .btn-main { background:transparent; color:var(--gold); border:1px solid var(--gold-line); border-left:3px solid var(--gold); }
+        .btn-main:hover { background:var(--gold-dim); border-color:var(--gold); }
+        .btn-ghost { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+        .btn-ghost:hover { border-color:var(--gold-line); color:var(--ink); }
+        .btn:disabled { opacity:0.25; cursor:not-allowed; }
+        .card {
+            background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold-line);
+            padding:22px 20px; margin-bottom:18px; border-radius:2px; position:relative; overflow:hidden;
+        }
+        .card::before { content:''; position:absolute; top:0; left:0; width:40px; height:2px; background:var(--gold); }
+        .card.gold { border-top-color:var(--gold); }
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+        .tag {
+            display:inline-block; font-family:'Courier New',monospace; font-size:0.62rem; letter-spacing:2px;
+            padding:4px 10px; text-transform:uppercase; border-radius:2px; margin-right:6px;
+        }
+        .tag.gold { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-line); }
+        .tag.line { background:transparent; border:1px solid var(--line-hard); color:var(--ink-dim); }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .maitre-card {
+            background:var(--card2); border:1px solid var(--line); border-top:2px solid var(--ink-ghost);
+            padding:16px; cursor:pointer; text-align:center; border-radius:2px; transition:all 0.2s ease;
+        }
+        .maitre-card:hover { border-top-color:var(--gold-line); }
+        .maitre-card.selected { background:var(--gold-dim); border-color:var(--gold-line); border-top-color:var(--gold); }
+        .maitre-name { font-family:'Georgia',serif; font-size:0.9rem; font-weight:600; margin-bottom:4px; color:var(--ink); }
+        .maitre-type { font-family:'Courier New',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
+        .chat-bubble {
+            background:var(--card2); border:1px solid var(--line); border-left:2px solid var(--gold-line);
+            padding:14px 18px; margin-bottom:10px; border-radius:2px;
+            font-family:'Georgia',serif; font-size:0.95rem; color:var(--ink-mid);
+        }
+        .chat-bubble strong { color:var(--gold); font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:6px; }
+        .post-body { font-family:'Georgia',serif; font-size:1.15rem; line-height:2; white-space:pre-wrap; color:var(--ink); padding:28px 0; }
+        .strat-block {
+            background:var(--gold-glow); border-left:2px solid var(--gold);
+            padding:14px 18px; margin-bottom:20px; font-family:'Courier New',monospace;
+            font-size:0.78rem; line-height:1.65; color:var(--ink-mid); border-radius:0 2px 2px 0;
+        }
+        .err-box { background:rgba(158,74,74,0.08); border-left:2px solid var(--red); padding:12px 16px; margin:12px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--red); border-radius:0 2px 2px 0; }
+        .ok-box { background:rgba(74,158,106,0.08); border-left:2px solid var(--green); padding:10px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--green); border-radius:0 2px 2px 0; }
+        .eval-band {
+            padding:10px 14px; margin-bottom:14px; font-family:'Courier New',monospace; font-size:0.75rem;
+            border-left:2px solid var(--gold); background:var(--gold-glow); border-radius:0 2px 2px 0;
+        }
+        .eval-band.green { border-left-color:var(--green); background:rgba(74,158,106,0.06); color:var(--green); }
+        .eval-band.red { border-left-color:var(--red); background:rgba(158,74,74,0.06); color:var(--red); }
+        .loading-bar { width:100%; height:2px; background:var(--line); margin-top:16px; border-radius:2px; overflow:hidden; }
+        .loading-bar-fill { width:0%; height:100%; background:var(--gold); border-radius:2px; animation:loadBar 2.2s ease infinite; }
+        @keyframes loadBar { 0%{width:0%;} 50%{width:80%;} 100%{width:0%;} }
+        .cal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
+        .cal-cell {
+            aspect-ratio:1; background:var(--card2); border:1px solid var(--line);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            cursor:pointer; transition:all 0.2s ease; position:relative; border-radius:2px; font-family:'Courier New',monospace;
+        }
+        .cal-cell .day-num { font-family:'Courier New',monospace; font-size:1rem; color:var(--ink-dim); }
+        .cal-cell .day-ep { font-family:'Courier New',monospace; font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-top:3px; }
+        .cal-cell.rest { opacity:0.22; cursor:default; pointer-events:none; }
+        .cal-cell.has { background:var(--card); border:1px solid var(--gold-line); border-top:2px solid var(--gold); cursor:pointer; }
+        .cal-cell.has .day-num { color:var(--ink); font-weight:500; }
+        .cal-cell.has:hover { background:var(--gold-dim); border-color:var(--gold); }
+        .cal-cell.has::before { content:attr(data-profil); position:absolute; top:4px; right:5px; font-family:'Courier New',monospace; font-size:0.42rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); }
+        .cal-cell.placeholder { cursor:pointer; border-top:2px solid var(--ink-ghost); }
+        .cal-cell.placeholder:hover { border-top-color:var(--gold-line); background:var(--card); }
+        .cal-cell.placeholder .day-num { color:var(--ink-dim); }
+        .day-detail {
+            background:var(--card); border:1px solid var(--line); border-top:2px solid var(--gold);
+            padding:22px 20px; margin-top:16px; border-radius:2px; position:relative;
+        }
+        .day-detail::before { content:''; position:absolute; top:0; left:0; width:60px; height:2px; background:var(--gold); }
+        .day-detail .post-preview {
+            font-family:'Georgia',serif; font-size:1rem; line-height:1.85; color:var(--ink-mid);
+            white-space:pre-wrap; margin:14px 0; border-left:1px solid var(--gold-line); padding-left:16px; font-style:italic;
+        }
+        .day-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+        .day-actions .btn { flex:1; min-width:120px; margin-top:0; }
+        .bottom-nav {
+            position:fixed; bottom:0; left:0; right:0;
+            background:rgba(8,8,8,0.96); border-top:1px solid var(--line-hard);
+            display:flex; justify-content:space-around; padding:6px 0 8px;
+            z-index:1000; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+        }
+        .nav-item {
+            display:flex; flex-direction:column; align-items:center; gap:4px;
+            cursor:pointer; padding:8px 14px; transition:all 0.2s ease;
+            font-family:'Courier New',monospace; font-size:0.58rem; letter-spacing:1.5px;
+            color:var(--ink-dim); text-transform:uppercase; border:none; background:none; position:relative;
+        }
+        .nav-item::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:1px; background:var(--gold); transition:width 0.2s ease; }
+        .nav-item.active { color:var(--gold); }
+        .nav-item.active::after { width:24px; }
+        .nav-icon { font-size:1.1rem; }
+        .nav-item.active .nav-icon { opacity:1; }
+        .nav-item:hover { color:var(--ink); }
+        a { color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold-dim); }
+        a:hover { border-bottom-color:var(--gold); }
+        @media(max-width:500px){ .grid-2,.grid-4{ grid-template-columns:1fr; } h1{ font-size:2rem; } }
+    </style>
 </head>
 <body>
-
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-title">MOMENT<br><em style="font-family:'Playfair Display',serif;font-style:italic;color:#C4440A;">Troc</em><br>STUDIO</div>
-  <div class="loader-sub">Agent IA · V3</div>
-  <div class="loader-bar"></div>
-</div>
-
-<!-- KEY GATE -->
-<div id="keygate" style="display:none;">
-  <div class="gate-inner">
-    <div class="gate-label">Moment Troc · Accès</div>
-    <div class="gate-title">Studio<br>V3</div>
-    <input type="text" class="gate-input" id="key-input" placeholder="Clé d'accès" autocomplete="off" onkeydown="if(event.key==='Enter')verifierCle()" oninput="this.value=this.value.toUpperCase()">
-    <div id="gate-err"></div>
-    <button class="gate-btn" onclick="verifierCle()">Activer →</button>
-    <div style="margin-top:20px;font-family:'Space Mono',monospace;font-size:9px;color:rgba(242,237,228,0.2);letter-spacing:1px;">Accès réservé aux membres Moment Troc</div>
-  </div>
-</div>
-
-<!-- MASTHEAD -->
-<div class="hr-thick"></div>
-<div class="masthead">
-  <div class="masthead-title">Moment <em>Troc</em> Studio</div>
-  <div class="masthead-meta">
-    Agent IA · Gemini<br>
-    Framework Moment Troc<br>
-    Vendre c'est reconnaître
-  </div>
-</div>
-<div class="hr-thin"></div>
-
-<!-- MODE NAV -->
-<nav class="section-nav">
-  <button class="section-tab on" onclick="switchMode('studio')">Studio</button>
-  <button class="section-tab" onclick="switchMode('trockit')">Troc Kit</button>
-  <button class="section-tab" onclick="switchMode('sprint')">Content Sprint</button>
-  <button class="section-tab" onclick="switchMode('diagnostic')">Diagnostic</button>
+<div id="app"></div>
+<nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchMode('studio')"><span class="nav-icon">🎯</span>Studio</button>
+    <button class="nav-item" onclick="switchMode('deconstruction')"><span class="nav-icon">🔬</span>Déconstruire</button>
+    <button class="nav-item" onclick="switchMode('trockit')"><span class="nav-icon">💎</span>Troc Kit</button>
+    <button class="nav-item" onclick="switchMode('arsenal')"><span class="nav-icon">📅</span>Arsenal</button>
 </nav>
-<div class="hr-thin"></div>
-
-<main>
-
-<!-- ══════════════ MODE STUDIO ══════════════ -->
-<div id="mode-studio">
-  <div class="col-layout">
-    <div class="col-main">
-
-      <div id="st-step1">
-        <div class="section-eyebrow">Mode Studio</div>
-        <div class="section-headline">L'agent<br><em>lit ta cible.</em></div>
-        <div class="section-deck">Décris ton univers. L'agent détecte les profils, choisit l'intention, et génère du contenu qui coupe.</div>
-
-        <div class="field">
-          <div class="field-label">Ton business ou produit <span class="opt">requis</span></div>
-          <textarea id="s-biz" rows="4" placeholder="Ce que tu fais, pour qui, ce que ça change dans leur vie..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Idée brute <span class="opt">optionnel</span></div>
-          <textarea id="s-idee" rows="2" placeholder="Une idée — l'agent va la transformer..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">La douleur centrale <span class="opt">optionnel</span></div>
-          <textarea id="s-douleur" rows="2" placeholder="La tension profonde que porte ta cible..."></textarea>
-        </div>
-        <button class="btn-primary" onclick="studioAnalyser()">Analyser les profils →</button>
-      </div>
-
-      <div id="st-step2" class="hidden">
-        <div class="section-eyebrow">Étape 02</div>
-        <div class="section-headline"><em>Profils</em><br>détectés.</div>
-
-        <div id="st-load1" class="loading">
-          <div class="loading-head">Lecture du marché...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Analyse des archétypes</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Détection des fissures</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Calibration Moment Troc</span></div>
-          </div>
-          <div class="loading-status" id="st-sub1"></div>
-        </div>
-
-        <div id="st-profils" class="hidden">
-          <div id="st-tags" class="profil-tags"></div>
-          <div class="reasoning" id="st-reasoning"></div>
-        </div>
-        <div id="st-err1" class="hidden error-box"></div>
-
-        <div class="hidden" id="st-etape-card" style="margin-top:28px;">
-          <div class="hr-rust" style="margin-bottom:20px;"></div>
-          <div class="field-label" style="margin-bottom:12px;">Choisis une étape Moment Troc</div>
-          <div class="sel-grid" id="st-etapes"></div>
-        </div>
-
-        <div class="btn-row hidden" id="st-actions2">
-          <button class="btn-ghost" onclick="studioBack(1)">← Retour</button>
-          <button class="btn-primary" id="st-btn-gen" onclick="studioGenerer()" disabled style="flex:1">Générer la série →</button>
-        </div>
-      </div>
-
-      <div id="st-step3" class="hidden">
-        <div class="section-eyebrow">Arsenal</div>
-        <div class="section-headline"><em>Contenu</em><br>calibré.</div>
-
-        <div id="st-load3" class="loading">
-          <div class="loading-head">Génération en cours...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Construction des hooks</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Injection style Wil Aime</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Auto-évaluation</span></div>
-          </div>
-          <div class="loading-status" id="st-sub3"></div>
-        </div>
-
-        <div id="st-result" class="hidden">
-          <div id="st-eval" class="eval-bar hidden">✓ Auto-évaluation — angles morts corrigés</div>
-          <div id="st-posts"></div>
-          <div class="section-break"><span>Calendrier</span></div>
-          <div id="st-cal" class="cal"></div>
-        </div>
-        <div id="st-err3" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="st-actions3">
-          <button class="btn-ghost" onclick="studioBack(2)">← Retour</button>
-          <button class="btn-primary" onclick="studioNouvelle()" style="flex:1">Changer d'étape →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">Les 3 Intentions</div>
-        <div class="widget-item"><strong>Valeur Brute</strong><br>Une vérité sèche. Aucune histoire. Actionnable.</div>
-        <div class="widget-item"><strong>Émotion / Miroir</strong><br>La scène. Le "il" qui bascule vers "tu". Mécanique Wil Aime.</div>
-        <div class="widget-item"><strong>Curiosité / Suspense</strong><br>Incomplet. Le lecteur veut la suite.</div>
-      </div>
-      <div class="widget">
-        <div class="widget-title">Les 4 Niveaux</div>
-        <div class="widget-item"><strong>Masque</strong> — Ce que le prospect montre</div>
-        <div class="widget-item"><strong>Déclencheur</strong> — Ce qui active la décision</div>
-        <div class="widget-item"><strong>Fissure</strong> — Ce qu'il n'ose pas dire</div>
-        <div class="widget-item"><strong>Reconstruction</strong> — Ce qu'il se raconte après</div>
-      </div>
-      <div class="widget">
-        <div class="widget-title">Philosophie</div>
-        <div class="widget-item" style="font-family:'Playfair Display',serif;font-style:italic;font-size:13px;line-height:1.6;color:var(--ink);">"Vendre c'est pas convaincre.<br>C'est reconnaître."</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODE TROC KIT ══════════════ -->
-<div id="mode-trockit" class="hidden">
-  <div class="col-layout">
-    <div class="col-main">
-      <div id="tk-step1">
-        <div class="section-eyebrow">Mode Troc Kit</div>
-        <div class="section-headline">Le script<br><em>qui vend.</em></div>
-        <div class="section-deck">Décris ton prospect. L'agent détecte son archétype et génère le script complet — du premier message au closing.</div>
-
-        <div class="field">
-          <div class="field-label">Décris ton prospect <span class="opt">requis</span></div>
-          <textarea id="tk-prospect" rows="4" placeholder="Qui est-il ? Que fait-il ? Quelle est sa situation maintenant ?..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Ton produit ou service <span class="opt">requis</span></div>
-          <textarea id="tk-produit" rows="3" placeholder="Ce que tu proposes à ce prospect..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Canal de contact <span class="opt">requis</span></div>
-          <div class="sel-grid cols3">
-            <button class="sel-item" onclick="selCanal(this,'whatsapp')"><div class="sel-item-name">WhatsApp</div></button>
-            <button class="sel-item" onclick="selCanal(this,'dm')"><div class="sel-item-name">DM Facebook</div></button>
-            <button class="sel-item" onclick="selCanal(this,'commentaire')"><div class="sel-item-name">Commentaire</div></button>
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">Objection probable <span class="opt">optionnel</span></div>
-          <input type="text" id="tk-objection" placeholder="Ex: trop cher, pas le bon moment...">
-        </div>
-        <button class="btn-primary" onclick="trocKitGen()">Générer le script →</button>
-      </div>
-
-      <div id="tk-step2" class="hidden">
-        <div class="section-eyebrow">Script généré</div>
-        <div class="section-headline"><em>Arsenal</em><br>de vente.</div>
-
-        <div id="tk-load" class="loading">
-          <div class="loading-head">Analyse du profil...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Détection archétype</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Calibration psychologique</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Auto-évaluation angles morts</span></div>
-          </div>
-          <div class="loading-status" id="tk-sub"></div>
-        </div>
-
-        <div id="tk-result" class="hidden">
-          <div id="tk-eval" class="eval-bar hidden">✓ Script auto-évalué — angles morts corrigés</div>
-          <div id="tk-arch" class="profil-tags" style="margin-bottom:20px;"></div>
-          <div id="tk-scripts"></div>
-        </div>
-        <div id="tk-err" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="tk-actions">
-          <button class="btn-ghost" onclick="trocKitBack()">← Modifier</button>
-          <button class="btn-primary" onclick="trocKitGen()" style="flex:1">Regénérer →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">Script complet</div>
-        <div class="widget-item"><strong>Premier message</strong><br>Calibré pour le canal et l'archétype</div>
-        <div class="widget-item"><strong>Relance</strong><br>Si pas de réponse après 24h</div>
-        <div class="widget-item"><strong>Gestion objection</strong><br>Réponse psychologique — pas argumentative</div>
-        <div class="widget-item"><strong>Closing</strong><br>La phrase exacte pour conclure</div>
-        <div class="widget-item"><strong>Erreurs à éviter</strong><br>Ce qui tue la vente avec ce profil</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODE CONTENT SPRINT ══════════════ -->
-<div id="mode-sprint" class="hidden">
-  <div class="col-layout">
-    <div class="col-main">
-      <div id="sp-step1">
-        <div class="section-eyebrow">Mode Content Sprint</div>
-        <div class="section-headline">30 jours.<br><em>Prêt à publier.</em></div>
-        <div class="section-deck">Un mois de contenu généré, auto-évalué, et organisé. Progression semaine par semaine vers la vente.</div>
-
-        <div class="field">
-          <div class="field-label">Ton business <span class="opt">requis</span></div>
-          <textarea id="sp-biz" rows="3" placeholder="Ton activité et ta cible..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Objectif du mois <span class="opt">requis</span></div>
-          <div class="sel-grid">
-            <button class="sel-item" onclick="selSprint(this,'notoriete')"><div class="sel-item-name">Notoriété</div><div class="sel-item-desc">Se faire connaître</div></button>
-            <button class="sel-item" onclick="selSprint(this,'vente')"><div class="sel-item-name">Vente</div><div class="sel-item-desc">Convertir des prospects</div></button>
-            <button class="sel-item" onclick="selSprint(this,'confiance')"><div class="sel-item-name">Confiance</div><div class="sel-item-desc">Bâtir l'autorité</div></button>
-            <button class="sel-item" onclick="selSprint(this,'lancement')"><div class="sel-item-name">Lancement</div><div class="sel-item-desc">Lancer une offre</div></button>
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">Archétype cible <span class="opt">optionnel</span></div>
-          <input type="text" id="sp-arch" placeholder="Ex: Élévateur, Automatiseur...">
-        </div>
-        <button class="btn-primary" onclick="sprintGen()">Lancer le Sprint →</button>
-      </div>
-
-      <div id="sp-step2" class="hidden">
-        <div class="section-eyebrow">Plan éditorial</div>
-        <div class="section-headline"><em>30 jours</em><br>de contenu.</div>
-
-        <div id="sp-load" class="loading">
-          <div class="loading-head">Construction du plan...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Planification semaine par semaine</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Génération des 15 posts</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Vérification progression</span></div>
-          </div>
-          <div class="loading-status" id="sp-sub"></div>
-        </div>
-
-        <div id="sp-result" class="hidden">
-          <div id="sp-eval" class="eval-bar hidden">✓ Sprint auto-évalué — équilibre et progression vérifiés</div>
-          <div id="sp-posts"></div>
-          <div class="section-break"><span>Calendrier 30 jours</span></div>
-          <div id="sp-cal" class="cal"></div>
-        </div>
-        <div id="sp-err" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="sp-actions">
-          <button class="btn-ghost" onclick="sprintBack()">← Modifier</button>
-          <button class="btn-primary" onclick="sprintGen()" style="flex:1">Regénérer →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">La progression</div>
-        <div class="widget-item"><strong>Semaine 1</strong><br>Notoriété + accroche</div>
-        <div class="widget-item"><strong>Semaine 2</strong><br>Valeur + preuve</div>
-        <div class="widget-item"><strong>Semaine 3</strong><br>Tension + désir</div>
-        <div class="widget-item"><strong>Semaine 4</strong><br>Closing + réassurance</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODE DIAGNOSTIC ══════════════ -->
-<div id="mode-diagnostic" class="hidden">
-  <div class="col-layout">
-    <div class="col-main">
-      <div id="d-step1">
-        <div class="section-eyebrow">Mode Diagnostic</div>
-        <div class="section-headline">Révèle tes<br><em>angles morts.</em></div>
-        <div class="section-deck">L'agent analyse ton marché, identifie ce que tu ne vois pas, et forge ton avantage comparatif réel.</div>
-
-        <div class="field">
-          <div class="field-label">Ton activité <span class="opt">requis</span></div>
-          <textarea id="d-activite" rows="3" placeholder="Ce que tu fais, pour qui, depuis combien de temps..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Tes résultats actuels <span class="opt">requis</span></div>
-          <textarea id="d-resultats" rows="2" placeholder="Ventes actuelles, audience, ce qui marche ou pas..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Tes concurrents <span class="opt">requis</span></div>
-          <textarea id="d-concurrents" rows="3" placeholder="Qui vend la même chose ? Comment ils se positionnent ?..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Ta force perçue <span class="opt">optionnel</span></div>
-          <textarea id="d-force" rows="2" placeholder="Ce qui te différencie selon toi..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Ta plus grande frustration <span class="opt">optionnel</span></div>
-          <textarea id="d-frustration" rows="2" placeholder="Ce qui bloque ta croissance..."></textarea>
-        </div>
-        <button class="btn-primary" onclick="diagGen()">Lancer le diagnostic →</button>
-      </div>
-
-      <div id="d-step2" class="hidden">
-        <div class="section-eyebrow">Rapport</div>
-        <div class="section-headline"><em>Diagnostic</em><br>complet.</div>
-
-        <div id="d-load" class="loading">
-          <div class="loading-head">Analyse en profondeur...</div>
-          <div class="loading-steps">
-            <div class="loading-step"><div class="dot"></div><span>Analyse du positionnement</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Identification angles morts</span></div>
-            <div class="loading-step"><div class="dot"></div><span>Forge de l'avantage comparatif</span></div>
-          </div>
-          <div class="loading-status" id="d-sub"></div>
-        </div>
-
-        <div id="d-result" class="hidden">
-          <div id="d-eval" class="eval-bar hidden">✓ Diagnostic auto-évalué — angles morts confirmés</div>
-          <div id="d-sections"></div>
-        </div>
-        <div id="d-err" class="hidden error-box"></div>
-
-        <div class="btn-row hidden" id="d-actions">
-          <button class="btn-ghost" onclick="diagBack()">← Modifier</button>
-          <button class="btn-primary" onclick="diagGen()" style="flex:1">Relancer →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-aside">
-      <div class="widget">
-        <div class="widget-title">Le rapport inclut</div>
-        <div class="widget-item"><strong>Archétype principal</strong><br>Le vrai profil de ta cible</div>
-        <div class="widget-item"><strong>Positionnement réel</strong><br>Comment tu te positionnes vraiment vs ce que tu crois</div>
-        <div class="widget-item"><strong>Angles morts</strong><br>Ce que tu ne vois pas, ce que les concurrents exploitent</div>
-        <div class="widget-item"><strong>Avantage comparatif</strong><br>Ton vrai différenciateur unique</div>
-        <div class="widget-item"><strong>Stratégie immédiate</strong><br>3 actions à faire cette semaine</div>
-        <div class="widget-item"><strong>Message clé</strong><br>La phrase qui résume ton positionnement</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</main>
-
 <script>
-(function(){
-'use strict';
+// ═══════════════════════════════════════════
+// MOMENT TROC · STUDIO — Code Final Complet
+// ═══════════════════════════════════════════
 
-// ═══════════════════════════════
-// CONFIG
-// ═══════════════════════════════
-var GEMINI_KEY = 'AIzaSyBIUIVeUbxrWwnXI2W2lOSprNTUPL4Acjw';
-var GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
-var MASTER = 'MKB2000-2022A';
-var KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
+// ─── Clés ───
+const MASTER_KEY = 'MKB2000-2022A';
+const VALID_KEYS = ['MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
+function getMomentKey(){ return localStorage.getItem('mt_moment_key'); }
+function setMomentKey(k){ localStorage.setItem('mt_moment_key', k); }
+function getGeminiKey(){ return localStorage.getItem('mt_gemini_key'); }
+function setGeminiKey(k){ localStorage.setItem('mt_gemini_key', k); }
 
-// ═══════════════════════════════
-// FRAMEWORK
-// ═══════════════════════════════
-var ARCHETYPES = {
-  'Automatiseur':{trigger:'gain de temps, efficacité, systèmes',peur:'perdre du temps sur des tâches inutiles',hook:'Ce que tu fais en 3h, ça peut se faire en 20 minutes.',fissure:'Il perd du temps et il le sait',version_peur:'Il a peur que son système s\'effondre'},
-  'Optimiseur Valeur':{trigger:'qualité, résultat concret, ROI',peur:'payer pour quelque chose qui ne tient pas',hook:'Tu ne paies pas le prix. Tu paies le résultat.',fissure:'Il doute que ça vaille ce que ça coûte',version_peur:'Il a peur d\'avoir fait le mauvais choix'},
-  'Optimiseur Prix':{trigger:'économie, meilleur deal, offre',peur:'être arnaqué ou payer trop cher',hook:'Même résultat. La moitié du prix.',fissure:'Il a peur de se faire avoir',version_peur:'La peur de perdre de l\'argent domine tout'},
-  'Élévateur':{trigger:'statut, transformation, reconnaissance',peur:'rester là où il est',hook:'Dans 90 jours, les gens autour de toi vont remarquer quelque chose.',fissure:'Il veut être vu différemment',version_peur:'Il a peur de redescendre après avoir grimpé'},
-  'Libérateur':{trigger:'liberté, sortir d\'une contrainte',peur:'rester prisonnier d\'une situation',hook:'Et si la vraie solution c\'était de tout arrêter et recommencer autrement ?',fissure:'Il étouffe et cherche une sortie',version_peur:'Il a peur de ne jamais sortir'},
-  'Protecteur':{trigger:'sécurité, protection — version peur de tous les autres archétypes',peur:'perdre ce qu\'il a construit',hook:'Ce n\'est pas ce que tu gagnes qui compte. C\'est ce que tu ne perds pas.',fissure:'La peur de perdre est plus forte que l\'envie de gagner',version_peur:'Il protège tout le monde sauf lui-même'}
+// ─── API Gemini ───
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
+async function callGemini(prompt, useSearch=false, maxTokens=1400, fastMode=false){
+  const key = getGeminiKey();
+  if(!key) throw new Error('Clé Gemini manquante');
+  const body = { contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.88, maxOutputTokens:fastMode?400:maxTokens} };
+  if(useSearch) body.tools = [{google_search:{}}];
+  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), fastMode?15000:25000);
+  const res = await fetch(GEMINI_URL+key, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal: controller.signal });
+  clearTimeout(timeout);
+  if(!res.ok){ const e = await res.json().catch(()=>({})); if(res.status===429) throw new Error('Limite API atteinte. Reviens dans 1 minute.'); throw new Error(e?.error?.message||'Erreur API'); }
+  const data = await res.json(); const text = data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  return text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/#{1,6}\s/g,'').trim();
+}
+
+// ─── Helpers ───
+const app = document.getElementById('app');
+function render(html){ app.innerHTML = html; }
+function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function copyTxt(text, btn){ navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copié'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='Copier'; btn.classList.remove('copied'); },2000); }); }
+
+// ─── Profils ───
+const PROFILS = {
+  AUTOMATISEUR: { organe:'Cortex Préfrontal', desir:'Un rail clair sans options', peur:'Le chaos, la surcharge mentale' },
+  OPTIMISEUR_VALEUR: { organe:'Striatum', desir:'Le meilleur retour sur investissement', peur:'Le mauvais investissement' },
+  OPTIMISEUR_PRIX: { organe:'Insula', desir:'Le juste prix', peur:'L\'arnaque, la douleur du prix' },
+  ÉLÉVATEUR: { organe:'Noyau Accumbens', desir:'Le statut, l\'image', peur:'L\'exclusion, la honte sociale' },
+  LIBÉRATEUR: { organe:'Cortex Cingulaire', desir:'La singularité, la liberté', peur:'Les cases, le générique' }
 };
 
-var ETAPES = [
-  {id:'masque',name:'MASQUE',desc:'Ce que le prospect montre — la surface de sa demande'},
-  {id:'declencheur',name:'DÉCLENCHEUR',desc:'Ce qui active réellement la décision d\'achat'},
-  {id:'fissure',name:'FISSURE',desc:'La tension cachée — ce qu\'il n\'ose pas dire'},
-  {id:'reconstruction',name:'RECONSTRUCTION',desc:'Comment il se raconte l\'histoire après l\'achat'}
+// ─── Maîtres ───
+const MAITRES = [
+  {id:'bismarck',nom:'Otto von Bismarck',categorie:'Stratège Silencieux',ton:'La force tranquille, le pragmatisme froid.'},
+  {id:'will',nom:'Will Aime',categorie:'Miroir Vivant',ton:'Un "il" qui devient "tu". Fin sans résolution.'},
+  {id:'itachi',nom:'Itachi Uchiha',categorie:'Briseur de Réalité',ton:'Projection noire puis réveil brutal.'},
+  {id:'scofield',nom:'Michael Scofield',categorie:'Architecte de l\'Ombre',ton:'Plan froid, imparable, chirurgical.'},
+  {id:'tyrion',nom:'Tyrion Lannister',categorie:'Miroir Vivant',ton:'La faiblesse retournée en pouvoir suprême.'},
+  {id:'hannibal',nom:'Hannibal Lecter',categorie:'Miroir Vivant',ton:'L\'observation si fine qu\'elle en devient terrifiante.'},
+  {id:'joker',nom:'Le Joker',categorie:'Miroir Vivant',ton:'La provocation qui révèle la vraie nature.'},
+  {id:'moriarty',nom:'James Moriarty',categorie:'Architecte de l\'Ombre',ton:'Toujours trois coups d\'avance sur la pensée du lecteur.'},
+  {id:'palpatine',nom:'Empereur Palpatine',categorie:'Architecte de l\'Ombre',ton:'Le faux mentor, le piège à long terme.'},
+  {id:'iago',nom:'Iago',categorie:'Architecte de l\'Ombre',ton:'Le poison des mots qui dégrade la certitude.'},
+  {id:'cobb',nom:'Dominick Cobb',categorie:'Briseur de Réalité',ton:'Plante une idée dans l\'esprit en faisant croire qu\'elle vient du lecteur.'},
+  {id:'mrrobot',nom:'Mr. Robot',categorie:'Briseur de Réalité',ton:'La rupture du système, le bug dans la matrice.'},
+  {id:'tyler',nom:'Tyler Durden',categorie:'Briseur de Réalité',ton:'Brûler le faux confort pour révéler la vérité nue.'},
+  {id:'baelish',nom:'Petyr Baelish',categorie:'Stratège Silencieux',ton:'Tirer avantage de chaque événement, surtout les pires.'},
+  {id:'frank',nom:'Frank Underwood',categorie:'Stratège Silencieux',ton:'La confession directe au lecteur, faire de lui un complice.'},
+  {id:'v',nom:'V',categorie:'Stratège Silencieux',ton:'Faire exploser un système de croyances pour le reconstruire.'}
 ];
+const CATEGORIES = ['Architecte de l\'Ombre','Briseur de Réalité','Miroir Vivant','Stratège Silencieux'];
 
-var WIL_AIME = 'Mécanique narrative Wil Aime — Le Gendre Idéal: commence par "il" — le lecteur se croit spectateur d\'une scène qui parle de quelqu\'un d\'autre. À mi-chemin la scène bascule vers "tu" sans transition forcée — il réalise que c\'est lui. Le vrai personnage qu\'on attendait n\'arrive jamais — quelqu\'un d\'autre occupe sa place. La révélation finale retourne tout sans résolution confortable. Dense émotionnellement.';
-
-var DIVIN = 'Style Divin Setondji: phrases ultra-courtes. Une idée par ligne. Pas de connecteurs évidents. Pivots inattendus. Le lecteur ne voit pas où tu vas jusqu\'à la dernière ligne.';
-
-var MIROIR = 'Positionnement Miroir Brutal: ne jamais caresser dans le sens du poil. Tout le monde applaudit — toi tu révèles la vérité même quand ça fait mal. Précision chirurgicale. Pas d\'encouragements vides.';
-
-var INTENTIONS = {
-  valeur: 'VALEUR BRUTE: Pas d\'histoire. Pas de "il". Pas d\'émotion. Une vérité précise, sèche, directe. Maximum 8 lignes. Ton autoritaire. Pas de question finale — une affirmation qui tranche.',
-  emotion: 'ÉMOTION/MIROIR (Wil Aime): Commence par "il" dans une scène concrète du quotidien local urbain africain. À mi-chemin bascule vers "tu" — le lecteur réalise que c\'est lui. Dense émotionnellement. Fin avec une question qui dérange.',
-  curiosite: 'CURIOSITÉ/SUSPENSE: Court — maximum 8 lignes. Une situation paradoxale ou un résultat inattendu. On ne donne pas tout. La fin annonce quelque chose sans l\'expliquer. Le lecteur doit commenter pour savoir la suite.'
+// ─── États globaux ───
+const state = {
+  step:'unlock', mode:'studio', biz:'', dialogueAnswers:[], profilData:null, profilMode:'désir',
+  atelier:null, format:null, maitre:null, currentPost:null, evalData:null, stratData:null,
+  arsenalPosts: JSON.parse(localStorage.getItem('mt_arsenal_posts')||'{}'),
+  verite:'', angles:[], sousAngles:[], currentGraineId:null, expertiseAnswers:[], generationMode:'unitaire',
+  arsenalFractal: JSON.parse(localStorage.getItem('mt_arsenal_fractal')||'[]')
 };
+const dcState = { step:'input', post:'', contexte:'', analyse:null, contreAngle:null };
+const tkState = { offre:'', profil:'AUTOMATISEUR', mode:'désir', scripts:null };
 
-// STATE
-var S = {
-  studio:{profils:[],etape:null,biz:'',idee:'',douleur:''},
-  trockit:{canal:null},
-  sprint:{objectif:null},
-  _stPosts:[],_tkTexts:{},_spPosts:[]
-};
-
-// ═══════════════════════════════
-// API
-// ═══════════════════════════════
-async function callGemini(prompt, tokens){
-  var r = await fetch(GEMINI_URL+GEMINI_KEY,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      contents:[{parts:[{text:prompt}]}],
-      generationConfig:{temperature:0.88,maxOutputTokens:tokens||2048}
-    })
+// ─── Navigation ───
+window.switchMode = function(m) {
+  state.mode = m;
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', ['studio','deconstruction','trockit','arsenal'][i] === m);
   });
-  if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error(e.error&&e.error.message?e.error.message:'Erreur API ('+r.status+')');}
-  var d=await r.json();
-  if(!d.candidates||!d.candidates[0]||!d.candidates[0].content)throw new Error('Réponse vide');
-  return d.candidates[0].content.parts[0].text;
+  if (m === 'studio') renderStudioMode();
+  else if (m === 'deconstruction') renderDeconstruction();
+  else if (m === 'trockit') renderTrocKit();
+  else if (m === 'arsenal') renderArsenalFractal();
+};
+
+/* ═══════════════════════════════════════ STUDIO ═══════════════════════════════════════ */
+function renderStudioMode() {
+  if (state.step === 'unlock') renderUnlock();
+  else if (state.step === 'gemini') renderGeminiGate();
+  else if (state.step === 'brief') renderBrief();
+  else if (state.step === 'dialogue') renderDialogue();
+  else if (state.step === 'profil') renderProfil();
+  else if (state.step === 'atelier') renderAtelier();
+  else if (state.step === 'format') renderFormat();
+  else if (state.step === 'pantheon') renderPantheon();
+  else if (state.step === 'result') renderResult();
 }
 
-async function callWithEval(main,evalP,tokens){
-  var r1=await callGemini(main,tokens||2500);
-  var evalFull=evalP+'\n\nCONTENU:\n'+r1+'\n\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée]';
-  var r2=await callGemini(evalFull,tokens||2500);
-  if(r2.trim().startsWith('AMÉLIORER')){return{content:r2.replace(/^AMÉLIORER\s*/i,'').trim(),improved:true};}
-  return{content:r1,improved:false};
+function renderUnlock(){
+  render(`<div class="center" style="margin-top:60px;"><div class="eyebrow">Moment Troc · Studio</div><h1>Clé d'Accès</h1><p class="sub">Entre la clé fournie.</p><input id="key-input" type="text" placeholder="MT-2024X..." autocomplete="off" style="text-transform:uppercase;" /><div id="gate-err" style="min-height:20px;color:var(--red);font-size:0.8rem;margin-top:8px;"></div><button class="btn btn-main" onclick="validateMomentKey()">Entrer →</button></div>`);
 }
-
-// ═══════════════════════════════
-// KEY GATE
-// ═══════════════════════════════
-window.verifierCle=function(){
-  var v=document.getElementById('key-input').value.trim().toUpperCase();
-  var e=document.getElementById('gate-err');
-  if(v===MASTER||KEYS.indexOf(v)!==-1){
-    localStorage.setItem('mt_k',v);
-    document.getElementById('keygate').style.display='none';
-    e.textContent='';
-  } else {e.textContent='Clé invalide.';}
+window.validateMomentKey = function(){
+  const k = document.getElementById('key-input').value.trim().toUpperCase();
+  const err = document.getElementById('gate-err');
+  if(k===MASTER_KEY||VALID_KEYS.includes(k)){ setMomentKey(k); state.step='gemini'; renderGeminiGate(); }
+  else { err.textContent = 'Clé invalide.'; }
 };
 
-// ═══════════════════════════════
-// UTILS
-// ═══════════════════════════════
-function show(id){document.getElementById(id).classList.remove('hidden');}
-function hide(id){document.getElementById(id).classList.add('hidden');}
-function txt(id,t){document.getElementById(id).textContent=t;}
-function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function err(id,msg){var e=document.getElementById(id);e.className='error-box';e.textContent='⚠ '+msg;e.classList.remove('hidden');}
-function statTimer(id,msgs,ms){var i=0;return setInterval(function(){if(i<msgs.length)txt(id,msgs[i++]);},ms||1400);}
-function cp(text,btn){navigator.clipboard.writeText(text).then(function(){btn.textContent='✓ Copié';btn.classList.add('on');setTimeout(function(){btn.textContent='Copier';btn.classList.remove('on');},2000);});}
-
-// ═══════════════════════════════
-// MODE SWITCH
-// ═══════════════════════════════
-window.switchMode=function(m){
-  ['studio','trockit','sprint','diagnostic'].forEach(function(x){
-    document.getElementById('mode-'+x).classList.toggle('hidden',x!==m);
-  });
-  document.querySelectorAll('.section-tab').forEach(function(t,i){
-    t.classList.toggle('on',['studio','trockit','sprint','diagnostic'][i]===m);
-  });
-  window.scrollTo({top:0,behavior:'smooth'});
-};
-
-// ═══════════════════════════════
-// ═══ STUDIO ════════════════════
-// ═══════════════════════════════
-function stRenderEtapes(){
-  var g=document.getElementById('st-etapes');g.innerHTML='';
-  ETAPES.forEach(function(e){
-    var b=document.createElement('button');
-    b.className='sel-item';
-    b.innerHTML='<div class="sel-item-name">'+e.name+'</div><div class="sel-item-desc">'+e.desc+'</div>';
-    b.onclick=function(){
-      document.querySelectorAll('#st-etapes .sel-item').forEach(function(x){x.classList.remove('on');});
-      b.classList.add('on');S.studio.etape=e.id;
-      document.getElementById('st-btn-gen').disabled=false;
-    };
-    g.appendChild(b);
-  });
+function renderGeminiGate(){
+  render(`<div class="center" style="margin-top:60px;"><div class="eyebrow">Étape 2/2</div><h1>Clé API Gemini</h1><p class="sub">Gratuit sur <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p><input id="gemini-input" type="password" placeholder="AIza..." autocomplete="off" /><div id="gemini-err" style="min-height:20px;color:var(--red);font-size:0.8rem;margin-top:8px;"></div><button class="btn btn-main" onclick="validateGeminiKey()">Activer le moteur →</button></div>`);
 }
-
-window.studioAnalyser=async function(){
-  S.studio.biz=document.getElementById('s-biz').value.trim();
-  S.studio.idee=document.getElementById('s-idee').value.trim();
-  S.studio.douleur=document.getElementById('s-douleur').value.trim();
-  if(!S.studio.biz){document.getElementById('s-biz').focus();return;}
-
-  hide('st-step1');show('st-step2');
-  show('st-load1');hide('st-profils');hide('st-err1');hide('st-etape-card');hide('st-actions2');
-
-  var al=Object.keys(ARCHETYPES).map(function(k){return '- '+k+': trigger='+ARCHETYPES[k].trigger+' / peur='+ARCHETYPES[k].peur+' / version_peur='+ARCHETYPES[k].version_peur;}).join('\n');
-  var t=statTimer('st-sub1',['Lecture du marché...','Détection des profils...','Analyse des fissures...']);
-
-  var prompt='Tu es expert Moment Troc (Duhigg + Maslow).\n\nNote importante: Le Protecteur est la version peur de tous les autres archétypes — quand un prospect est dominé par la peur de perdre plutôt que le désir de gagner.\n\nArchétypes:\n'+al+'\n\nBusiness: '+S.studio.biz+'\n'+(S.studio.douleur?'Douleur: '+S.studio.douleur+'\n':'')+'\nIdentifie 2-3 archétypes dominants ET précise si chaque profil est en mode désir ou mode peur.\nRéponds:\nARCHETYPES: [nom1 (désir/peur), nom2 (désir/peur)]\nANALYSE: [3-4 phrases — masque, déclencheur, fissure de cette cible]';
-
+window.validateGeminiKey = async function(){
+  const k = document.getElementById('gemini-input').value.trim();
+  const err = document.getElementById('gemini-err');
+  if(!k.startsWith('AIza')||k.length<30){ err.textContent='Clé invalide.'; return; }
   try{
-    var r=await callGemini(prompt,700);
-    clearInterval(t);
-    var am=r.match(/ARCHETYPES:\s*(.+)/i);
-    var an=r.match(/ANALYSE:\s*([\s\S]+)/i);
-    S.studio.profils=am?am[1].split(',').map(function(s){return s.trim();}):['Élévateur (désir)'];
-    hide('st-load1');show('st-profils');
-    var tags=document.getElementById('st-tags');tags.innerHTML='';
-    S.studio.profils.forEach(function(p){var tg=document.createElement('span');tg.className='profil-tag';tg.textContent=p;tags.appendChild(tg);});
-    txt('st-reasoning',an?an[1].trim():r);
-    stRenderEtapes();show('st-etape-card');show('st-actions2');
-  }catch(e){clearInterval(t);hide('st-load1');err('st-err1',e.message);show('st-err1');show('st-actions2');}
-};
-
-window.studioGenerer=async function(){
-  if(!S.studio.etape)return;
-  hide('st-step2');show('st-step3');
-  show('st-load3');hide('st-result');hide('st-err3');hide('st-actions3');hide('st-eval');
-
-  var ei=ETAPES.find(function(e){return e.id===S.studio.etape;});
-  var pd=S.studio.profils.map(function(p){
-    var k=p.replace(/\s*\(.*\)/,'').trim();
-    var a=ARCHETYPES[k];
-    return a?p+' — hook: "'+a.hook+'" / fissure: '+a.fissure:p;
-  }).join('\n');
-
-  var t=statTimer('st-sub3',['Construction des hooks...','Injection style Wil Aime...','Calibration miroir brutal...','Rédaction des posts...','Auto-évaluation...','Correction angles morts...']);
-
-  var main='Tu es le Studio Moment Troc — agent de contenu expert.\n\nPHILOSOPHIE: "Vendre c\'est pas convaincre. C\'est reconnaître."\nNIVEAUX: Masque → Déclencheur → Fissure → Reconstruction\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\nBUSINESS: '+S.studio.biz+'\n'+(S.studio.idee?'IDÉE: '+S.studio.idee+'\n':'')+(S.studio.douleur?'DOULEUR: '+S.studio.douleur+'\n':'')+'\nPROFILS:\n'+pd+'\nÉTAPE: '+ei.name+' — '+ei.desc+'\n\nGénère 5 posts avec les 3 intentions:\n- 2 posts ÉMOTION/MIROIR: '+INTENTIONS.emotion+'\n- 2 posts VALEUR BRUTE: '+INTENTIONS.valeur+'\n- 1 post CURIOSITÉ/SUSPENSE: '+INTENTIONS.curiosite+'\n\nRÈGLES ABSOLUES:\n- Une seule intention par post — jamais mélanger\n- Phrases ultra-courtes sauf posts émotionnels\n- Jamais de marketing visible\n- Miroir brutal — la vérité même quand ça fait mal\n- Pour les posts émotionnels: commence par "il" puis bascule vers "tu"\n- Fin ouverte ou affirmation qui tranche selon l\'intention\n- Le sujet sort toujours du produit réel — pas de généralité\n\nFORMAT STRICT:\nPOST [n]\nINTENTION: [Émotion Miroir / Valeur Brute / Curiosité Suspense]\nARCHETYPE: [profil ciblé]\n---\n[contenu]\n===';
-
-  var evalP='Tu es évaluateur expert Moment Troc + Wil Aime.\nÉvalue ces 5 posts:\n1. Chaque post a-t-il UNE SEULE intention claire ?\n2. Les posts Émotion/Miroir basculent-ils vraiment de "il" vers "tu" ?\n3. Les posts Valeur Brute sont-ils secs et autoritaires sans histoire ?\n4. Le post Curiosité/Suspense est-il vraiment incomplet et court ?\n5. Y a-t-il des angles morts — des vérités plus fortes qu\'on aurait dû dire ?\nSi tout est satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée même format]';
-
-  try{
-    var res=await callWithEval(main,evalP,3000);
-    clearInterval(t);
-    var posts=stParse(res.content,ei);
-    if(!posts.length)throw new Error('Aucun post généré. Réessaie.');
-    S._stPosts=posts;
-    hide('st-load3');show('st-result');
-    if(res.improved)show('st-eval');
-    stRenderPosts(posts);stRenderCal(posts);show('st-actions3');
-  }catch(e){clearInterval(t);hide('st-load3');err('st-err3',e.message);show('st-err3');show('st-actions3');}
-};
-
-function stParse(raw,ei){
-  var posts=[];
-  var blocks=raw.split(/POST\s*\d+/i).filter(function(b){return b.trim();});
-  blocks.forEach(function(block){
-    var im=block.match(/INTENTION:\s*(.+)/i);
-    var am=block.match(/ARCHETYPE:\s*(.+)/i);
-    var cm=block.match(/---\s*([\s\S]+?)(?:===|$)/);
-    posts.push({
-      etape:ei.name,
-      intention:im?im[1].trim():'',
-      archetype:am?am[1].trim():S.studio.profils[0]||'',
-      content:cm?cm[1].trim():block.replace(/INTENTION:.*\n|ARCHETYPE:.*\n|---/g,'').trim()
+    const test = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${k}`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:'OK'}]}],generationConfig:{maxOutputTokens:3}})
     });
-  });
-  return posts;
+    if(!test.ok) throw new Error('Clé rejetée');
+    setGeminiKey(k); state.step='brief'; renderBrief();
+  }catch(e){ err.textContent = 'Clé rejetée par Gemini. Vérifie ton compte.'; }
+};
+
+function renderBrief(){
+  const saved = JSON.parse(localStorage.getItem('mt_brief')||'{}');
+  if(saved.biz){ state.biz = saved.biz; }
+  render(`<div class="eyebrow">Brief</div><h1>Décharge ton idée</h1><p class="sub">Décris ton business, ta cible, le problème. Même en vrac.</p><textarea id="brief-input" rows="6" placeholder="Ex: Je vends une formation en ligne aux entrepreneurs africains qui n'arrivent pas à gérer leur trésorerie...">${esc(state.biz)}</textarea><button class="btn btn-main" onclick="submitBrief()">Analyser mon marché →</button>`);
+}
+window.submitBrief = async function(){
+  const raw = document.getElementById('brief-input').value.trim();
+  if(!raw||raw.length<15){ alert('Décris ton business un peu plus.'); return; }
+  state.biz = raw; localStorage.setItem('mt_brief',JSON.stringify({biz:raw})); state.step='dialogue'; renderDialogue();
+  try{
+    const qPrompt = `Tu es l'agent Moment Troc. Business : "${raw}". Pose exactement 2 questions stratégiques pour affiner le brief. Choisis parmi : "Qu'est-ce que ton client se dit quand il n'arrive pas à dormir ?", "Qu'a-t-il déjà essayé ? Pourquoi ça n'a pas marché ?", "Qui est son plus grand concurrent ? Pourquoi es-tu meilleur ?". Retourne chaque question sur une ligne séparée, sans numéro.`;
+    const qRaw = await callGemini(qPrompt, true, 400, true);
+    const questions = qRaw.split('\n').filter(l=>l.trim().length>10).slice(0,2);
+    document.getElementById('dialogue-questions').innerHTML = questions.map((q,i)=>`<div class="chat-bubble"><strong>Agent</strong> : ${esc(q)}</div><textarea id="dial-answer-${i}" rows="2" placeholder="Ta réponse..."></textarea>`).join('');
+    document.getElementById('dialogue-box').classList.remove('hidden');
+  }catch(e){ document.getElementById('dialogue-err').innerHTML = `<div class="err-box">⚠ ${esc(e.message)}</div>`; }
+};
+function renderDialogue(){
+  render(`<div class="eyebrow">Dialogue</div><h1>L'agent t'écoute</h1><div id="dialogue-questions"></div><div id="dialogue-box" class="hidden"><button class="btn btn-main" onclick="submitDialogue()">Continuer →</button></div><div id="dialogue-err"></div>`);
+}
+window.submitDialogue = async function(){
+  const answers = []; for(let i=0;i<2;i++){ const el=document.getElementById('dial-answer-'+i); if(el)answers.push(el.value.trim()); }
+  state.dialogueAnswers = answers;
+  try{
+    const detectPrompt = `Tu es un expert du framework Moment Troc. Business : "${state.biz}". Réponses aux questions : "${answers.join(' ')}". Retourne UNIQUEMENT ce JSON (rien d'autre) : {"profil":"AUTOMATISEUR","mode":"peur","organe":"Cortex Préfrontal","tension":"phrase intérieure","simple":"explication simple"}. Profils possibles : AUTOMATISEUR, OPTIMISEUR_VALEUR, OPTIMISEUR_PRIX, ÉLÉVATEUR, LIBÉRATEUR. Mode: désir ou peur.`;
+    const raw = await callGemini(detectPrompt, false, 500, true);
+    const match = raw.match(/\{[\s\S]*?\}/); if(!match) throw new Error('Profil non détecté');
+    state.profilData = JSON.parse(match[0]); state.step='profil'; renderProfil();
+  }catch(e){ document.getElementById('dialogue-err').innerHTML = `<div class="err-box">⚠ ${esc(e.message)}</div>`; }
+};
+
+function renderProfil(){
+  const p = state.profilData; const info = PROFILS[p.profil]||PROFILS.AUTOMATISEUR;
+  render(`<div class="eyebrow">Profil détecté</div><h1>${esc(p.profil)} <em>mode ${esc(p.mode)}</em></h1>
+    <div class="card"><div class="tag gold">${esc(p.organe)}</div><p style="margin-top:12px;font-style:italic;color:var(--ink-mid);">"${esc(p.tension)}"</p><p style="color:var(--ink-dim);margin-top:8px;">${esc(p.simple)}</p></div>
+    <div class="grid-2">
+      <div class="card ${state.profilMode==='désir'?'':'gold'}" style="cursor:pointer;" onclick="state.profilMode='désir';renderProfil();"><div class="tag gold">🟢 Désir</div><p style="margin-top:8px;color:var(--ink-mid);">Attiré par : ${esc(info.desir)}</p></div>
+      <div class="card ${state.profilMode==='peur'?'':'gold'}" style="cursor:pointer;" onclick="state.profilMode='peur';renderProfil();"><div class="tag gold">🔴 Peur</div><p style="margin-top:8px;color:var(--ink-mid);">Fuit : ${esc(info.peur)}</p></div>
+    </div>
+    <button class="btn btn-main" onclick="state.step='atelier';renderAtelier();">Choisir l'Atelier →</button>`);
 }
 
-function stRenderPosts(posts){
-  var list=document.getElementById('st-posts');list.innerHTML='';
-  posts.forEach(function(p,i){
-    var d=document.createElement('div');d.className='post-item';d.style.animationDelay=(i*0.08)+'s';
-    var intentionClass=p.intention.toLowerCase().includes('valeur')?'ptag-ink':p.intention.toLowerCase().includes('curiosit')?'ptag-rust':'';
-    d.innerHTML='<div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">J'+(i*6+1)+'</span><span class="ptag">'+esc(p.etape)+'</span><span class="ptag '+intentionClass+'">'+esc(p.intention)+'</span><span class="ptag">'+esc(p.archetype)+'</span></div></div><div class="post-body">'+esc(p.content)+'</div><div class="post-footer"><span class="post-num">Post '+(i+1)+' / 5</span><button class="copy-btn" onclick="stCp(this,'+i+')">Copier</button></div>';
-    list.appendChild(d);
-  });
+function renderAtelier(){
+  render(`<div class="eyebrow">Atelier</div><h1>Choisis ta phase</h1>
+    <div class="grid-2">
+      <div class="card" style="cursor:pointer;" onclick="selectAtelier(1)"><div class="tag gold">1</div><h3 style="margin-top:8px;">Le Miroir</h3><p style="color:var(--ink-dim);">Implanter l'expertise. Nommer la douleur. Pas de vente.</p></div>
+      <div class="card" style="cursor:pointer;" onclick="selectAtelier(2)"><div class="tag gold">2</div><h3 style="margin-top:8px;">La Forge</h3><p style="color:var(--ink-dim);">Intensifier la douleur. Se positionner comme la réponse.</p></div>
+      <div class="card" style="cursor:pointer;" onclick="selectAtelier(3)"><div class="tag gold">3</div><h3 style="margin-top:8px;">Le Closing</h3><p style="color:var(--ink-dim);">Vendre. Post calibré + Troc Kit.</p></div>
+    </div>
+    <button class="btn btn-main" id="btn-atelier-next" onclick="state.step='format';renderFormat();" disabled>Continuer →</button>`);
+}
+window.selectAtelier = function(id){ state.atelier=id; document.getElementById('btn-atelier-next').disabled=false; };
+
+function renderFormat(){
+  render(`<div class="eyebrow">Format</div><h1>Choisis ta forme</h1>
+    <div class="grid-2" id="format-grid">
+      <div class="card" style="cursor:pointer;" onclick="selectFormat('tweet')"><div class="tag gold">Tweet</div><p style="color:var(--ink-dim);">60-90 mots. Une vérité. Pas de suite.</p></div>
+      <div class="card" style="cursor:pointer;" onclick="selectFormat('thread')"><div class="tag gold">Thread</div><p style="color:var(--ink-dim);">Post + 4-5 commentaires. Suite en com.</p></div>
+      <div class="card" style="cursor:pointer;" onclick="selectFormat('courtmetrage')"><div class="tag gold">Court Métrage</div><p style="color:var(--ink-dim);">150-200 mots. Scène Wil Aime.</p></div>
+      <div class="card" style="cursor:pointer;" onclick="selectFormat('plan')"><div class="tag gold">Plan</div><p style="color:var(--ink-dim);">100-130 mots. Étapes. Dernière ligne = piège.</p></div>
+    </div>
+    <button class="btn btn-main" id="btn-format-next" onclick="state.step='pantheon';renderPantheon();" disabled>Continuer →</button>`);
+}
+window.selectFormat = function(id){ state.format=id; document.getElementById('btn-format-next').disabled=false; };
+
+function renderPantheon(){
+  render(`<div class="eyebrow">Arsenal des Maîtres</div><h1>Choisis ton illusion</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+      <button class="btn btn-ghost" onclick="filterMaitres('Tous')" style="width:auto;padding:8px 14px;font-size:0.7rem;">Tous</button>
+      ${CATEGORIES.map(c=>`<button class="btn btn-ghost" onclick="filterMaitres('${c}')" style="width:auto;padding:8px 14px;font-size:0.7rem;">${c}</button>`).join('')}
+    </div>
+    <div class="grid-2" id="maitres-grid">
+      ${MAITRES.map(m=>`<div class="maitre-card" id="maitre-${m.id}" data-cat="${m.categorie}" onclick="selectMaitre('${m.id}')"><div class="maitre-name">${m.nom}</div><div class="maitre-type">${m.categorie}</div><p style="font-size:0.7rem;color:var(--ink-dim);margin-top:6px;">${m.ton}</p></div>`).join('')}
+    </div>
+    <button class="btn btn-main" id="btn-generate" onclick="generatePost()" disabled>Générer le post →</button>`);
+}
+window.filterMaitres = function(cat){
+  document.querySelectorAll('.maitre-card').forEach(card=>{ card.classList.toggle('hidden', cat!=='Tous' && card.getAttribute('data-cat')!==cat); });
+};
+window.selectMaitre = function(id){
+  state.maitre = MAITRES.find(m=>m.id===id);
+  document.querySelectorAll('.maitre-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('maitre-'+id).classList.add('selected');
+  document.getElementById('btn-generate').disabled=false;
+};
+
+// Génération
+window.generatePost = async function(){
+  const p = state.profilData; const info = PROFILS[p.profil]; const m = state.maitre;
+  const modeDesc = state.profilMode==='peur'?info.peur:info.desir;
+  const atelierDesc = state.atelier===1?'Implanter. Pas de vente.':state.atelier===2?'Intensifier la douleur.':'Vendre.';
+  const expertise = document.getElementById('expertise-input')?.value.trim() || state.expertiseAnswers.join(' | ');
+  render(`<div class="eyebrow">Génération</div><h1>L'agent travaille…</h1><div class="card"><p style="color:var(--ink-dim);">Calibration ${esc(m.nom)} × ${esc(p.profil)} en cours…</p><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>`);
+  try{
+    const prompt = `Tu es un ghostwriter expert Moment Troc. Tu actives le Maître ${m.nom}.
+PROFIL CIBLE : ${p.profil}. Organe : ${info.organe}. Mode : ${state.profilMode} (${modeDesc}). Tension : "${p.tension}".
+BUSINESS : ${state.biz}. ATELIER : ${atelierDesc}. FORMAT : ${state.format}.
+${expertise ? `\nEXPERTISE ET VÉCU DE L'UTILISATEUR (source obligatoire pour le T1 et la suture. Utilise ses mots exacts.) : "${expertise}"` : ''}
+STRUCTURE OBLIGATOIRE : Hook → T1 (Expérience) → T2 (Rupture) → Suture (1 phrase max, viscérale) → T3 (Mise en lumière) → T4 (Permission douce, jamais "Tape X"). JAMAIS signature. JAMAIS "peace".`;
+    const text = await callGemini(prompt, false, 1400);
+    state.currentPost = text; state.step='result'; renderResult();
+  }catch(e){ app.innerHTML+=`<div class="err-box">${esc(e.message)}</div>`; }
+};
+
+function renderResult(){
+  render(`<div class="eyebrow">Post généré</div><h1>Ton missile</h1>
+    <div class="card" style="border-top-color:var(--gold);">
+      <div class="card-header"><div><span class="tag gold">${esc(state.profilData.profil)}</span><span class="tag gold">Atelier ${state.atelier}</span></div></div>
+      <div class="post-body">${esc(state.currentPost)}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(state.currentPost)},this)">Copier</button>
+        <button class="btn btn-ghost" onclick="state.step='pantheon';renderPantheon();">Nouveau Maître</button>
+        <button class="btn btn-main" id="btn-save-arsenal" onclick="saveToArsenal()">Sauvegarder dans l'Arsenal</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost" onclick="state.step='brief';renderBrief();">← Nouveau brief</button>`);
 }
 
-function stRenderCal(posts){
-  var cal=document.getElementById('st-cal');cal.innerHTML='';
-  var days=posts.map(function(p,i){return i*6+1;});
-  for(var d=1;d<=28;d++){
-    var c=document.createElement('div');c.className='cal-cell';
-    var idx=days.indexOf(d);
-    if(idx!==-1){c.classList.add('has');c.innerHTML='<span>'+d+'</span><div class="cal-pn">P'+(idx+1)+'</div>';}
-    else c.innerHTML='<span>'+d+'</span>';
-    cal.appendChild(c);
+/* ═══════════════════════════════════════ DÉCONSTRUCTION ═══════════════════════════ */
+function renderDeconstruction() {
+  render(`<div class="eyebrow">Mode Déconstruction</div><h1>L'agent dissèque</h1><p class="sub">Colle un post. L'agent révèle la mécanique cachée, les angles morts, et génère un contre-angle calibré.</p>
+    <div class="field"><textarea id="dc-post" rows="8" maxlength="2000" placeholder="Colle ici le post complet à analyser..."></textarea></div>
+    <div class="field"><textarea id="dc-contexte" rows="2" maxlength="300" placeholder="Qui a écrit ce post ? Dans quel secteur ?"></textarea></div>
+    <div class="field"><div class="flabel">Sous-angle d'analyse</div>
+      <div class="sgrid">
+        <div class="sitem on" data-dcmode="profil" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Profil</div><div class="sdesc">Diagnostic pur. Quel organe est activé.</div></div>
+        <div class="sitem" data-dcmode="marche" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Marché</div><div class="sdesc">Scan stratégique.</div></div>
+        <div class="sitem" data-dcmode="atelier" onclick="document.querySelectorAll('[data-dcmode]').forEach(e=>e.classList.remove('on')); this.classList.add('on');"><div class="sname">Angle Atelier</div><div class="sdesc">Recyclage.</div></div>
+      </div>
+    </div>
+    <button class="btn btn-main" onclick="runDeconstruction()">Lancer l'autopsie →</button>
+    <div id="dc-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Dissection en cours...</div><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>
+    <div id="dc-error" style="display:none;"></div>
+    <div id="dc-result" style="display:none;"></div>`);
+}
+
+window.runDeconstruction = async function() {
+  const post = document.getElementById('dc-post').value.trim();
+  const contexte = document.getElementById('dc-contexte').value.trim();
+  const mode = document.querySelector('[data-dcmode].on')?.getAttribute('data-dcmode') || 'profil';
+  if (!post || post.length < 30) { document.getElementById('dc-error').style.display=''; document.getElementById('dc-error').innerHTML='<div class="err-box">⚠ Le post doit faire au moins 30 caractères.</div>'; return; }
+  document.getElementById('dc-prog').style.display=''; document.getElementById('dc-error').style.display='none'; document.getElementById('dc-result').style.display='none';
+  try {
+    const raw = await callGemini(post.slice(0,1500), mode==='marche', 900);
+    const contreAngle = await callGemini(`Crée un contre-angle pour ce post : "${post.slice(0,800)}". T1-T2-Suture-T3-T4.`, false, 800);
+    document.getElementById('dc-prog').style.display='none'; document.getElementById('dc-result').style.display='';
+    document.getElementById('dc-result').innerHTML = `
+      <div class="dc-block" style="margin-top:24px;"><div class="s-eye">Rapport d'Autopsie</div><div style="font-size:11px;color:var(--ink-mid);line-height:1.9;white-space:pre-wrap;">${esc(raw)}</div></div>
+      <div class="dc-block" style="border-top-color:var(--gold);"><div class="s-eye">Contre-Angle</div><div class="post-body">${esc(contreAngle)}</div><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(contreAngle)},this)">Copier</button></div>
+      <button class="btn btn-ghost" onclick="renderDeconstruction()">← Nouvelle autopsie</button>`;
+  } catch(e) { document.getElementById('dc-prog').style.display='none'; document.getElementById('dc-error').style.display=''; document.getElementById('dc-error').innerHTML = `<div class="err-box">⚠ ${esc(e.message)}</div>`; }
+};
+
+/* ═══════════════════════════════════════ TROC KIT ═══════════════════════════ */
+function renderTrocKit() {
+  const profils = ['AUTOMATISEUR','OPTIMISEUR_VALEUR','OPTIMISEUR_PRIX','ÉLÉVATEUR','LIBÉRATEUR'];
+  render(`<div class="eyebrow">Troc Kit</div><h1>Le script qui vend</h1><p class="sub">Génère 4 messages calibrés sur le cerveau de ton prospect.</p>
+    <div class="field"><textarea id="tk-offre" rows="3" placeholder="Ce que tu vends, à quel prix...">${esc(tkState.offre)}</textarea></div>
+    <div class="field"><div class="flabel">Profil</div><div class="sgrid">${profils.map(p => `<div class="sitem ${tkState.profil === p ? 'on' : ''}" onclick="tkState.profil='${p}';renderTrocKit();"><div class="sname">${p.replace('_',' ')}</div></div>`).join('')}</div></div>
+    <div class="field"><div class="flabel">Mode</div><div class="sgrid c3"><div class="sitem ${tkState.mode==='désir'?'on':''}" onclick="tkState.mode='désir';renderTrocKit();"><div class="sname">🟢 Désir</div></div><div class="sitem ${tkState.mode==='peur'?'on':''}" onclick="tkState.mode='peur';renderTrocKit();"><div class="sname">🔴 Peur</div></div></div></div>
+    <button class="btn btn-main" onclick="runTrocKit()">Générer les 4 scripts →</button>
+    <div id="tk-prog" style="display:none;" class="prog-wrap"><div class="prog-title">Calibration...</div></div>
+    <div id="tk-error" style="display:none;"></div><div id="tk-result" style="display:none;"></div>`);
+}
+
+window.runTrocKit = async function() {
+  const offre = document.getElementById('tk-offre').value.trim();
+  if (!offre) { document.getElementById('tk-error').style.display=''; document.getElementById('tk-error').innerHTML='<div class="err-box">⚠ Décris ton offre.</div>'; return; }
+  tkState.offre = offre;
+  document.getElementById('tk-prog').style.display=''; document.getElementById('tk-error').style.display='none'; document.getElementById('tk-result').style.display='none';
+  const urg = { AUTOMATISEUR:{style:'organisationnelle',regle:'Urgence de planning.'}, OPTIMISEUR_VALEUR:{style:'mathématique',regle:'Urgence de rentabilité.'}, OPTIMISEUR_PRIX:{style:'transparente',regle:'Le prix est juste.'}, ÉLÉVATEUR:{style:'sociale',regle:'La porte se ferme.'}, LIBÉRATEUR:{style:'inexistante',regle:'Aucune deadline.'}, PEUR:{style:'rassurante',regle:'Aucune pression.'} };
+  const dosage = urg[tkState.mode==='peur'?'PEUR':tkState.profil] || urg.AUTOMATISEUR;
+  try {
+    const raw = await callGemini(`Offre : "${offre}". Profil : ${tkState.profil}. Mode : ${tkState.mode}. Urgence : ${dosage.style}. Génère 4 scripts (séparés par "---SEP---") : Approche, Valeur, Relance, Objection. Mise en Lumière + Permission + CTA doux. JAMAIS "Tape X".`, false, 1200);
+    const scripts = raw.split('---SEP---').map(s=>s.trim()).filter(Boolean);
+    tkState.scripts = scripts;
+    document.getElementById('tk-prog').style.display='none'; document.getElementById('tk-result').style.display='';
+    document.getElementById('tk-result').innerHTML = `<div class="ok-box">⚡ ${dosage.style} — ${dosage.regle}</div>${scripts.map(s => `<div class="tk-msg"><div class="tk-body">${esc(s)}</div><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(s)},this)">Copier</button></div>`).join('')}<button class="btn btn-ghost" onclick="renderTrocKit()">← Modifier</button>`;
+  } catch(e) { document.getElementById('tk-prog').style.display='none'; document.getElementById('tk-error').style.display=''; document.getElementById('tk-error').innerHTML=`<div class="err-box">⚠ ${esc(e.message)}</div>`; }
+};
+
+/* ═══════════════════════════════════════ ARSENAL FRACTAL ═══════════════════════════ */
+window.saveToArsenal = function() {
+  if (!state.currentPost) return;
+  let nextDay = null;
+  for (let d = 2; d <= 30; d += 2) { if (!state.arsenalPosts[d]) { nextDay = d; break; } }
+  if (!nextDay) { alert('Mois plein.'); return; }
+  const postData = { text:state.currentPost, profil:state.profilData?.profil||'Inconnu', atelier:state.atelier||1, maitre:state.maitre?.nom||'Inconnu', savedAt:Date.now(), jour:nextDay };
+  state.arsenalPosts[nextDay] = postData;
+  localStorage.setItem('mt_arsenal_posts', JSON.stringify(state.arsenalPosts));
+  const btn = document.getElementById('btn-save-arsenal'); if(btn){ btn.textContent='✓ Sauvegardé (Jour '+nextDay+')'; btn.classList.add('saved'); setTimeout(()=>{ btn.textContent='Sauvegarder dans l\'Arsenal'; btn.classList.remove('saved'); },2000); }
+};
+
+function renderArsenalFractal(){
+  let html = '<div class="eyebrow">Arsenal</div><h1>Ton plan<br><em>de tir.</em></h1><div class="cal-grid">';
+  for (let d = 1; d <= 30; d++) {
+    const isEven = d % 2 === 0; const post = state.arsenalPosts[d]; const profil = post ? post.profil?.substring(0, 3).toUpperCase() : '';
+    if (isEven) {
+      if (post) html += `<div class="cal-cell has" data-profil="${profil}" onclick="viewArsenalPost(${d})"><span class="day-num">J${d}</span><span class="day-ep">EP${Math.floor(d/2)}</span></div>`;
+      else html += `<div class="cal-cell placeholder" onclick="viewArsenalPost(${d})"><span class="day-num">+</span></div>`;
+    } else html += `<div class="cal-cell rest"><span class="day-num">J${d}</span></div>`;
   }
+  html += '</div><div id="arsenal-detail" class="day-detail hidden"></div><button class="btn btn-ghost" onclick="switchMode('studio')">← Retour au Studio</button>';
+  render(html);
 }
 
-window.stCp=function(btn,i){cp(S._stPosts[i].content,btn);};
-window.studioBack=function(s){if(s===1){hide('st-step2');show('st-step1');}else{hide('st-step3');show('st-step2');}};
-window.studioNouvelle=function(){S.studio.etape=null;document.querySelectorAll('#st-etapes .sel-item').forEach(function(b){b.classList.remove('on');});document.getElementById('st-btn-gen').disabled=true;hide('st-step3');show('st-step2');};
-
-// ═══════════════════════════════
-// ═══ TROC KIT ══════════════════
-// ═══════════════════════════════
-window.selCanal=function(btn,c){document.querySelectorAll('#tk-step1 .sel-item').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');S.trockit.canal=c;};
-
-window.trocKitGen=async function(){
-  var prospect=document.getElementById('tk-prospect').value.trim();
-  var produit=document.getElementById('tk-produit').value.trim();
-  var objection=document.getElementById('tk-objection').value.trim();
-  if(!prospect||!produit)return;
-  if(!S.trockit.canal){alert('Choisis un canal');return;}
-
-  hide('tk-step1');show('tk-step2');
-  show('tk-load');hide('tk-result');hide('tk-err');hide('tk-actions');hide('tk-eval');
-
-  var t=statTimer('tk-sub',['Détection archétype...','Analyse psychologique...','Construction du script...','Anticipation objections...','Auto-évaluation...']);
-
-  var al=Object.keys(ARCHETYPES).map(function(k){return k+': '+ARCHETYPES[k].trigger;}).join(' | ');
-
-  var main='Tu es expert Moment Troc en psychologie d\'achat.\n\nNote: Le Protecteur est la version peur de tous les autres archétypes.\nArchétypes: '+al+'\n\nPROSPECT: '+prospect+'\nPRODUIT: '+produit+'\nCANAL: '+S.trockit.canal+'\n'+(objection?'OBJECTION: '+objection+'\n':'')+'\nGénère un script de vente complet calibré sur cet archétype.\n\nFORMAT:\nARCHETYPE_DETECTE: [archétype + mode désir/peur + justification courte]\n\nPREMIER_MESSAGE:\n[message naturel calibré pour ce canal — jamais commercial]\n\nRELANCE:\n[message 24h sans réponse]\n\nGESTION_OBJECTION:\n[réponse qui utilise la psychologie du profil — pas d\'argumentation]\n\nCLOSING:\n[phrase exacte pour conclure — courte, sans pression]\n\nERREURS_A_EVITER:\n[3 erreurs qui tuent la vente avec ce profil]\n\nRÈGLES: Registre "tu", naturel, jamais de marketing visible, phrases courtes.';
-
-  var evalP='Tu es évaluateur Moment Troc.\nÉvalue ce script:\n1. Le premier message est-il vraiment naturel pour ce canal ?\n2. La gestion objection utilise-t-elle la psychologie du profil ou c\'est générique ?\n3. Y a-t-il des angles morts — des approches plus efficaces ?\n4. Le closing crée-t-il une tension sans pression ?\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[version corrigée même format]';
-
-  try{
-    var res=await callWithEval(main,evalP,2000);
-    clearInterval(t);
-    hide('tk-load');show('tk-result');
-    if(res.improved)show('tk-eval');
-    tkRender(res.content);show('tk-actions');
-  }catch(e){clearInterval(t);hide('tk-load');err('tk-err',e.message);show('tk-err');show('tk-actions');}
+window.viewArsenalPost = function(day) {
+  const post = state.arsenalPosts[day]; const el = document.getElementById('arsenal-detail');
+  if (!post) { el.innerHTML = `<div class="s-eye">Jour ${day} — Vide</div><button class="btn btn-ghost" onclick="switchMode('studio')">→ Aller au Studio</button>`; el.classList.remove('hidden'); return; }
+  el.innerHTML = `<div class="s-eye">Jour ${day} — ${post.profil}</div><div class="post-preview">${esc(post.text)}</div><div class="day-actions"><button class="btn btn-ghost" onclick="copyTxt(${JSON.stringify(post.text)},this)">Copier</button><button class="btn btn-ghost" onclick="state.biz=state.arsenalPosts[${day}].text;switchMode('studio');renderBrief();">Recycler</button><button class="btn btn-ghost" onclick="dcState.post=state.arsenalPosts[${day}].text;switchMode('deconstruction');renderDeconstruction();">Déconstruire</button><button class="btn btn-ghost" onclick="delete state.arsenalPosts[${day}];localStorage.setItem('mt_arsenal_posts',JSON.stringify(state.arsenalPosts));renderArsenalFractal();">Supprimer</button></div>`;
+  el.classList.remove('hidden');
 };
 
-function tkRender(raw){
-  var am=raw.match(/ARCHETYPE_DETECTE:\s*(.+)/i);
-  if(am){var t=document.getElementById('tk-arch');t.innerHTML='<span class="profil-tag">'+esc(am[1].trim())+'</span>';}
-  var secs=[{k:'PREMIER_MESSAGE',l:'Premier Message'},{k:'RELANCE',l:'Relance (24h)'},{k:'GESTION_OBJECTION',l:'Gestion Objection'},{k:'CLOSING',l:'Closing'},{k:'ERREURS_A_EVITER',l:'Erreurs à Éviter'}];
-  var c=document.getElementById('tk-scripts');c.innerHTML='';S._tkTexts={};
-  secs.forEach(function(s,i){
-    var rx=new RegExp(s.k+':\\s*([\\s\\S]+?)(?=(?:'+secs.map(function(x){return x.k;}).join('|')+'):|$)','i');
-    var m=raw.match(rx);
-    if(m){
-      S._tkTexts[i]=m[1].trim();
-      var d=document.createElement('div');d.className='script-block';
-      d.innerHTML='<div class="script-label">'+s.l+'</div><div class="script-body">'+esc(m[1].trim())+'<button class="script-copy" onclick="tkCp(this,'+i+')">Copier</button></div>';
-      c.appendChild(d);
-    }
-  });
-}
-window.tkCp=function(btn,i){cp(S._tkTexts[i],btn);};
-window.trocKitBack=function(){hide('tk-step2');show('tk-step1');};
-
-// ═══════════════════════════════
-// ═══ CONTENT SPRINT ════════════
-// ═══════════════════════════════
-window.selSprint=function(btn,o){document.querySelectorAll('#sp-step1 .sel-item').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');S.sprint.objectif=o;};
-
-window.sprintGen=async function(){
-  var biz=document.getElementById('sp-biz').value.trim();
-  var arch=document.getElementById('sp-arch').value.trim();
-  if(!biz)return;if(!S.sprint.objectif){alert('Choisis un objectif');return;}
-
-  hide('sp-step1');show('sp-step2');
-  show('sp-load');hide('sp-result');hide('sp-err');hide('sp-actions');hide('sp-eval');
-
-  var t=statTimer('sp-sub',['Planification du mois...','Semaine 1 — Notoriété...','Semaine 2 — Valeur...','Semaine 3 — Tension...','Semaine 4 — Closing...','Auto-évaluation...'],1800);
-
-  var main='Tu es le Studio Moment Troc — agent Content Sprint.\n\n'+WIL_AIME+'\n\n'+DIVIN+'\n\n'+MIROIR+'\n\nBUSINESS: '+biz+'\nOBJECTIF: '+S.sprint.objectif+'\n'+(arch?'ARCHÉTYPE: '+arch+'\n':'')+'\nGénère un plan éditorial de 30 jours avec 15 posts complets (1 tous les 2 jours).\n\nPROGRESSION:\n- Semaine 1 (J1-J8): Notoriété + accroche — posts Curiosité/Suspense dominants\n- Semaine 2 (J9-J15): Valeur + preuve — posts Valeur Brute dominants\n- Semaine 3 (J16-J22): Tension + désir — posts Émotion/Miroir dominants\n- Semaine 4 (J23-J30): Closing + réassurance — mix des 3 intentions\n\nMix d\'intentions: respecte les 3 intentions (Valeur Brute / Émotion Miroir / Curiosité Suspense). Ne jamais mélanger dans un même post.\n\nFORMAT pour chaque post:\nPOST [n] — JOUR [j]\nINTENTION: [intention]\nTYPE: [Concept/Histoire/Trigger/Preuve]\nARCHETYPE: [archétype]\n---\n[contenu complet]\n===\n\nRÈGLES: Phrases courtes, miroir brutal, jamais de marketing visible.';
-
-  var evalP='Évalue ce plan 30 jours:\n1. La progression semaine par semaine est-elle cohérente ?\n2. Y a-t-il un bon mix des 3 intentions ?\n3. Les posts construisent-ils vraiment vers la vente ?\n4. Angles morts — semaines trop faibles ?\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[plan corrigé même format]';
-
-  try{
-    var res=await callWithEval(main,evalP,4000);
-    clearInterval(t);
-    var posts=spParse(res.content);
-    if(!posts.length)throw new Error('Aucun post généré.');
-    S._spPosts=posts;
-    hide('sp-load');show('sp-result');
-    if(res.improved)show('sp-eval');
-    spRender(posts);spCal(posts);show('sp-actions');
-  }catch(e){clearInterval(t);hide('sp-load');err('sp-err',e.message);show('sp-err');show('sp-actions');}
-};
-
-function spParse(raw){
-  var posts=[];
-  var blocks=raw.split(/POST\s*\d+/i).filter(function(b){return b.trim();});
-  blocks.forEach(function(block,i){
-    var jm=block.match(/JOUR\s*(\d+)/i);
-    var im=block.match(/INTENTION:\s*(.+)/i);
-    var tm=block.match(/TYPE:\s*(.+)/i);
-    var am=block.match(/ARCHETYPE:\s*(.+)/i);
-    var cm=block.match(/---\s*([\s\S]+?)(?:===|$)/);
-    posts.push({jour:jm?parseInt(jm[1]):i*2+1,intention:im?im[1].trim():'',type:tm?tm[1].trim():'',archetype:am?am[1].trim():'',content:cm?cm[1].trim():block.replace(/JOUR.*\n|INTENTION:.*\n|TYPE:.*\n|ARCHETYPE:.*\n|---/g,'').trim()});
-  });
-  return posts;
-}
-
-function spRender(posts){
-  var list=document.getElementById('sp-posts');list.innerHTML='';
-  posts.forEach(function(p,i){
-    var d=document.createElement('div');d.className='post-item';d.style.animationDelay=(i*0.05)+'s';
-    d.innerHTML='<div class="post-header"><div class="post-tags"><span class="ptag ptag-rust">J'+p.jour+'</span><span class="ptag">'+esc(p.intention)+'</span><span class="ptag">'+esc(p.archetype)+'</span></div></div><div class="post-body">'+esc(p.content)+'</div><div class="post-footer"><span class="post-num">Post '+(i+1)+' / 15</span><button class="copy-btn" onclick="spCp(this,'+i+')">Copier</button></div>';
-    list.appendChild(d);
-  });
-}
-
-function spCal(posts){
-  var cal=document.getElementById('sp-cal');cal.innerHTML='';
-  var days=posts.map(function(p){return p.jour;});
-  for(var d=1;d<=30;d++){
-    var c=document.createElement('div');c.className='cal-cell';
-    var idx=days.indexOf(d);
-    if(idx!==-1){c.classList.add('has');c.innerHTML='<span>'+d+'</span><div class="cal-pn">P'+(idx+1)+'</div>';}
-    else c.innerHTML='<span>'+d+'</span>';
-    cal.appendChild(c);
+// ─── INIT ───
+window.onload = function(){
+  // 1. Force l'affichage du conteneur principal
+  const app = document.getElementById('app');
+  if (!app) {
+    const newApp = document.createElement('div');
+    newApp.id = 'app';
+    document.body.prepend(newApp);
   }
-}
-window.spCp=function(btn,i){cp(S._spPosts[i].content,btn);};
-window.sprintBack=function(){hide('sp-step2');show('sp-step1');};
 
-// ═══════════════════════════════
-// ═══ DIAGNOSTIC ════════════════
-// ═══════════════════════════════
-window.diagGen=async function(){
-  var activite=document.getElementById('d-activite').value.trim();
-  var resultats=document.getElementById('d-resultats').value.trim();
-  var concurrents=document.getElementById('d-concurrents').value.trim();
-  var force=document.getElementById('d-force').value.trim();
-  var frustration=document.getElementById('d-frustration').value.trim();
-  if(!activite||!resultats||!concurrents)return;
+  // 2. Initialisation protégée
+  try {
+    const mk = localStorage.getItem('mt_moment_key');
+    const gk = localStorage.getItem('mt_gemini_key');
+    const validKeys = ['MKB2000-2022A', 'MT-2024A','MT-2024B','MT-2024C','MT-2024D','MT-2024E','MT-2024F','MT-2024G','MT-2024H','MT-2024I','MT-2024J','MT-2024K','MT-2024L','MT-2024M','MT-2024N','MT-2024O','MT-2024P','MT-2024Q','MT-2024R','MT-2024S','MT-2024T'];
+    if (!mk || !validKeys.includes(mk)) {
+      state.step = 'unlock';
+    } else if (!gk || gk.length < 30) {
+      state.step = 'gemini';
+    } else {
+      state.step = 'brief';
+    }
+  } catch (e) {
+    console.error('Init error:', e);
+    state.step = 'unlock';
+  }
 
-  hide('d-step1');show('d-step2');
-  show('d-load');hide('d-result');hide('d-err');hide('d-actions');hide('d-eval');
+  // 3. Rendu forcé du premier écran
+  renderStudioMode();
 
-  var t=statTimer('d-sub',['Analyse du positionnement...','Détection angles morts...','Analyse concurrentielle...','Forge de l\'avantage...','Auto-évaluation...']);
-
-  var al=Object.keys(ARCHETYPES).map(function(k){return k+': '+ARCHETYPES[k].trigger;}).join(' | ');
-
-  var main='Tu es consultant stratégique expert Moment Troc.\n\nPhilosophie: "Vendre c\'est pas convaincre. C\'est reconnaître."\nArchétypes: '+al+'\nNote: Le Protecteur est la version peur de tous les autres.\n\nACTIVITÉ: '+activite+'\nRÉSULTATS: '+resultats+'\nCONCURRENTS: '+concurrents+'\n'+(force?'FORCE PERÇUE: '+force+'\n':'')+(frustration?'FRUSTRATION: '+frustration+'\n':'')+'\nGénère un diagnostic stratégique complet et précis — pas générique.\n\nFORMAT:\nARCHETYPE_PRINCIPAL: [archétype dominant + mode désir/peur + justification]\n\nPOSITIONNEMENT_ACTUEL: [comment il se positionne vraiment vs comment il pense se positionner — sois brutal]\n\nANGLES_MORTS: [3-5 angles morts SPÉCIFIQUES à sa situation — pas génériques]\n\nAVANTAGE_COMPARATIF: [son vrai avantage unique révélé par l\'analyse — pas ce qu\'il croit]\n\nSTRATEGIE_IMMEDIATE: [3 actions concrètes et spécifiques à faire cette semaine]\n\nMESSAGE_CLE: [la phrase courte et forte qui résume son positionnement réel]';
-
-  var evalP='Tu es évaluateur stratégique.\nÉvalue ce diagnostic:\n1. Les angles morts sont-ils spécifiques ou génériques ?\n2. L\'avantage comparatif est-il vraiment différenciant ?\n3. Les actions sont-elles réellement faisables cette semaine ?\n4. Y a-t-il des contradictions ?\nSi satisfaisant: VALIDE\nSinon: AMÉLIORER\n[diagnostic corrigé même format]';
-
-  try{
-    var res=await callWithEval(main,evalP,2500);
-    clearInterval(t);
-    hide('d-load');show('d-result');
-    if(res.improved)show('d-eval');
-    dRender(res.content);show('d-actions');
-  }catch(e){clearInterval(t);hide('d-load');err('d-err',e.message);show('d-err');show('d-actions');}
+  // 4. Sécurité : si après 600ms l'écran est vide, on réessaye
+  setTimeout(() => {
+    if (!document.getElementById('app')?.innerHTML) {
+      renderStudioMode();
+    }
+  }, 600);
 };
-
-function dRender(raw){
-  var secs=[
-    {k:'ARCHETYPE_PRINCIPAL',l:'Archétype Principal',rust:true},
-    {k:'POSITIONNEMENT_ACTUEL',l:'Positionnement Actuel'},
-    {k:'ANGLES_MORTS',l:'Angles Morts',danger:true},
-    {k:'AVANTAGE_COMPARATIF',l:'Avantage Comparatif',rust:true},
-    {k:'STRATEGIE_IMMEDIATE',l:'Stratégie Immédiate'},
-    {k:'MESSAGE_CLE',l:'Message Clé',rust:true}
-  ];
-  var c=document.getElementById('d-sections');c.innerHTML='';
-  secs.forEach(function(s,i){
-    var rx=new RegExp(s.k+':\\s*([\\s\\S]+?)(?=(?:'+secs.map(function(x){return x.k;}).join('|')+'):|$)','i');
-    var m=raw.match(rx);
-    if(m){
-      var text=m[1].trim();
-      var d=document.createElement('div');d.className='diag-block';
-      var color=s.rust?'color:var(--rust)':'';
-      if(s.danger){
-        d.innerHTML='<div class="diag-title" style="'+color+'">'+s.l+'</div><div class="angle-bloc"><div class="angle-label">Zones non vues</div><div class="angle-body">'+esc(text)+'</div></div>';
-      } else {
-        d.innerHTML='<div class="diag-title" style="'+color+'">'+s.l+'</div><div class="diag-body">'+esc(text)+'</div>';
-      }
-      c.appendChild(d);
-      if(i<secs.length-1){var sep=document.createElement('div');sep.className='section-break';sep.innerHTML='<span></span>';c.appendChild(sep);}
-    }
-  });
-}
-window.diagBack=function(){hide('d-step2');show('d-step1');};
-
-// ═══════════════════════════════
-// INIT
-// ═══════════════════════════════
-window.addEventListener('DOMContentLoaded',function(){
-  var saved=localStorage.getItem('mt_k');
-  setTimeout(function(){
-    document.getElementById('loader').style.display='none';
-    if(!saved||(saved!==MASTER&&KEYS.indexOf(saved)===-1)){
-      document.getElementById('keygate').style.display='flex';
-    }
-  },1800);
-});
-
-})();
 </script>
 </body>
 </html>
